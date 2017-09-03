@@ -1,0 +1,770 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Redis," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="前面章节已经涉及过基本的Redis事物，知晓了Redis的事物和传统的关系型数据库的事物并不相同。Redis虽然有简单的方法可以处理一连串相互一致的读操作和写操作，但是没有办法根据读取到的数据为依据来进行相关操作，这种无法以一致性的形式读取数据的行为将导致某一类型的问题变得难以解决。 模拟场景演示Redis事物下面以一个商品买卖市场为场景，来演示Redis事物的使用，在该场景下，人们可以在市场里自">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis学习笔记十【Redis事物】">
+<meta property="og:url" content="http://yoursite.com/2016/12/08/Redis学习笔记十【Redis事物】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="前面章节已经涉及过基本的Redis事物，知晓了Redis的事物和传统的关系型数据库的事物并不相同。Redis虽然有简单的方法可以处理一连串相互一致的读操作和写操作，但是没有办法根据读取到的数据为依据来进行相关操作，这种无法以一致性的形式读取数据的行为将导致某一类型的问题变得难以解决。 模拟场景演示Redis事物下面以一个商品买卖市场为场景，来演示Redis事物的使用，在该场景下，人们可以在市场里自">
+<meta property="og:updated_time" content="2016-12-09T01:36:22.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis学习笔记十【Redis事物】">
+<meta name="twitter:description" content="前面章节已经涉及过基本的Redis事物，知晓了Redis的事物和传统的关系型数据库的事物并不相同。Redis虽然有简单的方法可以处理一连串相互一致的读操作和写操作，但是没有办法根据读取到的数据为依据来进行相关操作，这种无法以一致性的形式读取数据的行为将导致某一类型的问题变得难以解决。 模拟场景演示Redis事物下面以一个商品买卖市场为场景，来演示Redis事物的使用，在该场景下，人们可以在市场里自">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/08/Redis学习笔记十【Redis事物】/"/>
+
+
+
+
+
+  <title> Redis学习笔记十【Redis事物】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/08/Redis学习笔记十【Redis事物】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Redis学习笔记十【Redis事物】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-08T19:24:54+08:00">
+                2016-12-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前面章节已经涉及过基本的Redis事物，知晓了Redis的事物和传统的关系型数据库的事物并不相同。Redis虽然有简单的方法可以处理一连串相互一致的读操作和写操作，但是没有办法根据读取到的数据为依据来进行相关操作，这种无法以一致性的形式读取数据的行为将导致某一类型的问题变得难以解决。</p>
+<h3 id="模拟场景演示Redis事物"><a href="#模拟场景演示Redis事物" class="headerlink" title="模拟场景演示Redis事物"></a>模拟场景演示Redis事物</h3><p>下面以一个商品买卖市场为场景，来演示Redis事物的使用，在该场景下，人们可以在市场里自由销售和购买商品。</p>
+<a id="more"></a>
+<h4 id="定义用户信息和用户包裹"><a href="#定义用户信息和用户包裹" class="headerlink" title="定义用户信息和用户包裹"></a>定义用户信息和用户包裹</h4><p>用户信息存储在一个散列中，散列的各个键值分别记录了用户的姓名、拥有的钱数等属性：</p>
+<ul>
+<li>key<ul>
+<li>user:××××××</li>
+</ul>
+</li>
+<li>hash value<ul>
+<li>subKey : name    | subValue : ××××××</li>
+<li>subKey : funds   | subValue : ××××××</li>
+</ul>
+</li>
+</ul>
+<p>用户包裹使用一个集合来表示，它记录了包裹里面每件商品的唯一编号：</p>
+<ul>
+<li>key<ul>
+<li>inventory:××××××</li>
+</ul>
+</li>
+<li>set value<ul>
+<li>××××××</li>
+<li>××××××</li>
+</ul>
+</li>
+</ul>
+<p>商品买卖市场的需求非常简单：一个用户可以将自己的商品按照给定的价格放到市场上进行销售，当另一个用户购买这个商品时，卖家就会收到钱。<br>为了将被销售的商品的全部信息都存储到市场里面，我会将商品的ID和卖家的ID拼接起来，并将拼接的结果用作成员存储到市场有序集合中，而商品的售价则用作分值，这样市场的数据结构也出来了：</p>
+<ul>
+<li>key<ul>
+<li>market:</li>
+</ul>
+</li>
+<li>zset value<ul>
+<li>member : ItemA_userA | score : 35</li>
+<li>member : ItemB_userB | score : 48</li>
+</ul>
+</li>
+</ul>
+<h4 id="将商品放到市场上销售"><a href="#将商品放到市场上销售" class="headerlink" title="将商品放到市场上销售"></a>将商品放到市场上销售</h4><p>在将一件商品放到市场上进行销售的时候，程序需要将被销售的商品添加到记录市场正在销售商品的有序集合中，并且在添加操作执行的过程中，监视卖家的包裹以确保被销售的商品缺失存在于卖家的包裹当中。代码示例位于<a href="https://github.com/bboyjing/redis-sample" target="_blank" rel="external">redis-sample项目</a>的market模块，下面列举出核心功能：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">listItem</span><span class="params">(String itemId, String sellerId, <span class="keyword">long</span> price)</span> </span>&#123;</div><div class="line">    String inventory = <span class="string">"inventory:"</span> + sellerId;</div><div class="line">    String item = itemId + <span class="string">'_'</span> + sellerId;</div><div class="line">    <span class="comment">//事物</span></div><div class="line">    SessionCallback&lt;List&lt;Object&gt;&gt; sessionCallback = <span class="keyword">new</span> SessionCallback&lt;List&lt;Object&gt;&gt;() &#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> List&lt;Object&gt; <span class="title">execute</span><span class="params">(RedisOperations operations)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</div><div class="line">            <span class="comment">/**</span></div><div class="line">             * WATCH 命令用于在事务开始之前监视任意数量的键:</div><div class="line">             * 当调用 EXEC 命令执行事务时， 如果任意一个被监视的键已经被其他客户端修改了</div><div class="line">             * 那么整个事务不再执行， 直接返回失败</div><div class="line">             * 此处用来监视包裹是否发生变化</div><div class="line">             */</div><div class="line">            operations.watch(inventory);</div><div class="line">            <span class="keyword">if</span>(!operations.opsForSet().isMember(inventory, itemId))&#123;</div><div class="line">                operations.unwatch();</div><div class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">            &#125;</div><div class="line">            operations.multi();</div><div class="line">            operations.opsForZSet().add(<span class="string">"market:"</span>, item, price);</div><div class="line">            operations.opsForSet().remove(inventory, itemId);</div><div class="line">            <span class="keyword">return</span> operations.exec();</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">    <span class="keyword">return</span> redisTemplate.execute(sessionCallback) == <span class="keyword">null</span> ? <span class="keyword">false</span> : <span class="keyword">true</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>构造测试数据，假设有一名叫Frank的卖家有100元，包裹里有ItemL、ItemM、ItemN，他想要以97元的价格销售ItemM：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; hmset user:001 name Frank funds 10000</div><div class="line">OK</div><div class="line">127.0.0.1:6379&gt; sadd inventory:001 ItemL ItemM ItemN</div><div class="line">(integer) 3</div></pre></td></tr></table></figure></p>
+<p>跑完测试用例后检查下Redis中的数据：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">//多了market:</div><div class="line">127.0.0.1:6379&gt; keys *</div><div class="line">1) &quot;market:&quot;</div><div class="line">2) &quot;user:001&quot;</div><div class="line">3) &quot;inventory:001&quot;</div><div class="line">//ItemM被从包裹中成功移除</div><div class="line">127.0.0.1:6379&gt; SMEMBERS inventory:001</div><div class="line">1) &quot;ItemL&quot;</div><div class="line">2) &quot;ItemN&quot;</div></pre></td></tr></table></figure></p>
+<p>另外，试了下断点在watch之后，手动随便删除inventory:001的一个member，测试结果根预想的一样会失败。</p>
+<h4 id="购买商品"><a href="#购买商品" class="headerlink" title="购买商品"></a>购买商品</h4><p>购买商品的具体流程：首先使用watch对市场以及卖家的个人信息进行监视，然后获取买家拥有的钱数以及商品的售价，并检查买家是否有足够的钱来购买该商品，如果买家买有足够的钱，那么程序会取消事物；相反地，如果买家的钱足够，那么首先会将买家支付的钱转移给卖家，然后将售出的商品移动至买家的包裹，并将该商品从市场中移除。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">purchaseItem</span><span class="params">(String buyerId, String itemId, String sellerId)</span> </span>&#123;</div><div class="line">    String buyer = <span class="string">"user:"</span> + buyerId;</div><div class="line">    String seller = <span class="string">"user:"</span> + sellerId;</div><div class="line">    String item = itemId + <span class="string">'_'</span> + sellerId;</div><div class="line">    String inventory = <span class="string">"inventory:"</span> + buyerId;</div><div class="line">    <span class="comment">//事物</span></div><div class="line">    SessionCallback&lt;List&lt;Object&gt;&gt; sessionCallback = <span class="keyword">new</span> SessionCallback&lt;List&lt;Object&gt;&gt;() &#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> List&lt;Object&gt; <span class="title">execute</span><span class="params">(RedisOperations operations)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</div><div class="line">            <span class="comment">//监视市场和卖家信息</span></div><div class="line">            operations.watch(Lists.newArrayList(<span class="string">"market:"</span>, buyer));</div><div class="line">            <span class="comment">//获取商品售价</span></div><div class="line">            <span class="keyword">long</span> sellPrice = operations.opsForZSet().score(<span class="string">"market:"</span>, item).longValue();</div><div class="line">            <span class="comment">//获取买家钱数</span></div><div class="line">            <span class="keyword">long</span> funds =  Long.valueOf((String) operations.opsForHash().get(buyer, <span class="string">"funds"</span>));</div><div class="line">            <span class="keyword">if</span> (sellPrice &gt; funds)&#123;</div><div class="line">                operations.unwatch();</div><div class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">            &#125;</div><div class="line">            operations.multi();</div><div class="line">            operations.opsForHash().increment(seller, <span class="string">"funds"</span>, sellPrice);</div><div class="line">            operations.opsForHash().increment(buyer, <span class="string">"funds"</span>, -sellPrice);</div><div class="line">            operations.opsForSet().add(inventory, itemId);</div><div class="line">            operations.opsForZSet().remove(<span class="string">"market:"</span>, item);</div><div class="line">            <span class="keyword">return</span> operations.exec();</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">    <span class="keyword">return</span> redisTemplate.execute(sessionCallback) == <span class="keyword">null</span> ? <span class="keyword">false</span> : <span class="keyword">true</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>构造测试数据，鸡舍有一名叫Bil的卖家正好有97元，想要购买Frank出售的ItemM：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; hmset user:002 name Bill funds 9700</div><div class="line">OK</div></pre></td></tr></table></figure></p>
+<p>跑完测试用例后检查下Redis中的数据：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; hget user:001 funds</div><div class="line">"19700"</div><div class="line">127.0.0.1:6379&gt; hget user:002 funds</div><div class="line">"0"</div><div class="line">127.0.0.1:6379&gt; smembers inventory:002</div><div class="line">1) "ItemM"</div><div class="line">127.0.0.1:6379&gt; zrange market: 0 -1</div><div class="line">(empty list or set)</div></pre></td></tr></table></figure></p>
+<p>综上所述，Redis并没有在watch的时候锁住数据，而是在数据已经被其它客户端抢先修改了的情况下，通知执行了watch命令的客户端，这种乐观锁的实现方式尽可能地减少了客户端的等待时间。</p>
+<h3 id="非事物型流水线"><a href="#非事物型流水线" class="headerlink" title="非事物型流水线"></a>非事物型流水线</h3><p>在需要执行大量命令的情况下，即使命令实际上并不需要放在事物里面执行，但是为了通过一次发送所有的命令来减少通信次数，我们也可以将命令包裹在MULTI和EXEC里面执行。但是，MULTI和EXEC并不是免费的，它们会消耗资源，并且可能会导致其他重要的命令被延迟执行。此时，我们可以选择使用pipeline来一次性提交多个不同的命令。下面改写前面基本的Redis事物中的例子来演示下如何使用pipeline：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">incrByPipeline</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException</span>&#123;</div><div class="line">    <span class="keyword">final</span> <span class="keyword">byte</span>[] rawKey = stringRedisTemplate.getStringSerializer().serialize(<span class="string">"trans:"</span>);</div><div class="line">    RedisCallback&lt;Object&gt; pipelineCallback = redisConnection -&gt; &#123;</div><div class="line">        redisConnection.incr(rawKey);</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            Thread.sleep(<span class="number">100</span>);</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        redisConnection.decr(rawKey);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    &#125;;</div><div class="line">    System.out.println(stringRedisTemplate.executePipelined(pipelineCallback).get(<span class="number">0</span>));</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>测试下来输出三个1，可以看出使用pipeline依然可以有效地防止数据错误发生，因为Redis会执行完一个管道内的所有命令再去处理下一个管道。</p>
+<h3 id="性能相关事项"><a href="#性能相关事项" class="headerlink" title="性能相关事项"></a>性能相关事项</h3><p>上面我们知道了如何在不适用事物的情况下，通过使用pipeline来提升Redi的性能，这一部分我们再来看看还有没有其他可以提升Redis性能的常规方法。<br>Redis提供了一个性能测试程序redis-benchmark来展示Redis在自己服务器上的各种性能特征：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">redis-3.2.4 src/redis-benchmark -c 1 -q</div><div class="line">PING_INLINE: 67980.97 requests per second</div><div class="line">PING_BULK: 69930.07 requests per second</div><div class="line">SET: 66489.37 requests per second</div><div class="line">GET: 69444.45 requests per second</div><div class="line">INCR: 68352.70 requests per second</div><div class="line">LPUSH: 65876.16 requests per second</div><div class="line">RPUSH: 65876.16 requests per second</div><div class="line">LPOP: 66533.60 requests per second</div><div class="line">RPOP: 67294.75 requests per second</div><div class="line">SADD: 68823.12 requests per second</div><div class="line">SPOP: 68027.21 requests per second</div><div class="line">LPUSH (needed to benchmark LRANGE): 65703.02 requests per second</div><div class="line">LRANGE_100 (first 100 elements): 32530.91 requests per second</div><div class="line">LRANGE_300 (first 300 elements): 14549.69 requests per second</div><div class="line">LRANGE_500 (first 450 elements): 10447.14 requests per second</div><div class="line">LRANGE_600 (first 600 elements): 8185.99 requests per second</div><div class="line">MSET (10 keys): 56657.22 requests per second</div></pre></td></tr></table></figure></p>
+<p>上面时本机使用一个Redis客户端的性能测试结果，这些数据可以参考下，应用程序的实际性能肯定达不到基准测试的数据，如果和基准数据偏差比较大，下面列举一些可能的原因：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">性能或者错误</th>
+<th style="text-align:center">可能的原因</th>
+<th>解决方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">单个客户端性能达到redis-benchmark的50%~60%</td>
+<td style="text-align:center">这是不使用pipeline时的预期性能</td>
+<td>无</td>
+</tr>
+<tr>
+<td style="text-align:left">单个客户端性能达到redis-benchmark的25%~30%</td>
+<td style="text-align:center">对于每个命令或者每组命令都创建新的连接</td>
+<td>使用连接池，重用已有的Redis连接</td>
+</tr>
+<tr>
+<td style="text-align:left">客户端返回错误：”Cannot assign request address”</td>
+<td style="text-align:center">对于每个命令或者每组命令都创建新的连接</td>
+<td>使用连接池，重用已有的Redis连接</td>
+</tr>
+</tbody>
+</table>
+<p>这里简单了列举一些问题以及解决方法，另外Redis慢的原因也有可能是以不正确的方式使用Redis数据结构导致的，至于其它疑难杂症就靠使用者自行研究了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Redis/" rel="tag"># Redis</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/08/Redis学习笔记九【处理系统故障】/" rel="next" title="Redis学习笔记九【处理系统故障】">
+                <i class="fa fa-chevron-left"></i> Redis学习笔记九【处理系统故障】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/12/Redis学习笔记十一【使用Redis构建支持程序】/" rel="prev" title="Redis学习笔记十一【使用Redis构建支持程序】">
+                Redis学习笔记十一【使用Redis构建支持程序】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#模拟场景演示Redis事物"><span class="nav-number">1.</span> <span class="nav-text">模拟场景演示Redis事物</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#定义用户信息和用户包裹"><span class="nav-number">1.1.</span> <span class="nav-text">定义用户信息和用户包裹</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#将商品放到市场上销售"><span class="nav-number">1.2.</span> <span class="nav-text">将商品放到市场上销售</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#购买商品"><span class="nav-number">1.3.</span> <span class="nav-text">购买商品</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非事物型流水线"><span class="nav-number">2.</span> <span class="nav-text">非事物型流水线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#性能相关事项"><span class="nav-number">3.</span> <span class="nav-text">性能相关事项</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

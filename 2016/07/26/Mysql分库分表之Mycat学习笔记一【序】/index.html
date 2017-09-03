@@ -1,0 +1,723 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Mysql,Mycat," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="一直对Mysql分库分表有点兴趣，但是也一直停留在有兴趣的阶段，没有遇到能应用的场景。人生苦短，与其等一个机会，不如自己创造吧。稍微调研了下，选择使用Mycat这样一款开源产品。没有什么特别的理由，也不去讨论挖掘机哪家强，只是为了学习。 本机环境 电脑环境：Ubuntu 16.04 JDK：1.8 Docker version 1.11.2 Mysql 5.7.13 Mycat 1.5-RELEA">
+<meta name="keywords" content="Mysql,Mycat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql分库分表之Mycat学习笔记一【序】">
+<meta property="og:url" content="http://yoursite.com/2016/07/26/Mysql分库分表之Mycat学习笔记一【序】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="一直对Mysql分库分表有点兴趣，但是也一直停留在有兴趣的阶段，没有遇到能应用的场景。人生苦短，与其等一个机会，不如自己创造吧。稍微调研了下，选择使用Mycat这样一款开源产品。没有什么特别的理由，也不去讨论挖掘机哪家强，只是为了学习。 本机环境 电脑环境：Ubuntu 16.04 JDK：1.8 Docker version 1.11.2 Mysql 5.7.13 Mycat 1.5-RELEA">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/mycat_1.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/mycat_2.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/mycat_3.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/mycat_4.png">
+<meta property="og:updated_time" content="2016-08-09T07:06:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mysql分库分表之Mycat学习笔记一【序】">
+<meta name="twitter:description" content="一直对Mysql分库分表有点兴趣，但是也一直停留在有兴趣的阶段，没有遇到能应用的场景。人生苦短，与其等一个机会，不如自己创造吧。稍微调研了下，选择使用Mycat这样一款开源产品。没有什么特别的理由，也不去讨论挖掘机哪家强，只是为了学习。 本机环境 电脑环境：Ubuntu 16.04 JDK：1.8 Docker version 1.11.2 Mysql 5.7.13 Mycat 1.5-RELEA">
+<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/mycat_1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/07/26/Mysql分库分表之Mycat学习笔记一【序】/"/>
+
+
+
+
+
+  <title> Mysql分库分表之Mycat学习笔记一【序】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/26/Mysql分库分表之Mycat学习笔记一【序】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Mysql分库分表之Mycat学习笔记一【序】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-26T16:23:59+08:00">
+                2016-07-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mycat/" itemprop="url" rel="index">
+                    <span itemprop="name">Mycat</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>一直对Mysql分库分表有点兴趣，但是也一直停留在有兴趣的阶段，没有遇到能应用的场景。人生苦短，与其等一个机会，不如自己创造吧。稍微调研了下，选择使用<a href="http://www.mycat.org.cn" target="_blank" rel="external">Mycat</a>这样一款开源产品。没有什么特别的理由，也不去讨论挖掘机哪家强，只是为了学习。</p>
+<h3 id="本机环境"><a href="#本机环境" class="headerlink" title="本机环境"></a>本机环境</h3><ul>
+<li>电脑环境：Ubuntu 16.04</li>
+<li>JDK：1.8</li>
+<li>Docker version 1.11.2</li>
+<li>Mysql 5.7.13</li>
+<li>Mycat 1.5-RELEASE</li>
+<li>Navicat for Mysql</li>
+</ul>
+<a id="more"></a>
+<h4 id="安装Mysql"><a href="#安装Mysql" class="headerlink" title="安装Mysql"></a>安装Mysql</h4><p>为了测试方便，Mysql都跑在Docker上，关于Docker环境的安装这里就不说了，参照<a href="https://www.daocloud.io/" target="_blank" rel="external">Daocloud</a>。Docker成功安装之后，去DaoCloud镜像下载Mysql镜像<code>docker pull daocloud.io/library/mysql:5.7.13</code>，下载完毕之后命令行执行<code>sudo docker images</code>确认下，输出如下：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/mycat_1.png" alt="图1"><br>上图的两个镜像分别是Mysql和Daocloud工具包，暂时用不到其他镜像，这样就可以了。<br>因为肯定要用到多个mysql，所以下面先启动两个mysql服务，测试下环境：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo docker run --name mysql1  -p 3306:3306 -e MYSQL_ROOT_PASSWORD=bboyjing -d daocloud.io/library/mysql:5.7.13</div><div class="line">sudo docker run --name mysql2  -p 3316:3306 -e MYSQL_ROOT_PASSWORD=bboyjing -d daocloud.io/library/mysql:5.7.13</div></pre></td></tr></table></figure></p>
+<p>命令行输入<code>sudo docker ps -a</code>，输出如下，启动正常<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/mycat_2.png" alt="图2"></p>
+<h4 id="本机安装Mysql客户端"><a href="#本机安装Mysql客户端" class="headerlink" title="本机安装Mysql客户端"></a>本机安装Mysql客户端</h4><p>本机只需要连接到服务端Mysql，所以只安装个客户端就可以了，命令行执行<code>sudo apt-get install mysql-client</code>，安装完毕之后测试下，命令行执行<code>mysql -h127.0.0.1 -P3306 -uroot -pbboyjing</code>、<code>mysql -h127.0.0.1 -P3316 -uroot -pbboyjing</code>，两个都能连接上表示环境正常。</p>
+<h4 id="安装Navicat"><a href="#安装Navicat" class="headerlink" title="安装Navicat"></a>安装Navicat</h4><p>图形界面的展示可能方便点，所以装个Navicat备用，直接<a href="https://www.navicat.com/download" target="_blank" rel="external">官网</a>下载就可以了，至于破解什么的，自己看着办。安装成功之后分别连上localhost的3306、3316端口测试下。</p>
+<h4 id="安装Mycat"><a href="#安装Mycat" class="headerlink" title="安装Mycat"></a>安装Mycat</h4><p><a href="https://github.com/MyCATApache/Mycat-download/tree/master/1.5-RELEASE" target="_blank" rel="external">Github</a>下载对应系统版本，解压即可，目录结构如下：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/mycat_3.png" alt="图3"></p>
+<ul>
+<li>bin目录：存放执行脚本的命令</li>
+<li>catlet目录：自定义分片规则存放路径</li>
+<li>conf目录：存放各种配置文件</li>
+<li>lib目录：存放Mycat依赖的一些jar包</li>
+<li>logs目录：日志目录</li>
+</ul>
+<p>下面到Mycat根目录下执行下bin目录的启动脚本试试看，要先安装jdk，这个就不说了。控制台执行<code>sudo ./bin/mycat console</code>，输出如下，表示正常启动<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/mycat_4.png" alt="图4"><br>若已经安装过jdk的情况下，出现Unable to start JVM: No such file or directory，可能是JAVA环境变量不在root用户下导致的，尝试下如下方法，若还是不成功，应该不会的。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">cd /opt</div><div class="line">sudo chmod -R 777 mycat</div><div class="line">./bin/mycat console</div></pre></td></tr></table></figure></p>
+<p>至此，简单的可运行的Mycat环境搭建完毕，稍微了解下Mycat，简单的来说它就是一个拦截在数据库前面的代理，数据库访问请求先经过Mycat，然后根据分片规则分发到具体的主机来实现分库分表等功能。具体该怎么使用，下面慢慢来学习学习吧。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+          
+            <a href="/tags/Mycat/" rel="tag"># Mycat</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/20/Neo4j学习笔记十【Spring-Data-Neo4j-Embedded-Driver】/" rel="next" title="Neo4j学习笔记十【Spring Data Neo4j--Embedded Driver】">
+                <i class="fa fa-chevron-left"></i> Neo4j学习笔记十【Spring Data Neo4j--Embedded Driver】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/27/Mysql分库分表之Mycat学习笔记二【配置初探】/" rel="prev" title="Mysql分库分表之Mycat学习笔记二【配置初探】">
+                Mysql分库分表之Mycat学习笔记二【配置初探】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#本机环境"><span class="nav-number">1.</span> <span class="nav-text">本机环境</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装Mysql"><span class="nav-number">1.1.</span> <span class="nav-text">安装Mysql</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#本机安装Mysql客户端"><span class="nav-number">1.2.</span> <span class="nav-text">本机安装Mysql客户端</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装Navicat"><span class="nav-number">1.3.</span> <span class="nav-text">安装Navicat</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装Mycat"><span class="nav-number">1.4.</span> <span class="nav-text">安装Mycat</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

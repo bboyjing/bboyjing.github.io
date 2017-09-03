@@ -1,0 +1,735 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Redis," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="计数信号量也是一种锁，它可以让用户限制一项资源最多能够同时被多少个进程访问，计数信号量和锁的区别在于，当客户端获取锁失败时，通常会选择等待；而当客户端获取计数信号量失败时，通常会选择立即返回失败结果。下面模拟一下，最多同时只允许5个进程同时访问一个资源。 构建基本的计数信号量构建计数信号量时要考虑的事情和构建其他类型的锁时要考虑的事情大部分都是相同的，比如判断时哪个客户端取得了锁，如何处理客户端在">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis学习笔记十四【使用Redis构建应用程序组件-计数信号量】">
+<meta property="og:url" content="http://yoursite.com/2016/12/16/Redis学习笔记十四【使用Redis构建应用程序组件-计数信号量】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="计数信号量也是一种锁，它可以让用户限制一项资源最多能够同时被多少个进程访问，计数信号量和锁的区别在于，当客户端获取锁失败时，通常会选择等待；而当客户端获取计数信号量失败时，通常会选择立即返回失败结果。下面模拟一下，最多同时只允许5个进程同时访问一个资源。 构建基本的计数信号量构建计数信号量时要考虑的事情和构建其他类型的锁时要考虑的事情大部分都是相同的，比如判断时哪个客户端取得了锁，如何处理客户端在">
+<meta property="og:updated_time" content="2016-12-19T00:45:48.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis学习笔记十四【使用Redis构建应用程序组件-计数信号量】">
+<meta name="twitter:description" content="计数信号量也是一种锁，它可以让用户限制一项资源最多能够同时被多少个进程访问，计数信号量和锁的区别在于，当客户端获取锁失败时，通常会选择等待；而当客户端获取计数信号量失败时，通常会选择立即返回失败结果。下面模拟一下，最多同时只允许5个进程同时访问一个资源。 构建基本的计数信号量构建计数信号量时要考虑的事情和构建其他类型的锁时要考虑的事情大部分都是相同的，比如判断时哪个客户端取得了锁，如何处理客户端在">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/16/Redis学习笔记十四【使用Redis构建应用程序组件-计数信号量】/"/>
+
+
+
+
+
+  <title> Redis学习笔记十四【使用Redis构建应用程序组件-计数信号量】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/16/Redis学习笔记十四【使用Redis构建应用程序组件-计数信号量】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Redis学习笔记十四【使用Redis构建应用程序组件-计数信号量】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-16T10:49:51+08:00">
+                2016-12-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>计数信号量也是一种锁，它可以让用户限制一项资源最多能够同时被多少个进程访问，计数信号量和锁的区别在于，当客户端获取锁失败时，通常会选择等待；而当客户端获取计数信号量失败时，通常会选择立即返回失败结果。下面模拟一下，最多同时只允许5个进程同时访问一个资源。</p>
+<h3 id="构建基本的计数信号量"><a href="#构建基本的计数信号量" class="headerlink" title="构建基本的计数信号量"></a>构建基本的计数信号量</h3><p>构建计数信号量时要考虑的事情和构建其他类型的锁时要考虑的事情大部分都是相同的，比如判断时哪个客户端取得了锁，如何处理客户端在获得锁之后奔溃的情况，以及如何处理锁超时的问题。为了使多个信号量持有者的信息都存储到同一个结构里面，将使用有序集合来构建计数信号量。就是为每个尝试获取信号量的进程生成一个唯一标识符，将这个标识符用作有序集合的成员，对应的分值是尝试获取信号量时的Unix时间戳。</p>
+<a id="more"></a>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//获取信号量</span></div><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">acquireSemaphore</span><span class="params">(String semname, <span class="keyword">int</span> limit)</span></span>&#123;</div><div class="line">    <span class="comment">//信号量多久后超时</span></div><div class="line">    <span class="keyword">long</span> timeout = <span class="number">100000</span>;</div><div class="line"></div><div class="line">    String identifier = UUID.randomUUID().toString();</div><div class="line">    <span class="keyword">long</span> now = System.currentTimeMillis();</div><div class="line"></div><div class="line">    SessionCallback&lt;List&lt;Object&gt;&gt; sessionCallback =  <span class="keyword">new</span> SessionCallback&lt;List&lt;Object&gt;&gt;() &#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> List&lt;Object&gt; <span class="title">execute</span><span class="params">(RedisOperations operations)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</div><div class="line">            operations.multi();</div><div class="line">            <span class="comment">/**</span></div><div class="line">             * 移除有序集合中score介于min和max之间的成员</div><div class="line">             * 清理有序集合中时间戳大于超时数字的标识符</div><div class="line">             */</div><div class="line">            operations.opsForZSet().removeRangeByScore(semname, Double.MIN_VALUE, now - timeout);</div><div class="line">            <span class="comment">//尝试获取信号量</span></div><div class="line">            operations.opsForZSet().add(semname, identifier, now);</div><div class="line">            operations.opsForZSet().rank(semname, identifier);</div><div class="line">            <span class="keyword">return</span> operations.exec();</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">    <span class="comment">//检查是否成功获取了信号量</span></div><div class="line">    <span class="keyword">if</span>((Long) stringRedisTemplate.execute(sessionCallback).get(<span class="number">2</span>) &lt; limit)&#123;</div><div class="line">        <span class="keyword">return</span> identifier;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">//获取信号量失败，删除之前添加的标示</span></div><div class="line">    stringRedisTemplate.opsForZSet().remove(semname, identifier);</div><div class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//释放信号量</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">releaseSemaphore</span><span class="params">(String semname, String identifier)</span></span>&#123;</div><div class="line">    stringRedisTemplate.opsForZSet().remove(semname, identifier);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个基本版本的信号量实现非常好用，不仅简单，而且运行速度也很快，但是存在不公平的问题。举个例子，假设有A、B两台机器，A的系统时间比B的系统时间快10毫秒，那么当A取得最后一个信号量的时候，B只需要在10毫秒内尝试获取信号量，就有可能偷走A的信号量，或者使获取的信号量超过limit值。每当锁或者信号量因为系统时钟的细微不同而导致的获取结果出现剧烈变化时，这个锁或者信号量就是不公平的，下面将尝试解决这个问题。</p>
+<h3 id="公平的信号量"><a href="#公平的信号量" class="headerlink" title="公平的信号量"></a>公平的信号量</h3><p>公平信号量的目的是使得只要各个系统的系统时间相差不超过1秒，就不会引起信号量被偷。为了尽可能地减少系统时间不一致带来的问题，我们需要给信号量添加一个计数器和一个有序集合。数据结构如下：</p>
+<ul>
+<li>key<ul>
+<li>semaphore:remote</li>
+</ul>
+</li>
+<li>zset value<ul>
+<li>member : f29b654d-e173-4ada-987e-7ef7a231d705 | score : 1481876968118</li>
+<li>member : ××× | score : ×××</li>
+</ul>
+</li>
+<li>key<ul>
+<li>semaphore:remote:owner</li>
+</ul>
+</li>
+<li>zset value<ul>
+<li>member : f29b654d-e173-4ada-987e-7ef7a231d705 | score : 7350</li>
+<li>member : ××× | score : ×××</li>
+</ul>
+</li>
+<li>key<ul>
+<li>semaphore:remote:counter</li>
+</ul>
+</li>
+<li>string value<ul>
+<li>7350</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">acquireFairSemaphore</span><span class="params">(String semname, <span class="keyword">int</span> limit)</span></span>&#123;</div><div class="line">    <span class="comment">//信号量多久后超时</span></div><div class="line">    <span class="keyword">long</span> timeout = <span class="number">100000</span>;</div><div class="line"></div><div class="line">    String identifier = UUID.randomUUID().toString();</div><div class="line">    String czset = semname + <span class="string">":owner"</span>;</div><div class="line">    String ctr = semname + <span class="string">":counter"</span>;</div><div class="line">    <span class="keyword">long</span> now = System.currentTimeMillis();</div><div class="line"></div><div class="line">    RedisCallback&lt;List&lt;Object&gt;&gt; redisCallback = redisConnection -&gt; &#123;</div><div class="line">        redisConnection.multi();</div><div class="line">        <span class="comment">//清理有序集合中时间戳大于超时数字的标识符</span></div><div class="line">        redisConnection.zRemRangeByScore(semname.getBytes(), Double.MIN_VALUE, now - timeout);</div><div class="line">        <span class="comment">/**</span></div><div class="line">         * czset、semname求交集，并将结果集覆盖到czset中，目的也是清理czset中的过期信号量</div><div class="line">         * 由于RedisOperations中的intersectAndStore方法没有weights参数，所以用这里是使用RedisConnection</div><div class="line">         * czset * 1 与 semname * 0求交集，这样就只留下了czset中的数据</div><div class="line">         */</div><div class="line">        redisConnection.zInterStore(czset.getBytes(),</div><div class="line">                RedisZSetCommands.Aggregate.SUM,</div><div class="line">                <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">1</span>,<span class="number">0</span>&#125;, czset.getBytes(),</div><div class="line">                semname.getBytes());</div><div class="line">        <span class="comment">//信号量计数+1</span></div><div class="line">        redisConnection.incr(ctr.getBytes());</div><div class="line">        <span class="keyword">return</span> redisConnection.exec();</div><div class="line">    &#125;;</div><div class="line">    <span class="comment">//获取计数器</span></div><div class="line">    <span class="keyword">long</span> counter = (Long)stringRedisTemplate.execute(redisCallback).get(<span class="number">2</span>);</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 尝试获取信号量</div><div class="line">     */</div><div class="line">    redisCallback = redisConnection -&gt; &#123;</div><div class="line">        redisConnection.multi();</div><div class="line">        redisConnection.zAdd(semname.getBytes(), now, identifier.getBytes());</div><div class="line">        redisConnection.zAdd(czset.getBytes(), counter, identifier.getBytes());</div><div class="line">        redisConnection.zRank(czset.getBytes(), identifier.getBytes());</div><div class="line">        <span class="keyword">return</span> redisConnection.exec();</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="keyword">if</span>((Long)stringRedisTemplate.execute(redisCallback).get(<span class="number">2</span>) &lt; limit)&#123;</div><div class="line">        <span class="keyword">return</span> identifier;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 获取信号量失败，删除记录</div><div class="line">     */</div><div class="line">    redisCallback = redisConnection -&gt; &#123;</div><div class="line">        redisConnection.multi();</div><div class="line">        redisConnection.zRem(semname.getBytes(), identifier.getBytes());</div><div class="line">        redisConnection.zRem(czset.getBytes(), identifier.getBytes());</div><div class="line">        <span class="keyword">return</span> redisConnection.exec();</div><div class="line">    &#125;;</div><div class="line">    stringRedisTemplate.execute(redisCallback);</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//释放信号量</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">releaseFairSemaphore</span><span class="params">(String semname, String identifier)</span></span>&#123;</div><div class="line">    SessionCallback&lt;List&lt;Object&gt;&gt; sessionCallback =  <span class="keyword">new</span> SessionCallback&lt;List&lt;Object&gt;&gt;() &#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> List&lt;Object&gt; <span class="title">execute</span><span class="params">(RedisOperations operations)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</div><div class="line">            operations.multi();</div><div class="line">            operations.opsForZSet().remove(semname, identifier);</div><div class="line">            operations.opsForZSet().remove(semname + <span class="string">":owner"</span>, identifier);</div><div class="line">            <span class="keyword">return</span> operations.exec();</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">    <span class="keyword">return</span> (Long)stringRedisTemplate.execute(sessionCallback).get(<span class="number">1</span>) == <span class="number">1</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="刷新信号量"><a href="#刷新信号量" class="headerlink" title="刷新信号量"></a>刷新信号量</h3><p>上面的信号量实现是在给定时间后超时，现在扩展下新功能，假如需要刷新信号量，防止其过期。因为公平信号量已经区分开了超时有序集合和信号量拥有者有序集合，所以程序只需要对超时有序集合进行更新，就可以立即刷新信号量的超时时间了。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">refreshFareSemaphore</span><span class="params">(String semname, String identifier)</span></span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * zadd返回被成功添加的新成员的数量，不包括那些被更新的、已经存在的成员。</div><div class="line">     * add返回true表示添加了新成员，而不是更新，所以需要释放掉刚添加的数据</div><div class="line">     */<span class="function">S</span></div><div class="line">    <span class="title">if</span><span class="params">(stringRedisTemplate.opsForZSet()</span>.<span class="title">add</span><span class="params">(semname, identifier, System.currentTimeMillis()</span>))&#123;</div><div class="line">        releaseFairSemaphore(semname, identifier);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="消除竞争条件"><a href="#消除竞争条件" class="headerlink" title="消除竞争条件"></a>消除竞争条件</h3><p>上面的信号量实现依然会带有可能会导致操作不正确的竞争条件出现。比如，当两个进程A和B都在尝试获取剩余最后一个信号量，假设A先对计数器执行了自增操作，此时只要B能够抢先地将自己的标识符添加到有序集合中，并且检查了标识符在有序集合中的排名，那么B就可以成功地取得信号量。之后A也将自己的标识符添加到有序结合里，并检查标识符在有序集合中的排名时，A也能获取信号量。<br>为了消除信号量中所有可能出现的竞争条件，构建一个正确的计数器信号量实现，我们需要用到前面构建的带有超时功能的分布式锁。总的来说，当程序想要获取信号量的时候，先尝试获取一个带有短暂超时功能的分布式锁。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">acquireSemaphoreWithLock</span><span class="params">(String semname, <span class="keyword">int</span> limit)</span></span>&#123;</div><div class="line">    String identifier = timeoutLockService.acquireLockWithTimeout(semname);</div><div class="line">    <span class="keyword">if</span>(!StringUtils.isEmpty(identifier))&#123;</div><div class="line">        <span class="keyword">try</span>&#123;</div><div class="line">            <span class="keyword">return</span> acquireFairSemaphore(semname, limit);</div><div class="line">        &#125;<span class="keyword">finally</span> &#123;</div><div class="line">            firstLockService.releaseLock(semname, identifier);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>信号量的实现就到此位置，列举下三种实现的优缺点：</p>
+<ul>
+<li>如果对使用系统时钟没有意见，也不需要对信号量进行刷新，并且能够接受信号量的数量欧尔超过限制，那么可以使用第一种实现。</li>
+<li>如果只信任差距在一两秒之间的系统时钟，但仍然能够接受信号量的数量偶尔超过限制，那么可以使用第二种实现。</li>
+<li>如果希望信号量一直都具有正确的行为，那么可以使用带锁的信号量实现来保证正确性。</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Redis/" rel="tag"># Redis</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/15/Redis学习笔记十三【使用Redis构建应用程序组件-分布式锁】/" rel="next" title="Redis学习笔记十三【使用Redis构建应用程序组件-分布式锁】">
+                <i class="fa fa-chevron-left"></i> Redis学习笔记十三【使用Redis构建应用程序组件-分布式锁】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/19/自己动手写JVM一【准备环境】/" rel="prev" title="自己动手写JVM一【准备环境】">
+                自己动手写JVM一【准备环境】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#构建基本的计数信号量"><span class="nav-number">1.</span> <span class="nav-text">构建基本的计数信号量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#公平的信号量"><span class="nav-number">2.</span> <span class="nav-text">公平的信号量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#刷新信号量"><span class="nav-number">3.</span> <span class="nav-text">刷新信号量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#消除竞争条件"><span class="nav-number">4.</span> <span class="nav-text">消除竞争条件</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

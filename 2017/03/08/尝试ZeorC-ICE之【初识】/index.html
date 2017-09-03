@@ -1,0 +1,780 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,RPC," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本系列博客的目的是为了学习ZeroC Ice的使用，并且和实际项目框架相结合，最后考虑是否能将这一产品引入到当前项目中，或者为新项目的技术选型多一个备选方案。到底什么是ZeroC Ice？用一句话概括就是支持多语言的RPC框架。暂且不去管它的优缺点，得先学了再说。本系列的知识点来自《ZeroC Ice》权威指南和官网文档。在这里向《ZeroC Ice》权威指南的作者表示敬意，这是目前关于ZeroC">
+<meta name="keywords" content="Java,RPC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="尝试ZeorC ICE之【初识】">
+<meta property="og:url" content="http://yoursite.com/2017/03/08/尝试ZeorC-ICE之【初识】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="本系列博客的目的是为了学习ZeroC Ice的使用，并且和实际项目框架相结合，最后考虑是否能将这一产品引入到当前项目中，或者为新项目的技术选型多一个备选方案。到底什么是ZeroC Ice？用一句话概括就是支持多语言的RPC框架。暂且不去管它的优缺点，得先学了再说。本系列的知识点来自《ZeroC Ice》权威指南和官网文档。在这里向《ZeroC Ice》权威指南的作者表示敬意，这是目前关于ZeroC">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_1.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_2.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_3.png">
+<meta property="og:updated_time" content="2017-03-09T19:13:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="尝试ZeorC ICE之【初识】">
+<meta name="twitter:description" content="本系列博客的目的是为了学习ZeroC Ice的使用，并且和实际项目框架相结合，最后考虑是否能将这一产品引入到当前项目中，或者为新项目的技术选型多一个备选方案。到底什么是ZeroC Ice？用一句话概括就是支持多语言的RPC框架。暂且不去管它的优缺点，得先学了再说。本系列的知识点来自《ZeroC Ice》权威指南和官网文档。在这里向《ZeroC Ice》权威指南的作者表示敬意，这是目前关于ZeroC">
+<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/08/尝试ZeorC-ICE之【初识】/"/>
+
+
+
+
+
+  <title> 尝试ZeorC ICE之【初识】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/08/尝试ZeorC-ICE之【初识】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                尝试ZeorC ICE之【初识】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-08T13:29:38+08:00">
+                2017-03-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ZeroC-Ice/" itemprop="url" rel="index">
+                    <span itemprop="name">ZeroC Ice</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本系列博客的目的是为了学习ZeroC Ice的使用，并且和实际项目框架相结合，最后考虑是否能将这一产品引入到当前项目中，或者为新项目的技术选型多一个备选方案。<br>到底什么是ZeroC Ice？用一句话概括就是支持多语言的RPC框架。暂且不去管它的优缺点，得先学了再说。本系列的知识点来自《ZeroC Ice》权威指南和<a href="https://doc.zeroc.com/display/Ice36/Ice+Manual" target="_blank" rel="external">官网文档</a>。在这里向《ZeroC Ice》权威指南的作者表示敬意，这是目前关于ZeroC Ice唯一的一本书。ZeroC是一家公司，Ice是该公司的产品，全称Internet Communications Engine。Ice遵循GPLv2开源协议，如果使用过程中出现问题，ZeroC公司可以提供收费支持。不扯了，下面正式开始学习。</p>
+<a id="more"></a>
+<h3 id="安装Ice"><a href="#安装Ice" class="headerlink" title="安装Ice"></a>安装Ice</h3><p><a href="https://zeroc.com/distributions/ice" target="_blank" rel="external">Ice官网的distributions</a>有详细的安装步骤，选择与自己机器匹配的系统，照着步骤即可。注意安装步骤的上方有下图一句话，表示安装了哪些服务和支持的语言种类(和选择的系统有关)。<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_1.png" alt="zeroc_ice_1"><br>安装完毕后，打开终端输入slice2，然后按下tab键，可以看到支持的语言指令，至于这些指令怎么用，下面就会讲到。<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_2.png" alt="zeroc_ice_2"></p>
+<h3 id="如何支持多语言"><a href="#如何支持多语言" class="headerlink" title="如何支持多语言"></a>如何支持多语言</h3><p>目前我们能从字面上看到Ice的一个优势，就是支持多语言。要怎样才能支持市面上一些主流开发语言呢，总不能让人家去统一吧。所以Ice采用了通过与编程语言无关的中立语言的方式来描述服务的接口，该语言叫Slice。先使用Slice编写接口描述，然后使用Ice提供的工具(就是上面提到的slice2×××)生成目标语言。下面我们就先来学习Slice这门中立语言。</p>
+<h4 id="Slice的基本数据结构"><a href="#Slice的基本数据结构" class="headerlink" title="Slice的基本数据结构"></a>Slice的基本数据结构</h4><p>下表列举了Slice定义的基本数据类型：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">类型</th>
+<th style="text-align:center">定义及范围</th>
+<th style="text-align:center">长度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">bool</td>
+<td style="text-align:center">false or true</td>
+<td style="text-align:center">≥ 1bit</td>
+</tr>
+<tr>
+<td style="text-align:center">byte</td>
+<td style="text-align:center">-128 ~ 127 or 0 ~ 255</td>
+<td style="text-align:center">≥ 8 bits</td>
+</tr>
+<tr>
+<td style="text-align:center">short</td>
+<td style="text-align:center">-2<sup>15</sup>  to 2<sup>15</sup>-1</td>
+<td style="text-align:center">≥ 16 bits</td>
+</tr>
+<tr>
+<td style="text-align:center">int</td>
+<td style="text-align:center">-2<sup>31</sup>  to 2<sup>31</sup>-1</td>
+<td style="text-align:center">≥ 32 bits</td>
+</tr>
+<tr>
+<td style="text-align:center">long</td>
+<td style="text-align:center">-2<sup>63</sup>  to 2<sup>63</sup>-1</td>
+<td style="text-align:center">≥ 64 bits</td>
+</tr>
+<tr>
+<td style="text-align:center">float</td>
+<td style="text-align:center">IEEE single-precision</td>
+<td style="text-align:center">≥ 32 bits</td>
+</tr>
+<tr>
+<td style="text-align:center">double</td>
+<td style="text-align:center">IEEE double-precision</td>
+<td style="text-align:center">≥ 64 bits</td>
+</tr>
+<tr>
+<td style="text-align:center">string</td>
+<td style="text-align:center">All Unicode characters, excluding the character with all bits zero.</td>
+<td style="text-align:center">Variable-length</td>
+</tr>
+</tbody>
+</table>
+<p>从表中可以看出，除了bool和string之外，其他类型与Java的基本类型保持一致，不难理解。<br>除了基本数据类型，Slice还设计了集中复合数据类型，如下所示：</p>
+<ul>
+<li><p>枚举类型 enum</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">例如：enum Fruit &#123;Apple, Pear, Orange&#125;;</div><div class="line">或者：enum Fruit &#123;Apple = 5, Pear = 3, Orange = 1&#125;;</div></pre></td></tr></table></figure>
+</li>
+<li><p>结构体 struct<br>  保护多个属性数据，类似于JavaBean</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">struct TimeOfDay &#123;</div><div class="line">    short hour;    // 0 - 23</div><div class="line">    short minute;  // 0 - 59</div><div class="line">    short second;  // 0 - 59</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>集合类型 sequence<br>  支持基本类型或者符合类型的集合，例如：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sequence&lt;Fruit&gt; FruitPlatter;</div><div class="line">sequence&lt;FruitPlatter&gt; FruitBanquet;(集合的集合)</div></pre></td></tr></table></figure>
+</li>
+<li><p>Map类型 dictionary<br>  类似Java HashMap，例如：<code>dictionary&lt;long, Employee&gt; EmployeeMap</code></p>
+</li>
+</ul>
+<p>结构体很好地对应于Java Bean对象，应该是会用的最多的复合数据类型，不过它有一个限制：不能嵌套，作为入门学习资料，还是把代码贴出来，下面是一个错误的示范：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">// demo表示文件名</div><div class="line">module demo &#123;</div><div class="line">    struct TwoPoints &#123;</div><div class="line">        // Illegal!</div><div class="line">        struct Point &#123;</div><div class="line">            short x;</div><div class="line">            short y;</div><div class="line">        &#125;;</div><div class="line">        Point coord1;</div><div class="line">        Point coord2;</div><div class="line">    &#125;;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>我们把上面错误的示范跑一下，看看会怎么样，顺便借此机会建个<a href="https://github.com/bboyjing/attempt_ice" target="_blank" rel="external">项目attempt_ice</a>，在根目录下新建demo.ice(slice文件的后缀为ice)，然后把上面错误的示范贴到文件中，执行步骤如下：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">cd ~/IdeaProjects/attempt_ice</div><div class="line">slice2java demo.ice</div><div class="line">//结果如下</div><div class="line">/home/zhangjing/IdeaProjects/attempt_ice/demo.ice:4: syntax error</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<p>下面修改成正确的姿势：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">module demo &#123;</div><div class="line">    struct Point &#123;</div><div class="line">        short x;</div><div class="line">        short y;</div><div class="line">    &#125;;</div><div class="line">    struct TwoPoints &#123;</div><div class="line">        Point coord1;</div><div class="line">        Point coord2;</div><div class="line">    &#125;;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>再次执行<code>slice2java demo.ice</code>，会生成demo目录以及一些java文件，如下：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_3.png" alt="zeroc_ice_3"><br>稍微解释下生成的文件：</p>
+<ul>
+<li>demo目录：对应module后面的关键字，表示内容都生成在demo目录中</li>
+<li>Point.java和PointHolder.java文件是根据struct Point生成的</li>
+<li>TwoPoints.java和TwoPointsHolder文件是根据struct TwoPoints生成的</li>
+</ul>
+<p>至此我们已经学会了定义简单的Java Bean。</p>
+<h4 id="接口和方法的定义"><a href="#接口和方法的定义" class="headerlink" title="接口和方法的定义"></a>接口和方法的定义</h4><p>接下来我们看看在Slice中怎么定义接口。与Java语义相同，Slice用关键字interface来申明一个接口，新建interface.ice文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">module demo2 &#123;</div><div class="line">    struct TimeOfDay &#123;</div><div class="line">        short hour;    // 0 - 23</div><div class="line">        short minute;  // 0 - 59</div><div class="line">        short second;  // 0 - 59</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    interface Clock &#123;</div><div class="line">        TimeOfDay getTime();</div><div class="line">        void setTime(TimeOfDay time);</div><div class="line">    &#125;;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>这样我们就成功地定义了一个简单的接口，当然Slice提供的接口功能并不只是这么简单，暂时就不深究了，后面有机会使用的过程中再查文档。Slice也支持异常的定义，通过exception关键字来定义，暂且不演示了。<br>这一篇就写到这里，主要目的是知道了Ice是什么，以及其Slice语言的简单使用。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/RPC/" rel="tag"># RPC</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/07/自己动手写JVM三十三【异常处理（二）】/" rel="next" title="自己动手写JVM三十三【异常处理（二）】">
+                <i class="fa fa-chevron-left"></i> 自己动手写JVM三十三【异常处理（二）】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/09/尝试ZeorC-ICE之【Hello-World】/" rel="prev" title="尝试ZeorC ICE之【Hello World】">
+                尝试ZeorC ICE之【Hello World】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Ice"><span class="nav-number">1.</span> <span class="nav-text">安装Ice</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何支持多语言"><span class="nav-number">2.</span> <span class="nav-text">如何支持多语言</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Slice的基本数据结构"><span class="nav-number">2.1.</span> <span class="nav-text">Slice的基本数据结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#接口和方法的定义"><span class="nav-number">2.2.</span> <span class="nav-text">接口和方法的定义</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

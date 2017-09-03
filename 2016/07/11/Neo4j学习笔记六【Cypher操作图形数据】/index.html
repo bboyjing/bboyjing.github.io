@@ -1,0 +1,701 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Neo4j," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Cypher更新图形数据创建新的USERS节点12create (n:USERS&amp;#123;name : &amp;apos;Grace Spencer&amp;apos;, yearOfBirth : 1982, email : &amp;apos;grace@gmail.com&amp;apos;&amp;#125;)return n;">
+<meta name="keywords" content="Neo4j">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Neo4j学习笔记六【Cypher操作图形数据】">
+<meta property="og:url" content="http://yoursite.com/2016/07/11/Neo4j学习笔记六【Cypher操作图形数据】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="Cypher更新图形数据创建新的USERS节点12create (n:USERS&amp;#123;name : &amp;apos;Grace Spencer&amp;apos;, yearOfBirth : 1982, email : &amp;apos;grace@gmail.com&amp;apos;&amp;#125;)return n;">
+<meta property="og:updated_time" content="2016-07-21T02:45:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Neo4j学习笔记六【Cypher操作图形数据】">
+<meta name="twitter:description" content="Cypher更新图形数据创建新的USERS节点12create (n:USERS&amp;#123;name : &amp;apos;Grace Spencer&amp;apos;, yearOfBirth : 1982, email : &amp;apos;grace@gmail.com&amp;apos;&amp;#125;)return n;">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/07/11/Neo4j学习笔记六【Cypher操作图形数据】/"/>
+
+
+
+
+
+  <title> Neo4j学习笔记六【Cypher操作图形数据】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/11/Neo4j学习笔记六【Cypher操作图形数据】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Neo4j学习笔记六【Cypher操作图形数据】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-11T14:54:39+08:00">
+                2016-07-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Neo4j/" itemprop="url" rel="index">
+                    <span itemprop="name">Neo4j</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="Cypher更新图形数据"><a href="#Cypher更新图形数据" class="headerlink" title="Cypher更新图形数据"></a>Cypher更新图形数据</h3><h4 id="创建新的USERS节点"><a href="#创建新的USERS节点" class="headerlink" title="创建新的USERS节点"></a>创建新的USERS节点</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">create (n:USERS&#123;name : &apos;Grace Spencer&apos;, yearOfBirth : 1982, email : &apos;grace@gmail.com&apos;&#125;)</div><div class="line">return n;</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<h4 id="创建关系"><a href="#创建关系" class="headerlink" title="创建关系"></a>创建关系</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">match (john:USERS),(grace:USERS)</div><div class="line">where john.name = &apos;John Johnson&apos; and grace.name = &apos;Grace Spencer&apos;</div><div class="line">create (john)-[r:IS_FRIEND_OF]-&gt;(grace)</div><div class="line">return r;</div></pre></td></tr></table></figure>
+<h4 id="同时创建新节点和关系"><a href="#同时创建新节点和关系" class="headerlink" title="同时创建新节点和关系"></a>同时创建新节点和关系</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">match (john:USERS)</div><div class="line">where john.name = &apos;John Johnson&apos;</div><div class="line">create (john)-[r:IS_FRIEND_OF]-&gt;(lee:USERS&#123;name : &apos;Lee&apos;, yearOfBirth : 1990, email : &apos;lee@gmail.com&apos;&#125;)</div><div class="line">return r,lee</div><div class="line">```	</div><div class="line">#### 删除数据</div><div class="line">```cypher</div><div class="line">//尝试执行上述代码会出错，Neo4j要求先删除关系</div><div class="line">start lee= node(10)</div><div class="line">delete lee;</div><div class="line"></div><div class="line">//明确删除一个节点和所有关联关系</div><div class="line">start lee = node(10)</div><div class="line">match (lee)-[r]-()</div><div class="line">delete lee,r</div><div class="line"></div><div class="line">//或者执行新的api</div><div class="line">MATCH (lee:USERS &#123; name:&apos;Lee&apos; &#125;)</div><div class="line">DETACH DELETE lee</div></pre></td></tr></table></figure>
+<h4 id="更新节点属性"><a href="#更新节点属性" class="headerlink" title="更新节点属性"></a>更新节点属性</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">match (john)</div><div class="line">where john.name = &apos;John Johnson&apos;</div><div class="line">//若yearOfBirth属性不存在会创建该属性</div><div class="line">set john.yearOfBirth = 1973;</div></pre></td></tr></table></figure>
+<h4 id="删除节点属性"><a href="#删除节点属性" class="headerlink" title="删除节点属性"></a>删除节点属性</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">match (john)</div><div class="line">where john.name = &apos;John Johnson&apos;</div><div class="line">remove john.yearOfBirth;</div></pre></td></tr></table></figure>
+<h3 id="高级Cypher"><a href="#高级Cypher" class="headerlink" title="高级Cypher"></a>高级Cypher</h3><h4 id="聚合"><a href="#聚合" class="headerlink" title="聚合"></a>聚合</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">match(user:USERS)-[:IS_FRIEND_OF]-()</div><div class="line">return user,count(*)</div><div class="line">order by count(*) desc;</div></pre></td></tr></table></figure>
+<h4 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h4><h4 id="查看每一类型有多少个关系开始于或结束于用户John"><a href="#查看每一类型有多少个关系开始于或结束于用户John" class="headerlink" title="查看每一类型有多少个关系开始于或结束于用户John"></a>查看每一类型有多少个关系开始于或结束于用户John</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">match (john:USERS&#123;name:&apos;John Johnson&apos;&#125;)</div><div class="line">match (john)-[rel]-()</div><div class="line">return type(rel),count(*);</div></pre></td></tr></table></figure>
+<h4 id="with语句的管道功能，只查出多于一次的关系"><a href="#with语句的管道功能，只查出多于一次的关系" class="headerlink" title="with语句的管道功能，只查出多于一次的关系"></a>with语句的管道功能，只查出多于一次的关系</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">match (john:USERS&#123;name:&apos;John Johnson&apos;&#125;)</div><div class="line">match (john)-[rel]-()</div><div class="line">with type(rel) as type, count(*) as count</div><div class="line">where count &gt; 1</div><div class="line">return type, count;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Neo4j/" rel="tag"># Neo4j</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/08/Neo4j学习笔记五【查询语言Cypher】/" rel="next" title=" Neo4j学习笔记五【查询语言Cypher】">
+                <i class="fa fa-chevron-left"></i>  Neo4j学习笔记五【查询语言Cypher】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/13/Neo4j学习笔记七【深度遍历（一）】/" rel="prev" title="Neo4j学习笔记七【深度遍历（一）】">
+                Neo4j学习笔记七【深度遍历（一）】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Cypher更新图形数据"><span class="nav-number">1.</span> <span class="nav-text">Cypher更新图形数据</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建新的USERS节点"><span class="nav-number">1.1.</span> <span class="nav-text">创建新的USERS节点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建关系"><span class="nav-number">1.2.</span> <span class="nav-text">创建关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#同时创建新节点和关系"><span class="nav-number">1.3.</span> <span class="nav-text">同时创建新节点和关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#更新节点属性"><span class="nav-number">1.4.</span> <span class="nav-text">更新节点属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#删除节点属性"><span class="nav-number">1.5.</span> <span class="nav-text">删除节点属性</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#高级Cypher"><span class="nav-number">2.</span> <span class="nav-text">高级Cypher</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#聚合"><span class="nav-number">2.1.</span> <span class="nav-text">聚合</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#函数"><span class="nav-number">2.2.</span> <span class="nav-text">函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看每一类型有多少个关系开始于或结束于用户John"><span class="nav-number">2.3.</span> <span class="nav-text">查看每一类型有多少个关系开始于或结束于用户John</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#with语句的管道功能，只查出多于一次的关系"><span class="nav-number">2.4.</span> <span class="nav-text">with语句的管道功能，只查出多于一次的关系</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

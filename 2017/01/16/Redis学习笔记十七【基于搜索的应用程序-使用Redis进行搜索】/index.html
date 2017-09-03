@@ -1,0 +1,743 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Redis," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Redis还特别适用于解决基于搜索的问题，这类问题通常需要使用集合以及有序集合的交集、并集、和差集操作查找符合指定要求的元素。本章就来学习下，如何使用Redis进行搜索。假设一个对文档搜索的场景，如何使用Redis更快地进行搜索。基于搜索的应用程序相关代码位于项目的search模块中。">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】">
+<meta property="og:url" content="http://yoursite.com/2017/01/16/Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="Redis还特别适用于解决基于搜索的问题，这类问题通常需要使用集合以及有序集合的交集、并集、和差集操作查找符合指定要求的元素。本章就来学习下，如何使用Redis进行搜索。假设一个对文档搜索的场景，如何使用Redis更快地进行搜索。基于搜索的应用程序相关代码位于项目的search模块中。">
+<meta property="og:updated_time" content="2017-01-21T18:46:22.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】">
+<meta name="twitter:description" content="Redis还特别适用于解决基于搜索的问题，这类问题通常需要使用集合以及有序集合的交集、并集、和差集操作查找符合指定要求的元素。本章就来学习下，如何使用Redis进行搜索。假设一个对文档搜索的场景，如何使用Redis更快地进行搜索。基于搜索的应用程序相关代码位于项目的search模块中。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/01/16/Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】/"/>
+
+
+
+
+
+  <title> Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/16/Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-16T17:07:25+08:00">
+                2017-01-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Redis还特别适用于解决基于搜索的问题，这类问题通常需要使用集合以及有序集合的交集、并集、和差集操作查找符合指定要求的元素。本章就来学习下，如何使用Redis进行搜索。假设一个对文档搜索的场景，如何使用Redis更快地进行搜索。基于搜索的应用程序相关代码位于<a href="https://github.com/bboyjing/redis-sample" target="_blank" rel="external">项目</a>的search模块中。</p>
+<a id="more"></a>
+<h3 id="基本搜索原理"><a href="#基本搜索原理" class="headerlink" title="基本搜索原理"></a>基本搜索原理</h3><p>为了获得比扫描文档更快的搜索速度，我们需要对文档进行预处理，这个预处理步骤通常被称为建索引(indexing)，而我们要创建的结构则被成为反向索引(inverted indexes)。选择使用Redis来创建反向索引的原因在于，Redis自带的集合和有序集合都非常使用于处理反向索引。<br>具体来说，反向索引会从每个被索引的文档里面抽取一些单词，并创建表格来记录每篇文章都包含了哪些单词。假设有两个文档，docA只包含标题《lord of the rings》，docB只包含标题《lord of the dance》。为这两个文档创建的反向索引如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">key</th>
+<th style="text-align:center">set value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">ind:lord</td>
+<td style="text-align:center">docA<br>docB</td>
+</tr>
+<tr>
+<td style="text-align:center">ind:of</td>
+<td style="text-align:center">docA<br>docB</td>
+</tr>
+<tr>
+<td style="text-align:center">ind:the</td>
+<td style="text-align:center">docA<br>docB</td>
+</tr>
+<tr>
+<td style="text-align:center">ind:rings</td>
+<td style="text-align:center">docA</td>
+</tr>
+<tr>
+<td style="text-align:center">ind:dance</td>
+<td style="text-align:center">docB</td>
+</tr>
+</tbody>
+</table>
+<p>在知道了索引操作的最终执行结构就是产生一些Reedis集合之后，我们接下来要了解的就是生成这些集合的具体方法。</p>
+<h4 id="基本索引操作"><a href="#基本索引操作" class="headerlink" title="基本索引操作"></a>基本索引操作</h4><p>为了给文档构建索引集合，首先需要对文档包含的单词进行处理。从文档里面提取单词的过程通常被称为语法分析(parsing)和标记化(tokenization)，这个过程可以产生出一系列用于标识文档的标记(token)，标记有时候又被称为单词(word)。为了演示简单，我们假设需要处理的文档只能由英文字母和单引号(‘)组成，并且每个字符至少有两个字符长。标记化的一个常见的步骤，就是移除内容中的非用词，非用词就是那些在文档中频繁出现但是却没有提供相应信息量的单词，对这些单词进行搜索将返回大量无用的结果。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 索引文档</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">indexDocument</span><span class="params">(String docid, String content)</span> </span>&#123;</div><div class="line">    <span class="comment">//获取标记化并且去非用词后的单词</span></div><div class="line">    Set&lt;String&gt; words = tokenize(content);</div><div class="line">    List&lt;Object&gt; results = stringRedisTemplate.execute(<span class="keyword">new</span> SessionCallback&lt;List&lt;Object&gt;&gt;() &#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> List&lt;Object&gt; <span class="title">execute</span><span class="params">(RedisOperations operations)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</div><div class="line">            operations.multi();</div><div class="line">            <span class="keyword">for</span> (String word : words) &#123;</div><div class="line">                operations.opsForSet().add(<span class="string">"idx:"</span> + word, docid);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> operations.exec();</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">    <span class="keyword">return</span> results.size();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="基本搜索操作"><a href="#基本搜索操作" class="headerlink" title="基本搜索操作"></a>基本搜索操作</h4><p>在索引里面查找一个单词是非常容易的，通过使用Redis集合操作以及一些辅助代码，可以对文档执行各种复杂的单词查询操作。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 根据method，对集合进行交集、并集和差集计算并临时保存</span></div><div class="line"><span class="function"><span class="keyword">private</span> String <span class="title">setCommon</span><span class="params">(String method, <span class="keyword">int</span> ttl, String key, String... otherKeys)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">    <span class="comment">// 组装其他set的key</span></div><div class="line">    List&lt;String&gt; otherKeyList = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">    <span class="keyword">for</span>(String otherKey : otherKeys)&#123;</div><div class="line">        otherKeyList.add(<span class="string">"idx:"</span> + otherKey);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">//生成临时标识符</span></div><div class="line">    String id = UUID.randomUUID().toString();</div><div class="line">    String destKey = <span class="string">"idx:"</span> + id;</div><div class="line"></div><div class="line">    <span class="comment">//反射调用指定的方法</span></div><div class="line">    Method[] methods = stringRedisTemplate.opsForSet().getClass().getMethods();</div><div class="line">    <span class="keyword">for</span> (Method m : methods)&#123;</div><div class="line">        <span class="keyword">if</span>(m.getName().equals(method))&#123;</div><div class="line">            Class[] parameterTypes = m.getParameterTypes();</div><div class="line">            <span class="keyword">if</span>(parameterTypes[<span class="number">1</span>].getName().equals(<span class="string">"java.util.Collection"</span>))&#123;</div><div class="line">                m.setAccessible(<span class="keyword">true</span>);</div><div class="line">                <span class="comment">//反射调用方法</span></div><div class="line">                m.invoke(stringRedisTemplate.opsForSet(), <span class="string">"idx:"</span> + key, otherKeyList, destKey);</div><div class="line">                <span class="comment">//30秒后过期</span></div><div class="line">                stringRedisTemplate.expire(destKey, ttl, TimeUnit.SECONDS);</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> id;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 集合求交集</span></div><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">intersect</span><span class="params">(String key, <span class="keyword">int</span> ttl, String... otherKeys)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">    <span class="keyword">return</span> setCommon(<span class="string">"intersectAndStore"</span>, ttl, key, otherKeys);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 集合求并集</span></div><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">union</span><span class="params">(String key, <span class="keyword">int</span> ttl, String... otherKeys)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">    <span class="keyword">return</span> setCommon(<span class="string">"unionAndStore"</span>, ttl, key, otherKeys);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 集合求差集</span></div><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">difference</span><span class="params">(String key, <span class="keyword">int</span> ttl, String... otherKeys)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">    <span class="keyword">return</span> setCommon(<span class="string">"differenceAndStore"</span>, ttl, key, otherKeys);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="分析并执行搜索"><a href="#分析并执行搜索" class="headerlink" title="分析并执行搜索"></a>分析并执行搜索</h4><p>到目前为止，我们已经具备了建立索引和进行搜搜所需要的绝大部分工具，包括标记化函数、索引函数以及基本的交集、并集和差集计算函数。现在缺少的就是一个将文本查询语句转换成搜索操作的函数。为此，我们将实现一个搜索函数，它可以查找那些包含了所有给定单词的文档，并允许我们指定同义词以及不需要的单词。假设有这样一个查询字符串”content indexed +indexing -another”，我们要根据前缀做出不同的查询动作。不加前缀表示单纯的查找含有该单词的文档；’+’前缀表示和前面一个单词是同义词，需要求并集；”-“前缀表示需要查询不包含该单词的文档。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 对查询字符串进行语法分析</span></div><div class="line"><span class="function"><span class="keyword">public</span> Query <span class="title">parse</span><span class="params">(String queryString)</span> </span>&#123;</div><div class="line">    Query query = <span class="keyword">new</span> Query();</div><div class="line">    <span class="comment">//查询单词集合</span></div><div class="line">    Set&lt;String&gt; current = <span class="keyword">new</span> HashSet&lt;&gt;();</div><div class="line">    Matcher matcher = QUERY_RE.matcher(queryString.toLowerCase());</div><div class="line"></div><div class="line">    <span class="keyword">while</span> (matcher.find())&#123;</div><div class="line">        String word = matcher.group().trim();</div><div class="line">        <span class="comment">//获取前缀，如果有则去掉</span></div><div class="line">        <span class="keyword">char</span> prefix = word.charAt(<span class="number">0</span>);</div><div class="line">        <span class="keyword">if</span> (prefix == <span class="string">'+'</span> || prefix == <span class="string">'-'</span>) &#123;</div><div class="line">            word = word.substring(<span class="number">1</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="comment">//验证单词合法性</span></div><div class="line">        <span class="keyword">if</span> (word.length() &lt; <span class="number">2</span> || STOP_WORDS.contains(word)) &#123;</div><div class="line">            <span class="keyword">continue</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">//若前缀为'-'，表示想查询不包含该单词的文档</span></div><div class="line">        <span class="keyword">if</span> (prefix == <span class="string">'-'</span>) &#123;</div><div class="line">            query.unwanted.add(word);</div><div class="line">            <span class="keyword">continue</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 如果同义词集合非空，并且单词不带'+'前缀</div><div class="line">         * 创建查询单词集合</div><div class="line">         */</div><div class="line">        <span class="keyword">if</span> (!current.isEmpty() &amp;&amp; prefix != <span class="string">'+'</span>) &#123;</div><div class="line">            query.all.add(<span class="keyword">new</span> ArrayList&lt;&gt;(current));</div><div class="line">            current.clear();</div><div class="line">        &#125;</div><div class="line">        current.add(word);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (!current.isEmpty())&#123;</div><div class="line">        query.all.add(<span class="keyword">new</span> ArrayList&lt;&gt;(current));</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> query;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//语法分析并查询</span></div><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">parseAndSearch</span><span class="params">(String queryString, <span class="keyword">int</span> ttl)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">    Query query = parse(queryString);</div><div class="line">    <span class="keyword">if</span> (query.all.isEmpty())&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">""</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    List&lt;String&gt; toIntersect = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">    <span class="keyword">for</span> (List&lt;String&gt; syn : query.all) &#123;</div><div class="line">        <span class="keyword">if</span>(syn.size() &gt; <span class="number">1</span>)&#123;</div><div class="line">            <span class="comment">//如果查询单词列表有多个，则先求并集</span></div><div class="line">            String key = syn.get(<span class="number">0</span>);</div><div class="line">            syn.remove(<span class="number">0</span>);</div><div class="line">            String[] otherKeys = <span class="keyword">new</span> String[syn.size()];</div><div class="line">            toIntersect.add(union(key, ttl, tsyn.toArray(otherKeys)));</div><div class="line">        &#125;<span class="keyword">else</span> &#123;</div><div class="line">            <span class="comment">//如果查询单词列表只包含一个，则直接使用</span></div><div class="line">            toIntersect.add(syn.get(<span class="number">0</span>));</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">//交集计算结果</span></div><div class="line">    String intersectResult;</div><div class="line">    <span class="keyword">if</span> (toIntersect.size() &gt; <span class="number">1</span>) &#123;</div><div class="line">        <span class="comment">//求交集</span></div><div class="line">        String key = toIntersect.get(<span class="number">0</span>);</div><div class="line">        toIntersect.remove(<span class="number">0</span>);</div><div class="line">        String[] otherKeys = <span class="keyword">new</span> String[toIntersect.size()];</div><div class="line">        intersectResult = intersect(key, ttl, toIntersect.toArray(otherKeys));</div><div class="line">    &#125;<span class="keyword">else</span> &#123;</div><div class="line">        intersectResult = toIntersect.get(<span class="number">0</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">//求差集</span></div><div class="line">    <span class="keyword">if</span> (!query.unwanted.isEmpty()) &#123;</div><div class="line">        intersectResult = difference(intersectResult, ttl,</div><div class="line">                query.unwanted.toArray(<span class="keyword">new</span> String[query.unwanted.size()]));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> intersectResult;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="对搜索结果进行排序"><a href="#对搜索结果进行排序" class="headerlink" title="对搜索结果进行排序"></a>对搜索结果进行排序</h3><p>虽然我们已经可以根据给定的单词对索引内的文档进行搜索，但这只是我们检索所需要信息的第一步。搜索程序取得多个文档后，通常还需要根据每个文档的重要性对它们进行排序。之前介绍过Redis的SORT命令可以对列表、集合或有序结合存储的内容进行排序。假设现在把文档的相关信息存储在一个散列中，数据格式如下：</p>
+<ul>
+<li>key<ul>
+<li>kb:docA</li>
+</ul>
+</li>
+<li>hash value<ul>
+<li>subKey : id    | subValue : ××××××</li>
+<li>subKey : created   | subValue : ××××××</li>
+<li>subKey : updated   | subValue : ××××××</li>
+</ul>
+</li>
+</ul>
+<p>如果要测试的话，这些信息自行加到redis中，下面重新定义一个含有排序功能的搜索函数。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> SearchResult <span class="title">searchAndSort</span><span class="params">(String queryString, String sort)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">    <span class="comment">//判断是否降序(默认升序)</span></div><div class="line">    <span class="keyword">boolean</span> desc = sort.startsWith(<span class="string">"-"</span>);</div><div class="line">    <span class="keyword">if</span> (desc)&#123;</div><div class="line">        sort = sort.substring(<span class="number">1</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="comment">//如果不是以时间或者id排序，则根据字母表顺序对元素进行排序</span></div><div class="line">    <span class="keyword">boolean</span> alpha = !<span class="string">"updated"</span>.equals(sort) &amp;&amp; !<span class="string">"id"</span>.equals(sort);</div><div class="line">    <span class="comment">//定义排序权重</span></div><div class="line">    String by = <span class="string">"kb:doc*-&gt;"</span> + sort;</div><div class="line">    <span class="comment">//获取搜索后的缓存记录</span></div><div class="line">    String id = parseAndSearch(queryString, <span class="number">300</span>);</div><div class="line"></div><div class="line">    List&lt;Object&gt; results = stringRedisTemplate.execute(<span class="keyword">new</span> SessionCallback&lt;List&lt;Object&gt;&gt;() &#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> List&lt;Object&gt; <span class="title">execute</span><span class="params">(RedisOperations operations)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</div><div class="line">            operations.multi();</div><div class="line">            <span class="comment">//获取搜索结果的数量</span></div><div class="line">            operations.opsForSet().size(<span class="string">"idx:"</span> + id);</div><div class="line">            <span class="comment">//构造排序参数</span></div><div class="line">            SortQuery&lt;String&gt; sortQuery = SortQueryBuilder.sort(<span class="string">"idx:"</span> + id)</div><div class="line">                    .by(by)</div><div class="line">                    .limit(<span class="number">0</span>, <span class="number">20</span>)</div><div class="line">                    .alphabetical(alpha)</div><div class="line">                    .order(desc ? SortParameters.Order.DESC : SortParameters.Order.ASC).build();</div><div class="line">            operations.sort(sortQuery);</div><div class="line">            <span class="keyword">return</span> operations.exec();</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> SearchResult(</div><div class="line">            id,</div><div class="line">            ((Long)results.get(<span class="number">0</span>)).longValue(),</div><div class="line">            (List&lt;String&gt;)results.get(<span class="number">1</span>));</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Redis/" rel="tag"># Redis</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/16/自己动手写JVM十【解析class文件（八）】/" rel="next" title="自己动手写JVM十【解析class文件（八）】">
+                <i class="fa fa-chevron-left"></i> 自己动手写JVM十【解析class文件（八）】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/22/自己动手写JVM十一【运行时数据区（一）】/" rel="prev" title="自己动手写JVM十一【运行时数据区（一）】">
+                自己动手写JVM十一【运行时数据区（一）】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本搜索原理"><span class="nav-number">1.</span> <span class="nav-text">基本搜索原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基本索引操作"><span class="nav-number">1.1.</span> <span class="nav-text">基本索引操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#基本搜索操作"><span class="nav-number">1.2.</span> <span class="nav-text">基本搜索操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分析并执行搜索"><span class="nav-number">1.3.</span> <span class="nav-text">分析并执行搜索</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对搜索结果进行排序"><span class="nav-number">2.</span> <span class="nav-text">对搜索结果进行排序</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

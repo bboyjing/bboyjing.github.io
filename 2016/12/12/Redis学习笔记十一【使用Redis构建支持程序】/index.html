@@ -1,0 +1,700 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Redis," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="之前学习了如何将Redis用作整个系统的一部分，这一章将来学习写如何使用Redis来构建辅助程序。代码示例位于redis-sample项目的support模块中。 日志使用列表存储最新的日志记录：123456789101112public void logRecent(String name, String message, String severity) &amp;#123;    final byt">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis学习笔记十一【使用Redis构建支持程序】">
+<meta property="og:url" content="http://yoursite.com/2016/12/12/Redis学习笔记十一【使用Redis构建支持程序】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="之前学习了如何将Redis用作整个系统的一部分，这一章将来学习写如何使用Redis来构建辅助程序。代码示例位于redis-sample项目的support模块中。 日志使用列表存储最新的日志记录：123456789101112public void logRecent(String name, String message, String severity) &amp;#123;    final byt">
+<meta property="og:updated_time" content="2016-12-13T18:38:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis学习笔记十一【使用Redis构建支持程序】">
+<meta name="twitter:description" content="之前学习了如何将Redis用作整个系统的一部分，这一章将来学习写如何使用Redis来构建辅助程序。代码示例位于redis-sample项目的support模块中。 日志使用列表存储最新的日志记录：123456789101112public void logRecent(String name, String message, String severity) &amp;#123;    final byt">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/12/Redis学习笔记十一【使用Redis构建支持程序】/"/>
+
+
+
+
+
+  <title> Redis学习笔记十一【使用Redis构建支持程序】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/12/Redis学习笔记十一【使用Redis构建支持程序】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Redis学习笔记十一【使用Redis构建支持程序】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-12T14:10:22+08:00">
+                2016-12-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>之前学习了如何将Redis用作整个系统的一部分，这一章将来学习写如何使用Redis来构建辅助程序。代码示例位于<a href="https://github.com/bboyjing/redis-sample" target="_blank" rel="external">redis-sample项目</a>的support模块中。</p>
+<h3 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h3><p>使用列表存储最新的日志记录：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">logRecent</span><span class="params">(String name, String message, String severity)</span> </span>&#123;</div><div class="line">    <span class="keyword">final</span> <span class="keyword">byte</span>[] destination = stringRedisTemplate</div><div class="line">            .getStringSerializer()</div><div class="line">            .serialize(<span class="string">"recent_"</span> + name + <span class="string">"_"</span> + severity);</div><div class="line">    RedisCallback&lt;Object&gt; pipelineCallback = redisConnection -&gt; &#123;</div><div class="line">        redisConnection.lPush(destination,</div><div class="line">                (TIMESTAMP.format(<span class="keyword">new</span> Date()) + <span class="string">' '</span> + message).getBytes());</div><div class="line">        redisConnection.lTrim(destination, <span class="number">0</span>, <span class="number">99</span>);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    &#125;;</div><div class="line">    stringRedisTemplate.executePipelined(pipelineCallback);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<h3 id="计数器"><a href="#计数器" class="headerlink" title="计数器"></a>计数器</h3><p>使用Redis来实现计数器，可以统计网站访问等信息。采用一个有序集合来存储需要记录的时间片信息，若干个散列来存储每个时间片在起始时间点的点击数。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//更新计数器</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">updateCounter</span><span class="params">(String name, <span class="keyword">int</span> count)</span></span>&#123;</div><div class="line">    <span class="keyword">long</span> now = System.currentTimeMillis() / <span class="number">1000</span>;</div><div class="line">    SessionCallback&lt;List&lt;Object&gt;&gt; sessionCallback =  <span class="keyword">new</span> SessionCallback&lt;List&lt;Object&gt;&gt;() &#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> List&lt;Object&gt; <span class="title">execute</span><span class="params">(RedisOperations operations)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</div><div class="line">            operations.multi();</div><div class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; PRECISION.length; i++)&#123;</div><div class="line">                <span class="keyword">int</span> prec = PRECISION[i];</div><div class="line">                <span class="comment">//取得当前时间片的开始时间</span></div><div class="line">                <span class="keyword">long</span> pnow = (now / prec) * prec;</div><div class="line">                String hash = String.valueOf(prec) + <span class="string">'_'</span> + name;</div><div class="line">                <span class="comment">//有序集合存储需要记录的时间片</span></div><div class="line">                operations.opsForZSet().add(<span class="string">"known:"</span>, hash, i);</div><div class="line">                <span class="comment">//时间片点击数散列</span></div><div class="line">                operations.opsForHash().increment(<span class="string">"count_"</span> + hash,String.valueOf(pnow), count);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> operations.exec();</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">    stringRedisTemplate.execute(sessionCallback);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//获取点击数</span></div><div class="line"><span class="keyword">public</span> List&lt;Pair&lt;Integer,Integer&gt;&gt; getCounter(String name, <span class="keyword">int</span> precision)&#123;</div><div class="line">    String hash = String.valueOf(precision) + <span class="string">'_'</span> + name;</div><div class="line">    Map&lt;Object, Object&gt; data = stringRedisTemplate.opsForHash().entries(<span class="string">"count_"</span> + hash);</div><div class="line">    ArrayList&lt;Pair&lt;Integer,Integer&gt;&gt; results = <span class="keyword">new</span> ArrayList&lt;&gt;();</div><div class="line">    data.forEach((k, v) -&gt;</div><div class="line">    	results.add(Pair.of(Integer.parseInt((String) k), Integer.parseInt((String) v))));</div><div class="line">    <span class="keyword">return</span> results;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="查找IP所属城市以及国家"><a href="#查找IP所属城市以及国家" class="headerlink" title="查找IP所属城市以及国家"></a>查找IP所属城市以及国家</h3><p>我们使用<a href="http://dev.maxmind.com/geoip/geoip2/geolite2/" target="_blank" rel="external">maxmind提供的geoip2</a>所属城市数据库作为测试数据，下载GeoLite2 City CSV文件，解压即可。<br>实现IP所属地查找程序会用到两个查找表，第一个查找表需要根据输入的IP地址来查找IP所属的geoname_id，第二个查找表则需要根据输入的geoname_id来查找ID对应的实际信息。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//将ip转换成整数</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">ipToScore</span><span class="params">(String ipAddress)</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> score = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span> (String v : ipAddress.split(<span class="string">"\\."</span>))&#123;</div><div class="line">        score = score * <span class="number">256</span> + Integer.parseInt(v, <span class="number">10</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> score&amp;<span class="number">0x0FFFFFFFFL</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//导入GeonameId</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">importIpsToRedis</span><span class="params">(File file)</span> <span class="keyword">throws</span> Exception</span>&#123;</div><div class="line">    FileReader reader = <span class="keyword">new</span> FileReader(file);</div><div class="line">    CSVParser parser = <span class="keyword">new</span> CSVParser(reader, CSVFormat.DEFAULT);</div><div class="line">    CSVRecord csvRecord;</div><div class="line">    Iterator&lt;CSVRecord&gt; recordIterator = parser.iterator();</div><div class="line">    <span class="keyword">while</span> (recordIterator.hasNext())&#123;</div><div class="line">        csvRecord = recordIterator.next();</div><div class="line">        <span class="keyword">if</span>(csvRecord.getRecordNumber() &gt; <span class="number">1</span>)&#123;</div><div class="line">            <span class="keyword">long</span> score = ipToScore(csvRecord.get(<span class="number">0</span>).split(<span class="string">"/"</span>)[<span class="number">0</span>]);</div><div class="line">            <span class="comment">//多个IP地址范围可能会被映射至同一个城市ID，所以加上行号确保member的唯一性</span></div><div class="line">            String geonameId = csvRecord.get(<span class="number">1</span>) + <span class="string">'_'</span> + csvRecord.getRecordNumber();</div><div class="line">            stringRedisTemplate.opsForZSet().add(<span class="string">"ip_geonameId:"</span>, geonameId, score);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//导入城市实际信息</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">importGeonameToRedis</span><span class="params">(File file)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">    FileReader reader = <span class="keyword">new</span> FileReader(file);</div><div class="line">    CSVParser parser = <span class="keyword">new</span> CSVParser(reader, CSVFormat.DEFAULT);</div><div class="line">    CSVRecord csvRecord;</div><div class="line">    Iterator&lt;CSVRecord&gt; recordIterator = parser.iterator();</div><div class="line">    Gson gson = <span class="keyword">new</span> Gson();</div><div class="line">    <span class="keyword">while</span> (recordIterator.hasNext())&#123;</div><div class="line">        csvRecord = recordIterator.next();</div><div class="line">        String geonameId = csvRecord.get(<span class="number">0</span>);</div><div class="line">        String country = csvRecord.get(<span class="number">5</span>);</div><div class="line">        String region = csvRecord.get(<span class="number">3</span>);</div><div class="line">        String city = !StringUtils.isEmpty(csvRecord.get(<span class="number">10</span>)) ? csvRecord.get(<span class="number">10</span>) : csvRecord.get(<span class="number">7</span>);</div><div class="line">        String json = gson.toJson(<span class="keyword">new</span> String[]&#123;city, region, country&#125;);</div><div class="line">        stringRedisTemplate.opsForHash().put(<span class="string">"geonameId_city:"</span>, geonameId, json);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//通过ip查找城市信息</span></div><div class="line"><span class="keyword">public</span> String[] findCityByIp(String ipAddress) &#123;</div><div class="line">    <span class="keyword">long</span> score = ipToScore(ipAddress);</div><div class="line">    Set&lt;String&gt; results = stringRedisTemplate.opsForZSet()</div><div class="line">            .reverseRangeByScore(<span class="string">"ip_geonameId:"</span>, <span class="number">0</span>, score, <span class="number">0</span>, <span class="number">1</span>);</div><div class="line">    <span class="keyword">if</span> (results.size() == <span class="number">0</span>) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    &#125;</div><div class="line">    String cityId = results.iterator().next();</div><div class="line">    cityId = cityId.substring(<span class="number">0</span>, cityId.indexOf(<span class="string">'_'</span>));</div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Gson().fromJson(</div><div class="line">            (String) stringRedisTemplate.opsForHash().get(<span class="string">"geonameId_city:"</span>, cityId), String[].class);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>项目需要导入的jar包：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.commons<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>commons-csv<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.4<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.google.code.gson<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>gson<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.8.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>另外，maxmind提供了mmdb文件，可以直接使用，<a href="https://github.com/maxmind" target="_blank" rel="external">maxmind gitbub</a>有api使用说明。本人测试了下，通过api查询的结果和导入Redis再查询出来的结果一致。但是有些ip和maxmind官网查出来的结果不一样，这个这里就不深究了。</p>
+<p>能使用Redis构建的支持程序远远不止上述案例，这里只是挑几个讲讲，更多的需要使用者按照Redis的特性自行挖掘。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Redis/" rel="tag"># Redis</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/08/Redis学习笔记十【Redis事物】/" rel="next" title="Redis学习笔记十【Redis事物】">
+                <i class="fa fa-chevron-left"></i> Redis学习笔记十【Redis事物】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/15/Redis学习笔记十二【使用Redis构建应用程序组件-自动补全】/" rel="prev" title="Redis学习笔记十二【使用Redis构建应用程序组件--自动补全】">
+                Redis学习笔记十二【使用Redis构建应用程序组件--自动补全】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#日志"><span class="nav-number">1.</span> <span class="nav-text">日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计数器"><span class="nav-number">2.</span> <span class="nav-text">计数器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查找IP所属城市以及国家"><span class="nav-number">3.</span> <span class="nav-text">查找IP所属城市以及国家</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

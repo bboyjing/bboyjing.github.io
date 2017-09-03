@@ -1,0 +1,858 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JVM,Go," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="上一章节已经实现了读取class文件，测试的时候还打印出一堆杂乱无章的数字，本章就来学习下，这些数字到底是什么，如何解析这些class文件。 class文件作为类信息的载体，每个class文件都完整地定义了一个类，也就是说所有的信息都包含在那一堆数字当中，我们可以通过网络下载、从数据库加载，甚至是在运行中直接生成class文件。所以，class文件并非特指位于磁盘中的.class文件，而是泛指任何">
+<meta name="keywords" content="JVM,Go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自己动手写JVM三【解析class文件（一）】">
+<meta property="og:url" content="http://yoursite.com/2017/01/03/自己动手写JVM三【解析class文件（一）】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="上一章节已经实现了读取class文件，测试的时候还打印出一堆杂乱无章的数字，本章就来学习下，这些数字到底是什么，如何解析这些class文件。 class文件作为类信息的载体，每个class文件都完整地定义了一个类，也就是说所有的信息都包含在那一堆数字当中，我们可以通过网络下载、从数据库加载，甚至是在运行中直接生成class文件。所以，class文件并非特指位于磁盘中的.class文件，而是泛指任何">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_3.png">
+<meta property="og:updated_time" content="2017-01-23T22:12:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="自己动手写JVM三【解析class文件（一）】">
+<meta name="twitter:description" content="上一章节已经实现了读取class文件，测试的时候还打印出一堆杂乱无章的数字，本章就来学习下，这些数字到底是什么，如何解析这些class文件。 class文件作为类信息的载体，每个class文件都完整地定义了一个类，也就是说所有的信息都包含在那一堆数字当中，我们可以通过网络下载、从数据库加载，甚至是在运行中直接生成class文件。所以，class文件并非特指位于磁盘中的.class文件，而是泛指任何">
+<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_3.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/01/03/自己动手写JVM三【解析class文件（一）】/"/>
+
+
+
+
+
+  <title> 自己动手写JVM三【解析class文件（一）】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/03/自己动手写JVM三【解析class文件（一）】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                自己动手写JVM三【解析class文件（一）】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-03T16:22:12+08:00">
+                2017-01-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一章节已经实现了读取class文件，测试的时候还打印出一堆杂乱无章的数字，本章就来学习下，这些数字到底是什么，如何解析这些class文件。</p>
+<h3 id="class文件"><a href="#class文件" class="headerlink" title="class文件"></a>class文件</h3><p>作为类信息的载体，每个class文件都完整地定义了一个类，也就是说所有的信息都包含在那一堆数字当中，我们可以通过网络下载、从数据库加载，甚至是在运行中直接生成class文件。所以，class文件并非特指位于磁盘中的.class文件，而是泛指任何格式符合规范的class数据。<br>为了更好的理解class文件，我们再建一个java项目，和go项目同级，该项目的作用就是在需要的时候测试自己写的JVM。现在，新建一个class：</p>
+<a id="more"></a>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClassFile</span> </span>&#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">boolean</span> FLAG = <span class="keyword">true</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">byte</span> BYTE = <span class="number">123</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">char</span> X = <span class="string">'X'</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">short</span> SHORT = <span class="number">12345</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> INT = <span class="number">123456789</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> LONG = <span class="number">12345678901L</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">float</span> PI = <span class="number">3.14f</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> E = <span class="number">2.71828</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> RuntimeException </span>&#123;</div><div class="line">        System.out.println(<span class="string">"Hello, World!"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>上述代码很简单，是为了学习编译后的class文件。《自己动手写Java虚拟机》的作者写了classpy的图形化工具，可以方便地查看反编译后的class文件。具体如何使用请参照<a href="https://github.com/zxh0/classpy" target="_blank" rel="external">作者的Github站点</a>。编译ClassFile，用classpy打开ClassFile.class:<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_3.png" alt="jvmgo_3"><br>各种看不懂啊，没有关系，慢慢来。构成class文件的基本数据单位是以16进制表示的一个字节，默认按大端方式存储，可以把整个class文件当成一个字节流来处理。<br>Java虚拟机规范使用一种类似C语言的结构体来描述class文件，这种伪结构只有两种数据类型：无符号数和表。其中无符号数是基本数据类型以u1、u2和u4来分别代表1、2和4个字节无符号数。表是由多个无符号数或者其他表作为数据项的复合数据类型，所有的表都习惯以_info结尾。下表列出calss文件的构成：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">类型</th>
+<th style="text-align:center">名称</th>
+<th style="text-align:center">数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">u4</td>
+<td style="text-align:center">magic</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">u2</td>
+<td style="text-align:center">minor_version</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">u2</td>
+<td style="text-align:center">major_version</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">u2</td>
+<td style="text-align:center">constant_pool_count</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">cp_info</td>
+<td style="text-align:center">constant_pool</td>
+<td style="text-align:center">constant_pool_count - 1</td>
+</tr>
+<tr>
+<td style="text-align:center">u2</td>
+<td style="text-align:center">access_flags</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">u2</td>
+<td style="text-align:center">this_class</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">u2</td>
+<td style="text-align:center">super_class</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">u2</td>
+<td style="text-align:center">interfaces_count</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">u2</td>
+<td style="text-align:center">interfaces</td>
+<td style="text-align:center">interfaces_count</td>
+</tr>
+<tr>
+<td style="text-align:center">u2</td>
+<td style="text-align:center">fields_count</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">field_info</td>
+<td style="text-align:center">fields</td>
+<td style="text-align:center">fields_count</td>
+</tr>
+<tr>
+<td style="text-align:center">u2</td>
+<td style="text-align:center">methods_count</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">method_info</td>
+<td style="text-align:center">methods</td>
+<td style="text-align:center">methods_count</td>
+</tr>
+<tr>
+<td style="text-align:center">u2</td>
+<td style="text-align:center">attribute_count</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">attribute_info</td>
+<td style="text-align:center">attributes</td>
+<td style="text-align:center">attribute_count</td>
+</tr>
+</tbody>
+</table>
+<p>现在再看看那一串数字，看似杂乱无章，其实是由严格地规定组合而成，我们要做的就是从数字中把规定找出来，那么就可以揭开class文件的面纱了。</p>
+<h3 id="读取class文件"><a href="#读取class文件" class="headerlink" title="读取class文件"></a>读取class文件</h3><p>下面将一边学习class文件格式，一边编写代码实现class文件解析。Go语言内置了丰富的数据类型，非常适合处理class文件。下表列举了Go和Java基本数据类型对照关系：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Go语言类型</th>
+<th style="text-align:center">Java语言类型</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">int8</td>
+<td style="text-align:center">byte</td>
+<td style="text-align:center">8比特有符号整数</td>
+</tr>
+<tr>
+<td style="text-align:center">unit8(别名byte)</td>
+<td style="text-align:center">N/A</td>
+<td style="text-align:center">8比特无符号整数</td>
+</tr>
+<tr>
+<td style="text-align:center">int16</td>
+<td style="text-align:center">short</td>
+<td style="text-align:center">16比特有符号整数</td>
+</tr>
+<tr>
+<td style="text-align:center">uint16</td>
+<td style="text-align:center">char</td>
+<td style="text-align:center">16比特无符号整数</td>
+</tr>
+<tr>
+<td style="text-align:center">int32(别名rune)</td>
+<td style="text-align:center">int</td>
+<td style="text-align:center">32比特有符号整数</td>
+</tr>
+<tr>
+<td style="text-align:center">uint32</td>
+<td style="text-align:center">N/A</td>
+<td style="text-align:center">32比特无符号整数</td>
+</tr>
+<tr>
+<td style="text-align:center">int64</td>
+<td style="text-align:center">long</td>
+<td style="text-align:center">64比特有符号整数</td>
+</tr>
+<tr>
+<td style="text-align:center">uint64</td>
+<td style="text-align:center">N/A</td>
+<td style="text-align:center">64比特无符号整数</td>
+</tr>
+<tr>
+<td style="text-align:center">float32</td>
+<td style="text-align:center">float</td>
+<td style="text-align:center">32比特IEEE-745浮点数</td>
+</tr>
+<tr>
+<td style="text-align:center">float64</td>
+<td style="text-align:center">double</td>
+<td style="text-align:center">64比特IEEE-745浮点数</td>
+</tr>
+</tbody>
+</table>
+<p>先不探究class文件的规律，把它读出来，之前说过了可以把class文件当成字节流来处理，我们定义一个结构来存储数据。class_reader.go用于读取字节流<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> classfile</div><div class="line"></div><div class="line"><span class="keyword">import</span> <span class="string">"encoding/binary"</span></div><div class="line"></div><div class="line"><span class="comment">// byte数组存储读取的字节流</span></div><div class="line"><span class="keyword">type</span> ClassReader <span class="keyword">struct</span> &#123;</div><div class="line">	data []<span class="keyword">byte</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 读取u1类型的数据</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ClassReader)</span> <span class="title">readUint8</span><span class="params">()</span> <span class="title">uint8</span></span> &#123;</div><div class="line">	<span class="comment">// 读取第一个字节，8位uint</span></div><div class="line">	val := self.data[<span class="number">0</span>]</div><div class="line">	<span class="comment">// 将读取过的字节从字节流中剔除</span></div><div class="line">	self.data = self.data[<span class="number">1</span>:]</div><div class="line">	<span class="keyword">return</span> val</div><div class="line">&#125;</div><div class="line"></div><div class="line">....</div><div class="line"></div><div class="line"><span class="comment">// 读取u2表，表的大小由开头的u2数据指出</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ClassReader)</span> <span class="title">readUint16s</span><span class="params">()</span> []<span class="title">uint16</span></span> &#123;</div><div class="line">	n := self.readUint16()</div><div class="line">	s := <span class="built_in">make</span>([]<span class="keyword">uint16</span>, n)</div><div class="line">	<span class="keyword">for</span> i := <span class="keyword">range</span> s &#123;</div><div class="line">		s[i] = self.readUint16();</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> s</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 读取指定数量的字节</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ClassReader)</span> <span class="title">readBytes</span><span class="params">(n <span class="keyword">uint32</span>)</span> []<span class="title">byte</span></span> &#123;</div><div class="line">	bytes := self.data[:n]</div><div class="line">	self.data = self.data[n:]</div><div class="line">	<span class="keyword">return</span> bytes</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>下面定义和Class文件结构数据类型一致的class_file.go<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> classfile</div><div class="line"></div><div class="line"><span class="keyword">type</span> ClassFile <span class="keyword">struct</span> &#123;</div><div class="line">	magic      <span class="keyword">uint32</span></div><div class="line">	minorVersion <span class="keyword">uint16</span></div><div class="line">	majorVersion <span class="keyword">uint16</span></div><div class="line">	constantPool ConstantPool</div><div class="line">	accessFlags  <span class="keyword">uint16</span></div><div class="line">	thisClass    <span class="keyword">uint16</span></div><div class="line">	superClass   <span class="keyword">uint16</span></div><div class="line">	interfaces   []<span class="keyword">uint16</span></div><div class="line">	fields       []*MemberInfo</div><div class="line">	methods      []*MemberInfo</div><div class="line">	attributes   []AttributeInfo</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>以上只是class_file.go的部分代码，后面一点点完善。其中的ConstantPool、MemberInfo和AttributeInfo都定义在其他文件中，暂时先不管，可以把文件建起来，数据结构定义好，能够编译通过就可以了。<br>这一章节其实也就做了一些解析class的准备工作，下面几个章节将对照class文件，详细学习下ClassFile中每一项的含义，同时完善代码。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JVM/" rel="tag"># JVM</a>
+          
+            <a href="/tags/Go/" rel="tag"># Go</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/28/Redis学习笔记十六【使用Redis构建应用程序组件-消息拉取】/" rel="next" title="Redis学习笔记十六【使用Redis构建应用程序组件-消息拉取】">
+                <i class="fa fa-chevron-left"></i> Redis学习笔记十六【使用Redis构建应用程序组件-消息拉取】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/05/自己动手写JVM四【解析class文件（二）】/" rel="prev" title="自己动手写JVM四【解析class文件（二）】">
+                自己动手写JVM四【解析class文件（二）】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#class文件"><span class="nav-number">1.</span> <span class="nav-text">class文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#读取class文件"><span class="nav-number">2.</span> <span class="nav-text">读取class文件</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

@@ -1,0 +1,763 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Mysql,Mycat," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本章节先了解下Mycat比较重要的部分，即配置文件，就是上一章节中说到的conf目录下的相关内容。 先看一下Mycat里几个重要的概念 用户 逻辑库（schema） 逻辑表（table） 分片节点（dataNode） 分片规则（rule） 全局序列号（sequence）  下面就逐个来讲讲，想一个场景，然后把配置都配好，最终要完整的运行起来。">
+<meta name="keywords" content="Mysql,Mycat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql分库分表之Mycat学习笔记二【配置初探】">
+<meta property="og:url" content="http://yoursite.com/2016/07/27/Mysql分库分表之Mycat学习笔记二【配置初探】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="本章节先了解下Mycat比较重要的部分，即配置文件，就是上一章节中说到的conf目录下的相关内容。 先看一下Mycat里几个重要的概念 用户 逻辑库（schema） 逻辑表（table） 分片节点（dataNode） 分片规则（rule） 全局序列号（sequence）  下面就逐个来讲讲，想一个场景，然后把配置都配好，最终要完整的运行起来。">
+<meta property="og:updated_time" content="2016-08-10T06:03:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mysql分库分表之Mycat学习笔记二【配置初探】">
+<meta name="twitter:description" content="本章节先了解下Mycat比较重要的部分，即配置文件，就是上一章节中说到的conf目录下的相关内容。 先看一下Mycat里几个重要的概念 用户 逻辑库（schema） 逻辑表（table） 分片节点（dataNode） 分片规则（rule） 全局序列号（sequence）  下面就逐个来讲讲，想一个场景，然后把配置都配好，最终要完整的运行起来。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/07/27/Mysql分库分表之Mycat学习笔记二【配置初探】/"/>
+
+
+
+
+
+  <title> Mysql分库分表之Mycat学习笔记二【配置初探】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/27/Mysql分库分表之Mycat学习笔记二【配置初探】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Mysql分库分表之Mycat学习笔记二【配置初探】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-27T00:27:36+08:00">
+                2016-07-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mycat/" itemprop="url" rel="index">
+                    <span itemprop="name">Mycat</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章节先了解下Mycat比较重要的部分，即配置文件，就是上一章节中说到的conf目录下的相关内容。</p>
+<h3 id="先看一下Mycat里几个重要的概念"><a href="#先看一下Mycat里几个重要的概念" class="headerlink" title="先看一下Mycat里几个重要的概念"></a>先看一下Mycat里几个重要的概念</h3><ol>
+<li>用户</li>
+<li>逻辑库（schema）</li>
+<li>逻辑表（table）</li>
+<li>分片节点（dataNode）</li>
+<li>分片规则（rule）</li>
+<li>全局序列号（sequence）</li>
+</ol>
+<p>下面就逐个来讲讲，想一个场景，然后把配置都配好，最终要完整的运行起来。</p>
+<a id="more"></a>
+<h4 id="用户"><a href="#用户" class="headerlink" title="用户"></a>用户</h4><p>用户相关配置位于conf/server.xml中，server.xml包含了整个Mycat Server的配置情况，这里只截取针对性的内容来看下<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">user</span> <span class="attr">name</span>=<span class="string">"root"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"password"</span>&gt;</span>bboyjing<span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"schemas"</span>&gt;</span>OrderDB<span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- &lt;property name="readOnly"&gt;true&lt;/property&gt; --&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">user</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>上述配置定义了连接Mycat Server的用户名和密码，以及能够访问的schema（schema下面再讲解），如果是只读用户可以加上readOnly属性为true。下面就把原有的user标签修改为上述内容。</p>
+<h4 id="逻辑库（schema）"><a href="#逻辑库（schema）" class="headerlink" title="逻辑库（schema）"></a>逻辑库（schema）</h4><p>schema的概念和Mysql中的DataBase概念是一样的，这样就容易理解了。其相关配置位于conf/schema.xml中，user标签中的schemas属性指向的就是schema标签的name属性。下面看下schema标签的内容：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">schema</span> <span class="attr">name</span>=<span class="string">"OrderDB"</span> <span class="attr">checkSQLschema</span>=<span class="string">"false"</span> <span class="attr">sqlMaxLimit</span>=<span class="string">"100"</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">schema</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>schema标签有四个属性</p>
+<ol>
+<li>name：schema的名称相当于数据库的名称</li>
+<li>dataNode：schema所在的分片（dataNode下面讲解），其实就是物理数据库。不过直接在schema上定义dataNode会略显粗糙，可能更多的还是由各个表自己定义分片规则来路由到相应的dataNode。</li>
+<li>checkSQLschema：当设置为true时，如果执行<code>select * from OrderDB.order</code>，Mycat会把语句修改为<code>select * from order</code>，即把表示schema的字符删掉，比较好的做法是关掉这个验证，发送SQL时不要带schema。</li>
+<li>sqlMaxLimit：当设置为某个数值时，即使执行SQL没有加上limit，Mycat也会自动加上对应的值。当SQL语句中指定了limit时，不受该值约束。官方文档上还说如果运行的schema为非拆分库的话，该属性不会生效，所以写SQL时还是严谨点好，该查多少条自己控制。</li>
+</ol>
+<h4 id="逻辑表（table）"><a href="#逻辑表（table）" class="headerlink" title="逻辑表（table）"></a>逻辑表（table）</h4><p>table就是对应Mysql中的表，table标签是schema的子标签，所以依然是修改conf/schema.xml。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">schema</span> <span class="attr">name</span>=<span class="string">"OrderDB"</span> <span class="attr">checkSQLschema</span>=<span class="string">"false"</span> <span class="attr">sqlMaxLimit</span>=<span class="string">"100"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">table</span> <span class="attr">name</span>=<span class="string">"order"</span> <span class="attr">dataNode</span>=<span class="string">"dn1,dn2"</span> <span class="attr">rule</span>=<span class="string">"mod-long"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">schema</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>table标签有九个属性</p>
+<ol>
+<li>name：对应Mysql中的表名</li>
+<li>dataNode：逻辑表所在的分片，该属性值需要和dataNode标签的name属性对应，dateNode标签下面会讲解</li>
+<li>rule：逻辑表使用的分片规则名称，规则在conf/rule.xml中配置，该属性值必须与tableRule标签中的name属性对应</li>
+<li>ruleRequired：是否绑定分片规则，如果为true的话，就一定要配置rule</li>
+<li>primaryKey：逻辑表对应真实表的主键</li>
+<li>type：逻辑表类型，分为全局表和普通表，后面写例子时再详细说明该属性</li>
+<li>autoIncrement：是否启用自增主键，对应Mysql自增主键，默认时禁用的</li>
+<li>subTable：分表，1.6以后开始支持</li>
+<li>needAddLimit：是否允许自动添加schema标签中设置的limit，默认为true</li>
+</ol>
+<p>table标签下还有个childTable子标签，用于定义E-R分片的字表，所谓E-R分片就是把两个有关系的路由到同一个分片，方便join操作，具体配置后面写示例时再看。</p>
+<h4 id="分片节点（dataNode）"><a href="#分片节点（dataNode）" class="headerlink" title="分片节点（dataNode）"></a>分片节点（dataNode）</h4><p>dataNode定义了Mycat中的数据节点，也就是通常说的数据分片，其实就是指向了具体的数据库地址和名称。<br>dataNode标签和schema同级，依然修改conf/schema.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dataNode</span> <span class="attr">name</span>=<span class="string">"dn1"</span> <span class="attr">dataHost</span>=<span class="string">"dockerhost1"</span> <span class="attr">database</span>=<span class="string">"order_db"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">dataNode</span> <span class="attr">name</span>=<span class="string">"dn2"</span> <span class="attr">dataHost</span>=<span class="string">"dockerhost2"</span> <span class="attr">database</span>=<span class="string">"order_db"</span> /&gt;</span></div></pre></td></tr></table></figure></p>
+<p>dataNode标签有三个属性</p>
+<ol>
+<li>name：分片名称，全局唯一</li>
+<li>dataHost：数据库实例地址，对应dataHost标签的name属性（下面讲解）</li>
+<li>dataBase：对应数据库实例上的具体数据库，要预先建好</li>
+</ol>
+<h4 id="节点主机（dataHost）"><a href="#节点主机（dataHost）" class="headerlink" title="节点主机（dataHost）"></a>节点主机（dataHost）</h4><p>dataHost标签定义了具体的数据库实例、读写分离配置和心跳语句。<br>dataHost标签和schema同级，依然修改conf/schema.xml。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dataHost</span> <span class="attr">name</span>=<span class="string">"dockerhost1"</span> <span class="attr">maxCon</span>=<span class="string">"1000"</span> <span class="attr">minCon</span>=<span class="string">"10"</span> <span class="attr">balance</span>=<span class="string">"0"</span></span></div><div class="line">    <span class="attr">writeType</span>=<span class="string">"0"</span> <span class="attr">dbType</span>=<span class="string">"mysql"</span> <span class="attr">dbDriver</span>=<span class="string">"native"</span> <span class="attr">switchType</span>=<span class="string">"1"</span>&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">heartbeat</span>&gt;</span>select user()<span class="tag">&lt;/<span class="name">heartbeat</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">writeHost</span> <span class="attr">host</span>=<span class="string">"hostM1"</span> <span class="attr">url</span>=<span class="string">"localhost:3306"</span> <span class="attr">user</span>=<span class="string">"root"</span> <span class="attr">password</span>=<span class="string">"bboyjing"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">writeHost</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dataHost</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">dataHost</span> <span class="attr">name</span>=<span class="string">"dockerhost2"</span> <span class="attr">maxCon</span>=<span class="string">"1000"</span> <span class="attr">minCon</span>=<span class="string">"10"</span> <span class="attr">balance</span>=<span class="string">"0"</span></span></div><div class="line">    <span class="attr">writeType</span>=<span class="string">"0"</span> <span class="attr">dbType</span>=<span class="string">"mysql"</span> <span class="attr">dbDriver</span>=<span class="string">"native"</span> <span class="attr">switchType</span>=<span class="string">"1"</span>&gt;</div><div class="line">    <span class="tag">&lt;<span class="name">heartbeat</span>&gt;</span>select user()<span class="tag">&lt;/<span class="name">heartbeat</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">writeHost</span> <span class="attr">host</span>=<span class="string">"hostM1"</span> <span class="attr">url</span>=<span class="string">"localhost:3316"</span> <span class="attr">user</span>=<span class="string">"root"</span> <span class="attr">password</span>=<span class="string">"bboyjing"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">writeHost</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dataHost</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>dataHost标签有9个属性</p>
+<ol>
+<li>name：节点主机名称</li>
+<li>maxCon：指定每个读写实例连接池的最大连接</li>
+<li>minCon：指定每个读写实例连接池的最小连接，即初始化连接池的大小</li>
+<li>balance：读操作负载均衡类型，目前有三个可选值”0”、”1”、”2”、”3”。读写分离相关策略，后面再详细讲，例子中的”0”代表不开启读写分离，读操作都发到writeHost上</li>
+<li>writeType：写操作负载均衡类型，目前有三可选值”0”、”1”、”2”，具体后面再看，例子中的”0”表示所有写操作发送到第一个writeHost，第一个挂了切换到还生存的第二个writeHost。</li>
+<li>dbType：指定连接的数据库类型，目前支持二进制的Mysql协议，还有其他的JDBC连接的数据库。例如mongodb、oracle、spark等</li>
+<li>dbDriver：指定连接数据库的驱动，目前可选指为native和JDBC。native支持mysql和mariadb，其他数据库需要用JDBC驱动</li>
+<li>switchType：自动切换标识，”1”为默认值，表示不自动切换，其他可选指为”1”、”2”，暂不展开</li>
+<li>tempReadHostAvailable：writeHost失联后，其下面的readHost仍旧可用，默认0，可选值0、1</li>
+</ol>
+<h4 id="分片规则（rule）"><a href="#分片规则（rule）" class="headerlink" title="分片规则（rule）"></a>分片规则（rule）</h4><p>分片规则位于conf/rule.xml中，其中定义了我们对表进行拆分所涉及到的规则定义，<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">tableRule</span> <span class="attr">name</span>=<span class="string">"mod-long"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">rule</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">columns</span>&gt;</span>id<span class="tag">&lt;/<span class="name">columns</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">algorithm</span>&gt;</span>mod-long<span class="tag">&lt;/<span class="name">algorithm</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">rule</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">tableRule</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">function</span> <span class="attr">name</span>=<span class="string">"mod-long"</span> <span class="attr">class</span>=<span class="string">"org.opencloudb.route.function.PartitionByMod"</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- how many data nodes --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"count"</span>&gt;</span>2<span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">function</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>tableRule标签</p>
+<ol>
+<li>name属性：指定rule全局唯一的名字</li>
+<li>columns标签：拆分的列的名字</li>
+<li>algorithm标签：指向function标签的name属性，表示具体的算法</li>
+</ol>
+<p>function标签</p>
+<ol>
+<li>name属性：指定算法名称</li>
+<li>class属性：指定路由算法具体的类名</li>
+<li>property标签：定义了算法具体的规则，此算法的含义是根据id mod2将数据路由到两个分片上。Mycat定义了一些算法规则，后面再讲</li>
+</ol>
+<h4 id="全局序列号后面章节再讲"><a href="#全局序列号后面章节再讲" class="headerlink" title="全局序列号后面章节再讲"></a>全局序列号后面章节再讲</h4><p>至此，了解了下Mycat基本的配置，下面尝试下基于这些配置，将Mycat启动，并且成功插入数据。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+          
+            <a href="/tags/Mycat/" rel="tag"># Mycat</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/26/Mysql分库分表之Mycat学习笔记一【序】/" rel="next" title="Mysql分库分表之Mycat学习笔记一【序】">
+                <i class="fa fa-chevron-left"></i> Mysql分库分表之Mycat学习笔记一【序】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/04/Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】/" rel="prev" title="Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】">
+                Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#先看一下Mycat里几个重要的概念"><span class="nav-number">1.</span> <span class="nav-text">先看一下Mycat里几个重要的概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#用户"><span class="nav-number">1.1.</span> <span class="nav-text">用户</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#逻辑库（schema）"><span class="nav-number">1.2.</span> <span class="nav-text">逻辑库（schema）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#逻辑表（table）"><span class="nav-number">1.3.</span> <span class="nav-text">逻辑表（table）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分片节点（dataNode）"><span class="nav-number">1.4.</span> <span class="nav-text">分片节点（dataNode）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#节点主机（dataHost）"><span class="nav-number">1.5.</span> <span class="nav-text">节点主机（dataHost）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分片规则（rule）"><span class="nav-number">1.6.</span> <span class="nav-text">分片规则（rule）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#全局序列号后面章节再讲"><span class="nav-number">1.7.</span> <span class="nav-text">全局序列号后面章节再讲</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

@@ -1,0 +1,712 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,MQ," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="最近项目需要使用RocketMQ，之前没有使用过，现在花点时间来学习下，顺便记录下学习过程。目前没有去找其他资源，先参照下官网文档学学看。 Quick Start基本上都是这套路，先照着Quick Start画个瓢。这里，Quick Start的目的是让使用者在本机快速地搭建RocketMQ系统，并且能够收发消息。对于系统以及软件的要求，官网说的很明确，下面列一下我本机的环境:">
+<meta name="keywords" content="Java,MQ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RocketMQ学习笔记一【Hello MQ】">
+<meta property="og:url" content="http://yoursite.com/2017/04/06/RocketMQ学习笔记一【Hello-MQ】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="最近项目需要使用RocketMQ，之前没有使用过，现在花点时间来学习下，顺便记录下学习过程。目前没有去找其他资源，先参照下官网文档学学看。 Quick Start基本上都是这套路，先照着Quick Start画个瓢。这里，Quick Start的目的是让使用者在本机快速地搭建RocketMQ系统，并且能够收发消息。对于系统以及软件的要求，官网说的很明确，下面列一下我本机的环境:">
+<meta property="og:updated_time" content="2017-04-25T03:42:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RocketMQ学习笔记一【Hello MQ】">
+<meta name="twitter:description" content="最近项目需要使用RocketMQ，之前没有使用过，现在花点时间来学习下，顺便记录下学习过程。目前没有去找其他资源，先参照下官网文档学学看。 Quick Start基本上都是这套路，先照着Quick Start画个瓢。这里，Quick Start的目的是让使用者在本机快速地搭建RocketMQ系统，并且能够收发消息。对于系统以及软件的要求，官网说的很明确，下面列一下我本机的环境:">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/04/06/RocketMQ学习笔记一【Hello-MQ】/"/>
+
+
+
+
+
+  <title> RocketMQ学习笔记一【Hello MQ】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/06/RocketMQ学习笔记一【Hello-MQ】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                RocketMQ学习笔记一【Hello MQ】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-06T14:25:23+08:00">
+                2017-04-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/RocketMQ/" itemprop="url" rel="index">
+                    <span itemprop="name">RocketMQ</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近项目需要使用RocketMQ，之前没有使用过，现在花点时间来学习下，顺便记录下学习过程。目前没有去找其他资源，先参照下<a href="https://rocketmq.incubator.apache.org/docs/quick-start/" target="_blank" rel="external">官网</a>文档学学看。</p>
+<h3 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h3><p>基本上都是这套路，先照着Quick Start画个瓢。这里，Quick Start的目的是让使用者在本机快速地搭建RocketMQ系统，并且能够收发消息。对于系统以及软件的要求，官网说的很明确，下面列一下我本机的环境:</p>
+<a id="more"></a>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">OS name: "linux", version: "4.4.0-24-generic", arch: "amd64", family: "unix"</div><div class="line">Java version: 1.8.0_91, vendor: Oracle Corporation</div><div class="line">Apache Maven 3.3.9</div><div class="line">git version 2.7.4</div></pre></td></tr></table></figure>
+<p>参照下来，满足要求了。下面一步是把RocketMQ下载下来，Quick Start中使用的方式是直接clone代码，然后自己build。直接clone的代码是最新的，我们保守点，还是下载最新的release版本，目前最新版是<a href="https://github.com/apache/incubator-rocketmq/releases" target="_blank" rel="external">rocketmq-4.0.0-incubating</a>。下载下来之后执行如下步骤，当然下载目录和安装目录按自己喜好来。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> cd ~/Downloads</div><div class="line"><span class="meta">#</span> 目录名太长了，改改</div><div class="line"><span class="meta">&gt;</span> mkdir rocketmq &amp;&amp; tar -zxvf incubator-rocketmq-rocketmq-4.0.0-incubating.tar.gz -C ./rocketmq --strip-components 1</div><div class="line"><span class="meta">&gt;</span> mvn clean package install -Prelease-all assembly:assembly -U</div></pre></td></tr></table></figure></p>
+<p>上面最后一步有可能会出编译失败，我这边遇到的问题是，可能因为之前的不当修改导致hostname对应ip不是当前的有效ip，最终导致common项目下的MixAllTest.testGetLocalInetAddress()方法测试不通过。当然，遇到的问题可能会不一样，但是仔细看编译错误，会给出提示信息，比如：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Please refer to /home/zhangjing/Downloads/rocketmq/common/target/surefire-reports</div><div class="line">for the individual test results.</div></pre></td></tr></table></figure></p>
+<p>我们照着提示信息去看下，发现surefire-reports是个文件夹，里面有一系列txt文件，存放着编译结果。如果不知道具体是哪儿出问题的话，可能需要逐个看下，也没几个文件。而且打印出来的错误也比较详细，相信很容易就能问题。我这边把hostname对应的ip改成127.0.0.1之后，就能顺利编译完成了。<br>最后把编译完的程序包拷贝到安装目录：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">sudo cp -r target/apache-rocketmq-all /opt</div><div class="line"><span class="meta">#</span> 本机测试</div><div class="line">sudo chmod -R 777 apache-rocketmq-all</div></pre></td></tr></table></figure></p>
+<h4 id="启动-Name-Server"><a href="#启动-Name-Server" class="headerlink" title="启动 Name Server"></a>启动 Name Server</h4><p>到这一步时RocketMQ已经成功编译好了，执行下面的步骤，可以启动Name Server。至于这个Name Server的作用是什么，后面再看。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> cd /opt/apache-rocketmq-all</div><div class="line"><span class="meta">&gt;</span> nohup sh bin/mqnamesrv &amp;</div><div class="line"><span class="meta">&gt;</span> tail -f ~/logs/rocketmqlogs/namesrv.log</div><div class="line">...</div><div class="line">INFO main - The Name Server boot success. serializeType=JSON</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<p>可以看出，RocketMQ默认的log位置在当前用户目录的logs/rocketmqlogs/中，从截取的输出可以看出，Name Server启动成功了。顺便看下~/logs/rocketmqlogs/目录，当前只有两个文件namesrv.log和namesrv_default.log，如果日后Name Server出问题，知道去哪儿看日志。</p>
+<h4 id="启动-Broker"><a href="#启动-Broker" class="headerlink" title="启动 Broker"></a>启动 Broker</h4><p>下面命令可以启动Broker：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> nohup sh bin/mqbroker -n localhost:9876 &amp;</div></pre></td></tr></table></figure></p>
+<p>命令执行完之后，笔记本直接卡死了，过了好几分钟有点缓过来。最终看到占用资源的进程：/usr/lib/jvm/jdk1.8.0_91/bin/java -server -Xms8g -Xmx8g…，原来是RocketMQ一个Broker的启动直接申请了8g内存，我电脑内存也才8g。修改下启动脚本bin/runbroker.sh：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> vim bin/runbroker.sh</div><div class="line"><span class="meta">#</span> 将JAVA_OPT="$&#123;JAVA_OPT&#125; -server -Xms8g -Xmx8g -Xmn1g"修改成如下：</div><div class="line">JAVA_OPT="$&#123;JAVA_OPT&#125; -server -Xms1g -Xmx1g -Xmn512m"</div></pre></td></tr></table></figure></p>
+<p>修改完之后，启动就正常了，下面看下log：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> tail -f ~/logs/rocketmqlogs/broker.log</div><div class="line">...</div><div class="line">The broker[asus, 172.17.0.1:10911] boot success. serializeType=JSON and name server is localhost:9876</div></pre></td></tr></table></figure></p>
+<p>虽然看log是启动成功了，但是注意下ip，172.17.0.1是安装的docker的ip。官网也有提示说，broker ip不能使用loopback network，也就是不能是127.0.0.1，所以启动的时候自动选择了一个不是回环地址的ip。查了一下，通过broker的brokerip1属性可以手动修改，但是这里暂时不需要修改，知道下有这回事情就可以了。</p>
+<h4 id="收发消息"><a href="#收发消息" class="headerlink" title="收发消息"></a>收发消息</h4><p>在收发消息之前，我们需要告诉客户端name servers的地址，RocketMQ提供多种配置方式。简单的方式是通过环境变量，在合适的位置添加NAMESRV_ADDR：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">export NAMESRV_ADDR=localhost:9876</div></pre></td></tr></table></figure></p>
+<p>消息生产者测试：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> sh bin/tools.sh org.apache.rocketmq.example.quickstart.Producer</div><div class="line">...</div><div class="line">SendResult [sendStatus=SEND_OK, msgId=AC11000122791B6D35861B139B380000...]</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<p>消息消费者测试：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> sh bin/tools.sh org.apache.rocketmq.example.quickstart.Consumer</div><div class="line">...</div><div class="line">ConsumeMessageThread_2 Receive New Messages: ...</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<h4 id="停止服务"><a href="#停止服务" class="headerlink" title="停止服务"></a>停止服务</h4><p>停止Broker：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> sh bin/mqshutdown broker</div><div class="line">The mqbroker(8411) is running...</div><div class="line">Send shutdown request to mqbroker(8411) OK</div></pre></td></tr></table></figure></p>
+<p>停止Name Servers：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> sh bin/mqshutdown namesrv</div><div class="line">The mqnamesrv(4716) is running...</div><div class="line">Send shutdown request to mqnamesrv(4716) OK</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/MQ/" rel="tag"># MQ</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/05/Java-NIO之【Scalable-IO-in-Java】/" rel="next" title="Java NIO之【Scalable IO in Java】">
+                <i class="fa fa-chevron-left"></i> Java NIO之【Scalable IO in Java】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/11/RocketMQ学习笔记二【了解RocketMQ概念】/" rel="prev" title="RocketMQ学习笔记二【了解RocketMQ概念】">
+                RocketMQ学习笔记二【了解RocketMQ概念】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Quick-Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#启动-Name-Server"><span class="nav-number">1.1.</span> <span class="nav-text">启动 Name Server</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动-Broker"><span class="nav-number">1.2.</span> <span class="nav-text">启动 Broker</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#收发消息"><span class="nav-number">1.3.</span> <span class="nav-text">收发消息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#停止服务"><span class="nav-number">1.4.</span> <span class="nav-text">停止服务</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

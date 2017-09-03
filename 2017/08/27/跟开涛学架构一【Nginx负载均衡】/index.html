@@ -1,0 +1,761 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Architecture,Nginx," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="最近在张开涛所著的《亿级流量网站架构核心技术》，粗粗浏览了下，核心思想是围绕着Nginx在转。如果平时没有一些运维实际经验的话，可能整本书看下来效果不是很好。要想吸收更多的知识，光看是没用的，还是得亲自动手操作。书中有不少代码片段，我会尝试尽量把案例都实现，组成可以跑通的完整测试项目，以达到学习的目的。本系列学习笔记的内容大多来自这本书，如果涉及到版权问题，请及时联系本人。下面就进入正题了。 环境">
+<meta name="keywords" content="Java,Architecture,Nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="跟开涛学架构一【Nginx负载均衡】">
+<meta property="og:url" content="http://yoursite.com/2017/08/27/跟开涛学架构一【Nginx负载均衡】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="最近在张开涛所著的《亿级流量网站架构核心技术》，粗粗浏览了下，核心思想是围绕着Nginx在转。如果平时没有一些运维实际经验的话，可能整本书看下来效果不是很好。要想吸收更多的知识，光看是没用的，还是得亲自动手操作。书中有不少代码片段，我会尝试尽量把案例都实现，组成可以跑通的完整测试项目，以达到学习的目的。本系列学习笔记的内容大多来自这本书，如果涉及到版权问题，请及时联系本人。下面就进入正题了。 环境">
+<meta property="og:updated_time" content="2017-09-03T08:47:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="跟开涛学架构一【Nginx负载均衡】">
+<meta name="twitter:description" content="最近在张开涛所著的《亿级流量网站架构核心技术》，粗粗浏览了下，核心思想是围绕着Nginx在转。如果平时没有一些运维实际经验的话，可能整本书看下来效果不是很好。要想吸收更多的知识，光看是没用的，还是得亲自动手操作。书中有不少代码片段，我会尝试尽量把案例都实现，组成可以跑通的完整测试项目，以达到学习的目的。本系列学习笔记的内容大多来自这本书，如果涉及到版权问题，请及时联系本人。下面就进入正题了。 环境">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/08/27/跟开涛学架构一【Nginx负载均衡】/"/>
+
+
+
+
+
+  <title> 跟开涛学架构一【Nginx负载均衡】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/27/跟开涛学架构一【Nginx负载均衡】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                跟开涛学架构一【Nginx负载均衡】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-27T17:04:08+08:00">
+                2017-08-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Architecture/" itemprop="url" rel="index">
+                    <span itemprop="name">Architecture</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近在张开涛所著的《亿级流量网站架构核心技术》，粗粗浏览了下，核心思想是围绕着Nginx在转。如果平时没有一些运维实际经验的话，可能整本书看下来效果不是很好。要想吸收更多的知识，光看是没用的，还是得亲自动手操作。书中有不少代码片段，我会尝试尽量把案例都实现，组成可以跑通的完整测试项目，以达到学习的目的。本系列学习笔记的内容大多来自这本书，如果涉及到版权问题，请及时联系本人。下面就进入正题了。</p>
+<h3 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h3><p>目前需要的环境是Java运行环境和Nginx。</p>
+<a id="more"></a>
+<h4 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx"></a>Nginx</h4><p>Nginx的话直接安装<a href="https://openresty.org/cn/" target="_blank" rel="external">Openresty</a>最新版(目前版本1.11.2.5)，具体参照官网安装步骤。本机环境为Mac OS X，直接采用官方推荐的方式：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> brew install homebrew/nginx/openresty</div></pre></td></tr></table></figure></p>
+<p>安装完之后的目录在/usr/local/Cellar/openresty下，直接运行openresty命令即可：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> sudo openresty</div><div class="line"><span class="meta">&gt;</span> curl localhost</div><div class="line">!DOCTYPE html&gt;</div><div class="line">&lt;html&gt;</div><div class="line">&lt;head&gt;</div><div class="line">&lt;title&gt;Welcome to OpenResty!&lt;/title&gt;</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<p>如果还是想执行nginx命令的话，将脚本路径加入到的PATH变量。具体怎么加，按照自己的系统来，下面举个本机的例子：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> vim ~/.zshrc</div><div class="line">export PATH="$PATH:/usr/local/Cellar/openresty/1.11.2.5/nginx/sbin"</div><div class="line"><span class="meta">&gt;</span> source ~/.zshrc</div></pre></td></tr></table></figure></p>
+<h4 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h4><p>Java环境的准备就不多说了，这里主要是提一下建测试项目，依然采用目前比较便捷的SpringBoot搭建后端项目。项目地址取名<a href="https://github.com/bboyjing/hunger" target="_blank" rel="external">hunger</a>，本系列涉及到的所有项目都在这个目录下。</p>
+<h3 id="Nginx常见用法"><a href="#Nginx常见用法" class="headerlink" title="Nginx常见用法"></a>Nginx常见用法</h3><p>感觉这本书面向的人群需要具有目前主流架构的简单了解，尤其是Nginx。本人也是一边查资料一遍学，过程就不写出来了，还是以实践为主。</p>
+<h4 id="负载均衡-反向代理"><a href="#负载均衡-反向代理" class="headerlink" title="负载均衡/反向代理"></a>负载均衡/反向代理</h4><p>其意思就是请求落到Nginx,Nginx代理了后端真正的服务地址，同时又能使流量均衡地发送过去。是通过upstream配置来实现该功能的。下面我们要做如下工作才能完成测试：</p>
+<ol>
+<li><p>配置Nginx，并且重启。我们就直接在hungeru目录下创建conf/nginx.conf文件。参照官网，文件如下内容如下：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">worker_processes  1;</div><div class="line">error_log logs/error.log;</div><div class="line">events &#123;</div><div class="line">    worker_connections 1024;</div><div class="line">&#125;</div><div class="line">http &#123;</div><div class="line">    server &#123;</div><div class="line">        listen 80;</div><div class="line">        location / &#123;</div><div class="line">            default_type text/html;</div><div class="line">            content_by_lua &apos;</div><div class="line">                ngx.say(&quot;&lt;p&gt;hello, world&lt;/p&gt;&quot;)</div><div class="line">            &apos;;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p> 尝试启动Nginx</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> sudo nginx -c ~/IdeaProjects/hunger/conf/nginx.conf</div><div class="line">会报错，提示没有logs文件夹，需要在/usr/local/Cellar/openresty/1.11.2.5/nginx下手动添加logs文件夹，再启动就好了。</div></pre></td></tr></table></figure>
+<p> 启动成功之后，访问localhost会成功输出hello, world。content_by_lua配置项属于Openresty范畴，如果不了解的话，需要自行再去学习了。</p>
+</li>
+<li><p>新建Java项目，我们在hunger目录下快速创建2个项目，过程就不写出来了。贴出核心代码：</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RequestMapping</span>(path = <span class="string">"/"</span>, method = RequestMethod.GET)</div><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">handle</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="string">"from real server 1"</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="meta">@RequestMapping</span>(path = <span class="string">"/"</span>, method = RequestMethod.GET)</div><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">handle</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="string">"from real server 2"</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>模拟业务项目准备完毕之后，就可以来改Nginx配置了，主要是修改nginx.conf文件：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">http &#123;</div><div class="line">    upstream real_server &#123;</div><div class="line">        server localhost:8081;</div><div class="line">        server localhost:8082;</div><div class="line">    &#125;</div><div class="line">    server &#123;</div><div class="line">        listen 80;</div><div class="line">        location / &#123;</div><div class="line">            proxy_pass http://real_server;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>上述配置完毕，将项目都启动，即可进行测试，稍微解释下上述配置文件。当有localhost:80的请求过来，nginx会反向代理到proxy_pass配置的upstream server，然后请求会平均地落到两台实际业务服务器上。测试结果如下：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> curl localhost</div><div class="line">from real server 1%</div><div class="line"><span class="meta">&gt;</span> curl localhost</div><div class="line">from real server 2%</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<h4 id="负载均衡算法"><a href="#负载均衡算法" class="headerlink" title="负载均衡算法"></a>负载均衡算法</h4><p>负载均衡指的是如何将流量分配到upstream server，默认采用的是round-roobin，从上面的测也也可以看出来，请求是平均地落到real_server上。同时还支持其他几种算法：</p>
+<ul>
+<li><p>weighte权重算法，通过给server配置weight可以实现基于权重的轮询，修改nginx.conf文件：     </p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">upstream real_server &#123;</div><div class="line">    server localhost:8081 weight=1;</div><div class="line">    server localhost:8082 weight=2;</div><div class="line">&#125;</div><div class="line"></div><div class="line"># 测试结果</div><div class="line">&gt; curl localhost</div><div class="line">from real server 1%</div><div class="line">&gt; curl localhost</div><div class="line">from real server 2%</div><div class="line">&gt; curl localhost</div><div class="line">from real server 2%</div><div class="line">...</div></pre></td></tr></table></figure>
+<p>  上述配置的意思是每3个请求中的1个落到8081，另外2个落到8082。可以请求localhost:80来测试下。</p>
+</li>
+<li><p>ip_hash算法，根据客户端IP进行负载均衡，即相同的IP将负载均衡到同一个upstream，修改nginx.conf文件：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">upstream real_server &#123;</div><div class="line">    ip_hash;</div><div class="line">    server localhost:8081;</div><div class="line">    server localhost:8082;</div><div class="line">&#125;</div><div class="line"># 经过测试，本机所有的请求都落在8081上，证明配置生效</div><div class="line">&gt; curl localhost</div><div class="line">from real server 1%</div><div class="line">&gt; curl localhost</div><div class="line">from real server 1%</div><div class="line">...</div></pre></td></tr></table></figure>
+</li>
+<li><p>hash key[consistent]，对某个key进行哈希或者使用一致性哈希算法进行负载均衡。这里简单地根据请求uri进行负载均衡。修改java项目和nginx.conf来测试：</p>
+  <figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">// Java项目新增接口</div><div class="line">@RequestMapping(path = "/&#123;uri&#125;", method = RequestMethod.GET)</div><div class="line">public String handleUri(@PathVariable String uri) &#123;</div><div class="line">    return "from real server 1, param is " + uri;</div><div class="line">&#125;</div><div class="line"></div><div class="line">@RequestMapping(path = "/&#123;uri&#125;", method = RequestMethod.GET)</div><div class="line">public String handleUri(@PathVariable String uri) &#123;</div><div class="line">    return "from real server 2, param is " + uri;</div><div class="line">&#125;</div><div class="line"></div><div class="line"># 修改nginx配置</div><div class="line">upstream real_server &#123;</div><div class="line">    hash $uri;</div><div class="line">    server localhost:8081;</div><div class="line">    server localhost:8082;</div><div class="line">&#125;</div><div class="line"></div><div class="line"># 测试结果</div><div class="line">&gt; curl localhost/a</div><div class="line">from real server 1, param is a</div><div class="line">&gt; curl localshot/c</div><div class="line">from real server 2, param is c</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="失败重试"><a href="#失败重试" class="headerlink" title="失败重试"></a>失败重试</h4><p>通过upstream server的max_fails和fail_timeout来实现该功能。意思是在fail_timeout时间内失败了max_fails次请求后，则认为该上游服务器不可用，然后将该服务地址踢除掉。fail_timeout时间后会再次将该服务器加入存活列表，进行重试。修改nginx.conf文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream real_server &#123;</div><div class="line">    server localhost:8081 max_fails=2 fail_timeout=60s;</div><div class="line">    server localhost:8082 max_fails=2 fail_timeout=60s;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>下面我们来测试下：</p>
+<ol>
+<li>停掉real_server_2</li>
+<li><p>请求localhost，并查看输出以及nginx error.log</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> curl localhost</div><div class="line">from real server 1%</div><div class="line"><span class="meta">&gt;</span> tail -f /usr/local/Cellar/openresty/1.11.2.5/nginx/logs/error.log</div><div class="line">...Connection refused...upstream: "http://127.0.0.1:8082/"...</div></pre></td></tr></table></figure>
+</li>
+<li><p>重启real_server_2后会再次连上</p>
+</li>
+</ol>
+<p>通过wireshark截取请求可以看出，确实在判断出real_servert_2不在线之后，fail_timeout时间内没有对它再请求，以此可以作为nginx把服务器地址踢掉的证据。另外，翻了一下书本，后面有一章专门讲超超时与重试机制，到那时候再详细看看。</p>
+<h4 id="健康检查"><a href="#健康检查" class="headerlink" title="健康检查"></a>健康检查</h4><p>Nginx对上游服务器的健康检查默认采用的是惰性策略，书中的例子是通过集成nginx_upstream_check_module模块来进行主动健康检查。但是Openresty本身自带了一个叫<a href="https://github.com/openresty/lua-resty-upstream-healthcheck" target="_blank" rel="external">lua-resty-upstream-healthcheck</a>的模块，可以提供这样的功能。我们就直接使用该模块做测试，下面开始可能会比较多地涉及Openresty的相关内容，建议先看下<a href="http://jinnianshilongnian.iteye.com/blog/2190344" target="_blank" rel="external">开涛老师的一个系列博客</a>入门。假定我们已经有一点基础了，就来试下吧：</p>
+<ol>
+<li><p>在conf目录下新建一个名为lua的文件夹，以后所有的的lua文件都放到conf/lua目录下，然后在lua目录下新建healthcheck.lua</p>
+ <figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- 引入healthcheck模块</span></div><div class="line"><span class="keyword">local</span> hc = <span class="built_in">require</span> <span class="string">"resty.upstream.healthcheck"</span></div><div class="line">healthcheck = <span class="function"><span class="keyword">function</span><span class="params">()</span></span></div><div class="line">    <span class="keyword">local</span> ok, err = hc.spawn_checker &#123;</div><div class="line">        shm = <span class="string">"healthcheck"</span>,</div><div class="line">        upstream = <span class="string">"real_server"</span>,</div><div class="line">        <span class="built_in">type</span> = <span class="string">"http"</span>,</div><div class="line">        http_req = <span class="string">"GET / HTTP/1.0\r\nHost: real_server\r\n\r\n"</span>,</div><div class="line">        interval = <span class="number">2000</span>,</div><div class="line">        timeout = <span class="number">5000</span>,</div><div class="line">        fall = <span class="number">3</span>,</div><div class="line">        rise = <span class="number">2</span>,</div><div class="line">        valid_statuses = &#123;<span class="number">200</span>, <span class="number">302</span>&#125;,</div><div class="line">        concurrency = <span class="number">1</span>,</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> <span class="keyword">not</span> ok <span class="keyword">then</span></div><div class="line">        ngx.<span class="built_in">log</span>(ngx.ERR, <span class="string">"=====&gt; failed to spawn health checker: "</span>, err)</div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="comment">-- 调用上面定义的function</span></div><div class="line">healthcheck()</div></pre></td></tr></table></figure>
+</li>
+<li><p>修改nginx.conf</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">http &#123;</div><div class="line">    # 共享全局变量，在所有worker间共享</div><div class="line">    lua_shared_dict healthcheck 1m;</div><div class="line">    </div><div class="line">    # 关闭cosocket错误日志</div><div class="line">    lua_socket_log_errors off;</div><div class="line"></div><div class="line">    # 用于启动一些定时任务，比如心跳检查，定时拉取服务器配置等等</div><div class="line">    # 此处的任务数量 == Worker进程数</div><div class="line">    init_worker_by_lua_file /Users/zhangjing/IdeaProjects/hunger/conf/lua/healthcheck.lua;  </div><div class="line"></div><div class="line">    upstream real_server &#123;</div><div class="line">        server localhost:8081;</div><div class="line">        server localhost:8082;</div><div class="line">    &#125;</div><div class="line">    server &#123;</div><div class="line">        ...</div><div class="line">        location /status &#123;</div><div class="line">            access_log off;</div><div class="line">            allow 127.0.0.1;</div><div class="line">            deny all;</div><div class="line">            content_by_lua_block &#123;</div><div class="line">                local hc = require &quot;resty.upstream.healthcheck&quot;</div><div class="line">                ngx.say(&quot;Nginx Worker PID: &quot;, ngx.worker.pid())</div><div class="line">                ngx.print(hc.status_page())</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>测试，启动real_server_1、real_server_2、nginx</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> curl localhost/status</div><div class="line">Nginx Worker PID: 59109</div><div class="line">Upstream real_server</div><div class="line">    Primary Peers</div><div class="line">        127.0.0.1:8081 up</div><div class="line">        [::1]:8081 up</div><div class="line">        127.0.0.1:8082 up</div><div class="line">        [::1]:8082 up</div><div class="line">    Backup Peers</div><div class="line"><span class="meta">#</span> 停掉real_server_2</div><div class="line"><span class="meta">&gt;</span> curl localhost/status</div><div class="line">Nginx Worker PID: 59109</div><div class="line">Upstream real_server</div><div class="line">    Primary Peers</div><div class="line">        127.0.0.1:8081 up</div><div class="line">        [::1]:8081 up</div><div class="line">        127.0.0.1:8082 DOWN</div><div class="line">        [::1]:8082 DOWN</div><div class="line">    Backup Peers</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h4 id="其他配置项"><a href="#其他配置项" class="headerlink" title="其他配置项"></a>其他配置项</h4><ul>
+<li>备份上游服务器，通过backup来指定，当所有主服务器都不存活时，请求会发给备服务器</li>
+<li>不可用上游服务器，通过down来指定，表示该上游服务器永久不可用</li>
+</ul>
+<p>这两个配置项比较简单，就不测试了。另外，这一章节就学到这里吧。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Architecture/" rel="tag"># Architecture</a>
+          
+            <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/21/RocketMQ源码分析之【rocketmq-namesrv】/" rel="next" title="RocketMQ源码分析之【rocketmq-namesrv】">
+                <i class="fa fa-chevron-left"></i> RocketMQ源码分析之【rocketmq-namesrv】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/01/跟开涛学架构一【Nginx长连接】/" rel="prev" title="跟开涛学架构一【Nginx长连接】">
+                跟开涛学架构一【Nginx长连接】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境准备"><span class="nav-number">1.</span> <span class="nav-text">环境准备</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Nginx"><span class="nav-number">1.1.</span> <span class="nav-text">Nginx</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Java"><span class="nav-number">1.2.</span> <span class="nav-text">Java</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx常见用法"><span class="nav-number">2.</span> <span class="nav-text">Nginx常见用法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#负载均衡-反向代理"><span class="nav-number">2.1.</span> <span class="nav-text">负载均衡/反向代理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#负载均衡算法"><span class="nav-number">2.2.</span> <span class="nav-text">负载均衡算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#失败重试"><span class="nav-number">2.3.</span> <span class="nav-text">失败重试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#健康检查"><span class="nav-number">2.4.</span> <span class="nav-text">健康检查</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他配置项"><span class="nav-number">2.5.</span> <span class="nav-text">其他配置项</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

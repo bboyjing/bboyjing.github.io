@@ -1,0 +1,753 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JVM,Go," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本节继续实现方法调用和返回。 测试首先要改造命令行工具，增加两个选项。java命令提供-verbose:class选项，可以控制是否把类加载信息输出到控制台。另外参照这个选项增加一个-verbose:inst选项，用来控制是否把指令执行信息输出到控制台，下面是测试步骤：">
+<meta name="keywords" content="JVM,Go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自己动手写JVM二十五【方法调用和返回（三）】">
+<meta property="og:url" content="http://yoursite.com/2017/02/22/自己动手写JVM二十五【方法调用和返回（三）】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="本节继续实现方法调用和返回。 测试首先要改造命令行工具，增加两个选项。java命令提供-verbose:class选项，可以控制是否把类加载信息输出到控制台。另外参照这个选项增加一个-verbose:inst选项，用来控制是否把指令执行信息输出到控制台，下面是测试步骤：">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_44.png">
+<meta property="og:updated_time" content="2017-02-22T08:42:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="自己动手写JVM二十五【方法调用和返回（三）】">
+<meta name="twitter:description" content="本节继续实现方法调用和返回。 测试首先要改造命令行工具，增加两个选项。java命令提供-verbose:class选项，可以控制是否把类加载信息输出到控制台。另外参照这个选项增加一个-verbose:inst选项，用来控制是否把指令执行信息输出到控制台，下面是测试步骤：">
+<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_44.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/22/自己动手写JVM二十五【方法调用和返回（三）】/"/>
+
+
+
+
+
+  <title> 自己动手写JVM二十五【方法调用和返回（三）】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/22/自己动手写JVM二十五【方法调用和返回（三）】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                自己动手写JVM二十五【方法调用和返回（三）】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-22T16:54:46+08:00">
+                2017-02-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本节继续实现方法调用和返回。</p>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>首先要改造命令行工具，增加两个选项。java命令提供-verbose:class选项，可以控制是否把类加载信息输出到控制台。另外参照这个选项增加一个-verbose:inst选项，用来控制是否把指令执行信息输出到控制台，下面是测试步骤：</p>
+<a id="more"></a>
+<ol>
+<li><p>修改/cmd/cmd.go文件：</p>
+ <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> Cmd <span class="keyword">struct</span> &#123;</div><div class="line">    ...</div><div class="line">    VerboseClassFlag <span class="keyword">bool</span></div><div class="line">    VersionFlag      <span class="keyword">bool</span></div><div class="line">    ...</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">ParseCmd</span><span class="params">()</span> *<span class="title">Cmd</span></span> &#123;</div><div class="line">    ...</div><div class="line">    flag.BoolVar(&amp;cmd.VerboseClassFlag, <span class="string">"verbose"</span>, <span class="literal">false</span>, <span class="string">"enable verbose output"</span>)</div><div class="line">    flag.BoolVar(&amp;cmd.VerboseClassFlag, <span class="string">"verbose:class"</span>, <span class="literal">false</span>, <span class="string">"enable verbose output"</span>)</div><div class="line">    flag.BoolVar(&amp;cmd.VerboseInstFlag, <span class="string">"verbose:inst"</span>, <span class="literal">false</span>, <span class="string">"enable verbose output"</span>)</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>修改/rtdata/heap/class_loader.go文件，添加verboseFlag：</p>
+ <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> ClassLoader <span class="keyword">struct</span> &#123;</div><div class="line">    ...</div><div class="line">    <span class="comment">// 是否把类加载信息输出到控制台</span></div><div class="line">    verboseFlag <span class="keyword">bool</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewClassLoader</span><span class="params">(cp *classpath.Classpath, verboseFlag <span class="keyword">bool</span>)</span> *<span class="title">ClassLoader</span></span> &#123;...&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ClassLoader)</span> <span class="title">loadNonArrayClass</span><span class="params">(name <span class="keyword">string</span>)</span> *<span class="title">Class</span></span> &#123;</div><div class="line">    ...</div><div class="line">    <span class="keyword">if</span> self.verboseFlag &#123;</div><div class="line">        fmt.Printf(<span class="string">"[Loaded %s from %s]\n"</span>, name, entry)</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>修改main.go文件：</p>
+ <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">startJVM</span><span class="params">(cmd *cmd.Cmd)</span></span> &#123;</div><div class="line">    <span class="comment">// 获取Classpath</span></div><div class="line">    cp := classpath.Parse(cmd.XjreOption, cmd.CpOption)</div><div class="line">    classLoader := heap.NewClassLoader(cp, cmd.VerboseClassFlag)</div><div class="line"></div><div class="line">    <span class="comment">// class权限定名，将.替换成/(java.lang.String -&gt; java/lang/String)</span></div><div class="line">    className := strings.Replace(cmd.Class, <span class="string">"."</span>, <span class="string">"/"</span>, <span class="number">-1</span>)</div><div class="line">    <span class="comment">// 加载主类</span></div><div class="line">    mainClass := classLoader.LoadClass(className)</div><div class="line">    <span class="comment">// 获取主类的main()方法</span></div><div class="line">    mainMethod := mainClass.GetMainMethod()</div><div class="line">    <span class="keyword">if</span> mainMethod != <span class="literal">nil</span> &#123;</div><div class="line">        instructions.Interpret(mainMethod, cmd.VerboseInstFlag)</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        fmt.Printf(<span class="string">"Main method not found in class %s\n"</span>, cmd.Class)</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>新增一个测试类到java项目中：</p>
+ <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">public class FibonacciTest &#123;</div><div class="line">       public static void main(String[] args) &#123;</div><div class="line">           long x = fibonacci(<span class="number">30</span>);</div><div class="line">           System.out.<span class="built_in">println</span>(x);</div><div class="line">       &#125;</div><div class="line"></div><div class="line">       private static long fibonacci(long n) &#123;</div><div class="line">           <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) &#123;</div><div class="line">               <span class="keyword">return</span> n;</div><div class="line">           &#125; <span class="keyword">else</span> &#123;</div><div class="line">               <span class="keyword">return</span> fibonacci(n - <span class="number">1</span>) + fibonacci(n - <span class="number">2</span>);</div><div class="line">           &#125;</div><div class="line">       &#125;</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>测试</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">cd /home/zhangjing/IdeaProjects/jvmgo/go</div><div class="line">go install cn.didadu/jvmgo</div><div class="line">./bin/jvmgo -classpath /home/zhangjing/IdeaProjects/jvmgo/java/target/classes cn.didadu.FibonacciTest</div><div class="line">//输出如下</div><div class="line">832040</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="类初始化"><a href="#类初始化" class="headerlink" title="类初始化"></a>类初始化</h3><p>之前实现了一个简化版的类加载器，可以把类加载到方法区中。但是因为当时还没有实现方法调用，所以没有办法初始化类。现在可以把这个逻辑补上了。我们已经知道了类初始化就是执行类的初始化方法(&lt;clinit&gt;)。类的初始化在下列情况下触发：</p>
+<ul>
+<li>执行new指令创建类实例，但是类还没有被初始化。</li>
+<li>执行putstatic、getstatic指令存取类的静态变量，但声明该字段的类还没有被初始化。</li>
+<li>执行invokestatic调用类的静态方法，但声明该方法的类还没有被初始化。</li>
+<li>当初始化一个类时，如果类的超类还没有被初始化，要先初始化类的超类。</li>
+<li>执行某些反射操作时</li>
+</ul>
+<p>这里穿插一下，在之前写的ClassFile.class中怎么都没有看到&lt;clinit&gt;方法，只看到&lt;init&gt;方法。稍微查了下资料，&lt;clinit&gt;方法是编译器自动生成的，用来执行静态变量初始化语句和静态块的。但是ClassFile有静态变量呀，再仔细一看，ClassFile的静态变量都是final的，编译的时候就可以确定值了，所以是在链接阶段(ClassLoader.link())就初始化好了。只要稍作修改，随便把其中一个变量的final拿掉<code>public static double E = 2.71828;</code>，在字节码中就能够看到&lt;clinit&gt;方法了。另外&lt;init&gt;方法其实就是默认无参构造函数，如果自己没有声明的话，由编译器自动生成。如果有多个构造函数的话，字节码中就会有多个&lt;init&gt;方法。<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_44.png" alt="jvmgo_44"></p>
+<p>要实现类初始化功能需要修改挺多地方，下面我们一个个来看：</p>
+<ol>
+<li>为了判断类是否已经初始化，需要给Class结构体添加新字段，修改/rtdata/heap/class.go文件： <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> Class <span class="keyword">struct</span> &#123;</div><div class="line">    ...</div><div class="line">    <span class="comment">// 表示类的&lt;clinit&gt;方法是否已经开始执行</span></div><div class="line">    initStarted       <span class="keyword">bool</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Class)</span> <span class="title">InitStarted</span><span class="params">()</span> <span class="title">bool</span></span> &#123;</div><div class="line">    <span class="keyword">return</span> self.initStarted</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Class)</span> <span class="title">StartInit</span><span class="params">()</span></span> &#123;</div><div class="line">    self.initStarted = <span class="literal">true</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<ol>
+<li><p>修改new指令，在Execute()方法中添加如下代码，/instructions/references/new.go文件。判断逻辑中就三行代码，有两行还没实现，先解释下。主要功能就是调用类的初始化方法，并终止当前指令的执行，但是由于此时指令已经执行一部分，也就是说当前帧的nextPC字段已经指向了下一条指令，所以需要修改nextPC，让它重新指向当前指令。</p>
+ <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">   <span class="comment">// 判断类初始化是否已经开始</span></div><div class="line"><span class="keyword">if</span> !class.InitStarted() &#123;</div><div class="line">	frame.RevertNextPC()</div><div class="line">	base.InitClass(frame.Thread(), class)</div><div class="line">	<span class="keyword">return</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>实现RevertNextPC()方法，该方法在Frame结构体中，修改/rtdata/frame.go文件：</p>
+ <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 重置nextPC</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Frame)</span> <span class="title">RevertNextPC</span><span class="params">()</span></span> &#123;</div><div class="line">    <span class="comment">// 因为Thread的pc寄存器字段始终指向当前指令地址</span></div><div class="line">    self.nextPC = self.thread.pc</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>实现类的初始化方法，这个逻辑是通用的，新建/instructions/base/class_init_logic.go文件：</p>
+ <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 类初始化方法</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">InitClass</span><span class="params">(thread *rtdata.Thread, class *heap.Class)</span></span> &#123;</div><div class="line">    <span class="comment">// 设置类初始化开始标志</span></div><div class="line">    class.StartInit()</div><div class="line">    scheduleClinit(thread, class)</div><div class="line">    initSuperClass(thread, class)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">scheduleClinit</span><span class="params">(thread *rtdata.Thread, class *heap.Class)</span></span> &#123;</div><div class="line">    <span class="comment">// 获取&lt;clinit&gt;方法</span></div><div class="line">    clinit := class.GetClinitMethod()</div><div class="line">    <span class="keyword">if</span> clinit != <span class="literal">nil</span> &#123;</div><div class="line">        <span class="comment">// 创建新的帧</span></div><div class="line">        newFrame := thread.NewFrame(clinit)</div><div class="line">        <span class="comment">// 将新建的帧推入Java虚拟机栈</span></div><div class="line">        thread.PushFrame(newFrame)</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 初始化超类</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">initSuperClass</span><span class="params">(thread *rtdata.Thread, class *heap.Class)</span></span> &#123;</div><div class="line">    <span class="keyword">if</span> !class.IsInterface() &#123;</div><div class="line">        superClass := class.SuperClass()</div><div class="line">        <span class="keyword">if</span> superClass != <span class="literal">nil</span> &amp;&amp; !superClass.InitStarted() &#123;</div><div class="line">            <span class="comment">/*</span></div><div class="line">                递归调用InitClass()方法</div><div class="line">                这样就可以保证超类的初始化方法对应的帧在子类上面，</div><div class="line">                使超类初始化方法先于子类</div><div class="line">             */</div><div class="line">            InitClass(thread, superClass)</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>实现GetClinitMethod()方法，修改/rtdata/heap/class.go文件：</p>
+ <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Class)</span> <span class="title">GetClinitMethod</span><span class="params">()</span> *<span class="title">Method</span></span> &#123;</div><div class="line">    <span class="keyword">return</span> self.getStaticMethod(<span class="string">"&lt;clinit&gt;"</span>, <span class="string">"()V"</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>putstatic、getstatic和invokestatic指令的Execute()中也需要添加类初始化方法逻辑，代码和new指令一样，这里就不贴出来了，参照项目源码。</p>
+</li>
+<li><p>最后还需要增加一个hack。由于目前还不支持本地方法调用，而Java类库中的很多类都要注册本地方法，比如Object类就有一个registerNatives()本地方法，用于注册其他方法。由于Object类是其他所有类的超类，所以这会导致Java虚拟机崩溃。解决办法是修改InvokeMethod()函数，跳过所有registerNatives()方法。修改/instructions/base/method_invoke_logic.go文件：</p>
+ <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">InvokeMethod</span><span class="params">(invokerFrame *rtdata.Frame, method *heap.Method)</span></span> &#123;</div><div class="line">    ...</div><div class="line">    <span class="comment">// hack!</span></div><div class="line">    <span class="keyword">if</span> method.IsNative() &#123;</div><div class="line">        <span class="keyword">if</span> method.Name() == <span class="string">"registerNatives"</span> &#123;</div><div class="line">            thread.PopFrame()</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="built_in">panic</span>(fmt.Sprintf(<span class="string">"native method: %v.%v%v\n"</span>,</div><div class="line">                method.Class().Name(), method.Name(), method.Descriptor()))</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>修改/rtdata/heap/method.go文件，添加IsNative()方法：</p>
+ <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Method)</span> <span class="title">IsNative</span><span class="params">()</span> <span class="title">bool</span></span> &#123;</div><div class="line">    <span class="keyword">return</span> <span class="number">0</span> != self.accessFlags&amp;ACC_NATIVE</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>方法调用和返回的学习就到此结束。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JVM/" rel="tag"># JVM</a>
+          
+            <a href="/tags/Go/" rel="tag"># Go</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/21/自己动手写JVM二十四【方法调用和返回（二）】/" rel="next" title="自己动手写JVM二十四【方法调用和返回（二）】">
+                <i class="fa fa-chevron-left"></i> 自己动手写JVM二十四【方法调用和返回（二）】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/23/自己动手写JVM二十六【数组和字符串（一）】/" rel="prev" title="自己动手写JVM二十六【数组和字符串（一）】">
+                自己动手写JVM二十六【数组和字符串（一）】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#测试"><span class="nav-number">1.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类初始化"><span class="nav-number">2.</span> <span class="nav-text">类初始化</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

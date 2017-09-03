@@ -1,0 +1,762 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,RPC," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="从本章开始，我们以《ZeroC Ice权威指南》中提供的在线预定图书为例，来深入学习Ice的使用。 RPC调用详解首先还是新建个项目ice_book，步骤就不说了，已经建过两个项目了，有经验了。在slice文件夹中新建Service.ice文件：12345678910111213[[&amp;quot;java:package:cn.didadu.generate&amp;quot;]]module book &amp;">
+<meta name="keywords" content="Java,RPC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="尝试ZeorC ICE之【在线预定图书项目(一)】">
+<meta property="og:url" content="http://yoursite.com/2017/03/13/尝试ZeorC-ICE之【在线预定图书项目-一-】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="从本章开始，我们以《ZeroC Ice权威指南》中提供的在线预定图书为例，来深入学习Ice的使用。 RPC调用详解首先还是新建个项目ice_book，步骤就不说了，已经建过两个项目了，有经验了。在slice文件夹中新建Service.ice文件：12345678910111213[[&amp;quot;java:package:cn.didadu.generate&amp;quot;]]module book &amp;">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_7.png">
+<meta property="og:updated_time" content="2017-03-14T20:25:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="尝试ZeorC ICE之【在线预定图书项目(一)】">
+<meta name="twitter:description" content="从本章开始，我们以《ZeroC Ice权威指南》中提供的在线预定图书为例，来深入学习Ice的使用。 RPC调用详解首先还是新建个项目ice_book，步骤就不说了，已经建过两个项目了，有经验了。在slice文件夹中新建Service.ice文件：12345678910111213[[&amp;quot;java:package:cn.didadu.generate&amp;quot;]]module book &amp;">
+<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_7.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/13/尝试ZeorC-ICE之【在线预定图书项目-一-】/"/>
+
+
+
+
+
+  <title> 尝试ZeorC ICE之【在线预定图书项目(一)】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/13/尝试ZeorC-ICE之【在线预定图书项目-一-】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                尝试ZeorC ICE之【在线预定图书项目(一)】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-13T17:40:54+08:00">
+                2017-03-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ZeroC-Ice/" itemprop="url" rel="index">
+                    <span itemprop="name">ZeroC Ice</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>从本章开始，我们以《ZeroC Ice权威指南》中提供的在线预定图书为例，来深入学习Ice的使用。</p>
+<h3 id="RPC调用详解"><a href="#RPC调用详解" class="headerlink" title="RPC调用详解"></a>RPC调用详解</h3><p>首先还是新建个项目ice_book，步骤就不说了，已经建过两个项目了，有经验了。在slice文件夹中新建Service.ice文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">[[&quot;java:package:cn.didadu.generate&quot;]]</div><div class="line">module book &#123;</div><div class="line">    struct Message &#123;</div><div class="line">        string name;</div><div class="line">        int type;</div><div class="line">        bool valid;</div><div class="line">        double price;</div><div class="line">        string content;</div><div class="line">    &#125;;</div><div class="line">    interface OnlineBook &#123;</div><div class="line">        Message bookTick(Message message);</div><div class="line">    &#125;;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<p>本例中我们创建了一个结构体Message作为参数和返回值，还有OnlineBook接口，该接口只有一个bookTick()方法。我们可以看下结构体Message的定义，涵盖了布尔类型、数值类型、整数类型以及字符串，目的是尽可能接近现实业务的需求；另外返回值Message也是为了测试RPC通信。然后在ice_book项目根目录执行<code>gradle build</code>，一共生成了12个java文件，下面挑重点来看下：</p>
+<ul>
+<li><p>_OnlineBookOperationsNC和_OnlineBookOperations这两个姐妹接口是OnlineBook的具体业务方法定义的接口，不同的是_OnlineBookOperations在方法签名中增加了Ice的内部对象Current，这个Current对象包括了当前调用的网络连接等上下文信息。</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">_OnlineBookOperations</span></span>&#123;</div><div class="line">    <span class="function">Message <span class="title">bookTick</span><span class="params">(Message message, Ice.Current __current)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>_OnlineBookDisp作为实现了OnlineBook接口的抽象类，完成了基本的RPC调用过程，其中Disp是Dispatch的缩写，即调用分发。我们来看下核心代码。这里有一个小问题，我们知道Java平台采用大端字节序，而Ice采用小端字节序，转换的时候会有额外的开销，照官方说法在整个请求来看这个开销可以忽略不计，但感觉略有点儿不爽。</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> *</div><div class="line"> * <span class="doctag">@param</span> __obj</div><div class="line"> * <span class="doctag">@param</span> __inS 代表当前RPC请求的网络通道</div><div class="line"> * <span class="doctag">@param</span> __current</div><div class="line"> * <span class="doctag">@return</span></div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> Ice.<span class="function">DispatchStatus <span class="title">___bookTick</span><span class="params">(OnlineBook __obj,</span></span></div><div class="line">                                             IceInternal.Incoming __inS,</div><div class="line">                                             Ice.Current __current) &#123;</div><div class="line">    __checkMode(Ice.OperationMode.Normal, __current.mode);</div><div class="line">    <span class="comment">// 从当前网络通道中读取RPC方法传入的参数</span></div><div class="line">    IceInternal.BasicStream __is = __inS.startReadParams();</div><div class="line">    Message message = <span class="keyword">null</span>;</div><div class="line">    <span class="comment">// 执行反序列化，将网络字节流变为具体的Java对象</span></div><div class="line">    message = Message.__read(__is, message);</div><div class="line">    __inS.endReadParams();</div><div class="line">    <span class="comment">// 调用用户实现的OnlineBook的具体业务接口，即_OnlineBookOperationsNC的实现方法</span></div><div class="line">    Message __ret = __obj.bookTick(message, __current);</div><div class="line">    <span class="comment">// 将结果回写到RPC请求的网络应答报文中</span></div><div class="line">    IceInternal.BasicStream __os = __inS.__startWriteParams(Ice.FormatType.DefaultFormat);</div><div class="line">    <span class="comment">// 序列化调用结果，写入网络通道，等待发送给客户端</span></div><div class="line">    Message.__write(__os, __ret);</div><div class="line">    __inS.__endWriteParams(<span class="keyword">true</span>);</div><div class="line">    <span class="comment">// 完成调用</span></div><div class="line">    <span class="keyword">return</span> Ice.DispatchStatus.DispatchOK;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>另外，我们看下Ice Object的Identity相关代码，从其代码看，一个Ice Object可以绑定多个ID，但是其中只有一个是最确切的真正的ID，此ID用来查找和定位RPC的远程对象：<br>    <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String[] __ids = &#123;</div><div class="line">        <span class="comment">// 所有的Ice Object都有此ID</span></div><div class="line">        <span class="string">"::Ice::Object"</span>,</div><div class="line">        <span class="comment">// OnlineBook的真正ID</span></div><div class="line">        <span class="string">"::book::OnlineBook"</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="comment">// 二分查找是否是某个远程对象</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">ice_isA</span><span class="params">(String s)</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> java.util.Arrays.binarySearch(__ids, s) &gt;= <span class="number">0</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 默认ID是::book::OnlineBook</span></div><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">ice_id</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> __ids[<span class="number">1</span>];</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<ul>
+<li>OnlineBookPrxHelper负责客户端调用逻辑，Ice的版本比作者写书的时候新了许多，客户端的调用略有改动，这里先不剖析了，等项目完成，我们单步debug下看看。</li>
+</ul>
+<h3 id="了解IceBox"><a href="#了解IceBox" class="headerlink" title="了解IceBox"></a>了解IceBox</h3><p>简单地说，IceBox就好像是一个Tomcat，我们只要写N个Ice服务的代码，用一个装配文件定义需要加载的服务列表，服务的启动参数，启动次序等必要信息，然后启动IceBox，我们的应用系统就能够正常运行了。<br>要将一个Ice服务纳入到IceBox中，我们需要引入icebox包，改下build.gradle文件：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">ext &#123;</div><div class="line">    iceVersion = <span class="string">"3.6.3"</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">dependencies</span> &#123;</div><div class="line">    testCompile <span class="keyword">group</span>: <span class="string">'junit'</span>, name: <span class="string">'junit'</span>, version: <span class="string">'4.11'</span></div><div class="line">    <span class="keyword">compile</span> <span class="keyword">group</span>: <span class="string">'com.zeroc'</span>, name: <span class="string">'ice'</span>, version: iceVersion</div><div class="line">    <span class="keyword">compile</span> <span class="keyword">group</span>: <span class="string">'com.zeroc'</span>, name: <span class="string">'icebox'</span>, version: iceVersion</div><div class="line">    <span class="keyword">compile</span> <span class="keyword">group</span>: <span class="string">'org.slf4j'</span>, name: <span class="string">'slf4j-log4j12'</span>, version: <span class="string">'1.7.24'</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>然后让我们的服务实现类继承IceBox的Service接口即可，此接口有两个方法：</p>
+<ul>
+<li>void start(String name, Ice.Communicator communicator, String[] args)：服务启动方法</li>
+<li>void stop();服务停止方法</li>
+</ul>
+<p>实际上，IceBox定义的这个Service接口是一个标准的服务生命周期管理接口，具体使用方法后面会涉及到。</p>
+<h3 id="实现OnlineBook服务"><a href="#实现OnlineBook服务" class="headerlink" title="实现OnlineBook服务"></a>实现OnlineBook服务</h3><p>理解了IceBook基本知识后，我们来实现OnlineBook服务，新建cn.didadu.service.OnlineBookService.java，我们先看下实现IceBox.Service的两个方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"> <span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">(String name, Communicator communicator, String[] args)</span> </span>&#123;</div><div class="line">    <span class="comment">// 创建ObjectAdapter，这里和service同名</span></div><div class="line">    _adapter = communicator.createObjectAdapter(name);</div><div class="line">    <span class="comment">// 创建servant，同样和service同名</span></div><div class="line">    _adapter.add(<span class="keyword">this</span>, communicator.stringToIdentity(name));</div><div class="line">    <span class="comment">// 激活servant</span></div><div class="line">    _adapter.activate();</div><div class="line">    logger.info(<span class="string">"Service "</span> + name + <span class="string">" started."</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="comment">// 销毁ObjectAdapter</span></div><div class="line">    _adapter.destroy();</div><div class="line">    logger.info(<span class="string">"Service "</span> + _adapter.getName() + <span class="string">" stopped."</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>看到这里，有两个疑问：</p>
+<ol>
+<li><p>每个ObjectAdapter只绑定一个Servant，有没有浪费资源的嫌疑？因为我稍微修改了下ice_better_hello项目，一个ObjectAdapter是可以绑定多个Servant的，具体步骤就不贴出来了，很简单，部分引用代码如下：</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">adapter.add(<span class="keyword">new</span> HelloImpl(), Ice.Util.stringToIdentity(<span class="string">"hello"</span>));</div><div class="line">adapter.add(<span class="keyword">new</span> GoodbyeImpl(), Ice.Util.stringToIdentity(<span class="string">"bye"</span>));</div></pre></td></tr></table></figure>
+</li>
+<li><p>如果每个Service都需要实现IceBox.Service，并且所有的类这两个方法的实现代码都一样，那岂不是很蛋疼。</p>
+</li>
+</ol>
+<p>这两个问题我们先保留，等后面看有没有合理的解决方案。<br>在看下继承_OnlineBookDisp的实现逻辑：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> Message <span class="title">bookTick</span><span class="params">(Message message, Current __current)</span> </span>&#123;</div><div class="line">    logger.info(<span class="string">"call bookTick : "</span> + message.toString());</div><div class="line">    <span class="keyword">return</span> message;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>就这么短短的一行代码，又有一个疑问了，如果我们需要重写Message的toString()方法，可以去改java代码，但是项目重新编译一下，生成的*.java会被覆盖，照这么看，如果自动生成的代码有任何修改，后果都是灾难性的。不过这也是可以理解的，毕竟是自动生成的代码，谁让你去改的呢。但是，从结果来看，总归是不灵活，同样保留疑问吧。</p>
+<h3 id="配置log4j"><a href="#配置log4j" class="headerlink" title="配置log4j"></a>配置log4j</h3><p>OnlineBookService中用到了log4j，配置一下，要不然日志没法输出，在resources目录下新建log4j.properties，随便找个例子配置下，目前能打印出日志就行了：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">log4j.rootLogger=debug, stdout</div><div class="line">log4j.appender.stdout=org.apache.log4j.ConsoleAppender</div><div class="line">log4j.appender.stdout.layout=org.apache.log4j.PatternLayout</div><div class="line"># Pattern to output the caller&apos;s file name and line number.</div><div class="line">log4j.appender.stdout.layout.ConversionPattern=%5p [%t] (%F:%L) - %m%n</div></pre></td></tr></table></figure></p>
+<h3 id="配置IceBox"><a href="#配置IceBox" class="headerlink" title="配置IceBox"></a>配置IceBox</h3><p>IceBox配置文件分为两部分：一部分是与具体服务定义相关的配置；另一部分是共有属性的定义。下面我们来详细看看：</p>
+<ul>
+<li>在所有的服务的初始化完成之后，服务管理器将打印”token ready”。如果有脚本想要等待所有服务准备就绪，则这个特性很有用，比如：IceBox.PrintServicesReady=MyAppIceBox，会打印”MyAppIceBox ready”</li>
+<li>当存在多个Ice服务时，通常它们之间有先后启动的顺序问题，我们通过下面的参数配置可以确定这些服务的启动先后顺序：IceBox.LoadOrder=server1,server2,server34</li>
+<li>优化本地服务之间的调用的重要参数UseSharedCommunicator，值为1表示开启优化，下面假设Hello和Printer的两个服务存在调用关系，又部署在一个IceBox实例中，则定义两者使用同一个Communicator对象：IceBox.UseSharedCommunicator.Hello=1、IceBox.UseSharedCommunicator.Printer=1</li>
+<li>Ice.MessageSizeMax=2048：最大消息包的字节数</li>
+<li>Ice.Trace.Network=1：开启网络时间相关的日志追踪</li>
+<li>Ice.Trace.ThreadPool=1：开启线程池时间的日志追踪</li>
+<li>Ice.Trace.Locator=1：开启对Locator对象的日志追踪</li>
+<li>IceBox还有个管理服务组件，使之能够被远程控制，为了安全期间，管理服务组件默认是关闭的，可以通过Ice.Admin.Endpoints=tcp -p 9996 -h localhost开启，关于这一点，我们后面再看可以怎么使用</li>
+<li>定义具体服务的相关参数，对于每个IceBox服务，需要这样定义：IceBox.Service.name=entry_point [–key=value] [args]，配置项含义如下：<ul>
+<li>name定义了service的名字，作为start方法的name参数，必须唯一</li>
+<li>entry_point是上面的service的完整类名，必须在classpath中可以找到</li>
+<li>[–key=value]作为property属性，用于构造该服务的communicator，这里也可以用–Ice.Config=xxx.cfg的方式独立配置</li>
+<li>[args]作为参数传入start方法的String[] args中。</li>
+</ul>
+</li>
+</ul>
+<p>这么多配置也只是不完全列举，有点懵逼。我们先配置几个必须项，尝试着跑跑看：</p>
+<ol>
+<li><p>在resources目录下新建config.icebox文件：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">IceBox.PrintServicesReady=MyAppIceBox</div><div class="line">IceBox.Service.OnlineBook=cn.didadu.service.OnlineBookService --Ice.Config=config.service</div></pre></td></tr></table></figure>
+</li>
+<li><p>在resources目录下新建config.server文件：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">OnlineBook.Endpoints=tcp -h localhost -p 10000</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="运行IceBox"><a href="#运行IceBox" class="headerlink" title="运行IceBox"></a>运行IceBox</h3><h4 id="命令行方式"><a href="#命令行方式" class="headerlink" title="命令行方式"></a>命令行方式</h4><p>首先需要在build.gradle中添加如下内容，打成fat jar，要不然没法执行：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">jar &#123;</div><div class="line">    manifest &#123;</div><div class="line">        attributes(<span class="string">"Main-Class"</span>: <span class="string">"IceBox.Server"</span>)</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">from</span> &#123;</div><div class="line">        <span class="keyword">configurations</span>.<span class="keyword">compile</span>.<span class="keyword">collect</span> &#123; it.isDirectory() ? it : zipTree(it) &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在项目根目录执行如下命令：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">gradle build</div><div class="line">java -jar build/libs/ice_book-1.0.0-SNAPSHOT.jar --Ice.Config=config.icebox</div><div class="line">// 成功输出</div><div class="line">INFO [main] (OnlineBookService.java:28) - Service OnlineBook started.</div><div class="line">MyAppIceBox ready</div></pre></td></tr></table></figure></p>
+<h4 id="图形界面"><a href="#图形界面" class="headerlink" title="图形界面"></a>图形界面</h4><p>在开发过程中，还是图形来的方便，在IDEA中新建一个Run/Debug Configurations，配好之后点击Run就可以了。<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_7.png" alt="zeroc_ice_7"></p>
+<p>这一章节就写到这里了，我们跑通了一个简单的IceBox，在查资料的过程中找到一个<a href="https://github.com/dengly/Ice-demo" target="_blank" rel="external">小伙伴的Github</a>，推荐一下。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/RPC/" rel="tag"># RPC</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/11/尝试ZeorC-ICE之【了解Ice概念和原理】/" rel="next" title="尝试ZeorC ICE之【了解Ice概念和原理】">
+                <i class="fa fa-chevron-left"></i> 尝试ZeorC ICE之【了解Ice概念和原理】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/15/尝试ZeorC-ICE之【在线预定图书项目-二-】/" rel="prev" title="尝试ZeorC ICE之【在线预定图书项目(二)】">
+                尝试ZeorC ICE之【在线预定图书项目(二)】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#RPC调用详解"><span class="nav-number">1.</span> <span class="nav-text">RPC调用详解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#了解IceBox"><span class="nav-number">2.</span> <span class="nav-text">了解IceBox</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现OnlineBook服务"><span class="nav-number">3.</span> <span class="nav-text">实现OnlineBook服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置log4j"><span class="nav-number">4.</span> <span class="nav-text">配置log4j</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置IceBox"><span class="nav-number">5.</span> <span class="nav-text">配置IceBox</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运行IceBox"><span class="nav-number">6.</span> <span class="nav-text">运行IceBox</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#命令行方式"><span class="nav-number">6.1.</span> <span class="nav-text">命令行方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#图形界面"><span class="nav-number">6.2.</span> <span class="nav-text">图形界面</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

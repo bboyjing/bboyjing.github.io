@@ -1,0 +1,715 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,RPC," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="这一篇我们以一个简单的例子来跑通Ice，顺便慢慢地搭建项目的框架。 安装gradle项目的构建工具选用gradle，至于为什么，后面就知道了。Gradle官网官网有详细的安装步骤，这里就不赘述了。 新建项目开发工具我用的是IDEA，安装个Gradle插件即可。在之前的attempt_ice目录下新建一个项目ice_hello，直接在IDEA中通过图形界面新建gradle项目就没啥好说了。对了，把【">
+<meta name="keywords" content="Java,RPC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="尝试ZeorC ICE之【Hello World】">
+<meta property="og:url" content="http://yoursite.com/2017/03/09/尝试ZeorC-ICE之【Hello-World】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="这一篇我们以一个简单的例子来跑通Ice，顺便慢慢地搭建项目的框架。 安装gradle项目的构建工具选用gradle，至于为什么，后面就知道了。Gradle官网官网有详细的安装步骤，这里就不赘述了。 新建项目开发工具我用的是IDEA，安装个Gradle插件即可。在之前的attempt_ice目录下新建一个项目ice_hello，直接在IDEA中通过图形界面新建gradle项目就没啥好说了。对了，把【">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_4.png">
+<meta property="og:updated_time" content="2017-03-09T19:13:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="尝试ZeorC ICE之【Hello World】">
+<meta name="twitter:description" content="这一篇我们以一个简单的例子来跑通Ice，顺便慢慢地搭建项目的框架。 安装gradle项目的构建工具选用gradle，至于为什么，后面就知道了。Gradle官网官网有详细的安装步骤，这里就不赘述了。 新建项目开发工具我用的是IDEA，安装个Gradle插件即可。在之前的attempt_ice目录下新建一个项目ice_hello，直接在IDEA中通过图形界面新建gradle项目就没啥好说了。对了，把【">
+<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_4.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/09/尝试ZeorC-ICE之【Hello-World】/"/>
+
+
+
+
+
+  <title> 尝试ZeorC ICE之【Hello World】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/09/尝试ZeorC-ICE之【Hello-World】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                尝试ZeorC ICE之【Hello World】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-09T11:52:38+08:00">
+                2017-03-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ZeroC-Ice/" itemprop="url" rel="index">
+                    <span itemprop="name">ZeroC Ice</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这一篇我们以一个简单的例子来跑通Ice，顺便慢慢地搭建项目的框架。</p>
+<h3 id="安装gradle"><a href="#安装gradle" class="headerlink" title="安装gradle"></a>安装gradle</h3><p>项目的构建工具选用gradle，至于为什么，后面就知道了。<a href="https://gradle.org/install" target="_blank" rel="external">Gradle官网</a>官网有详细的安装步骤，这里就不赘述了。</p>
+<h3 id="新建项目"><a href="#新建项目" class="headerlink" title="新建项目"></a>新建项目</h3><p>开发工具我用的是IDEA，安装个Gradle插件即可。在之前的attempt_ice目录下新建一个项目ice_hello，直接在IDEA中通过图形界面新建gradle项目就没啥好说了。对了，把【初识】篇章建的测试文件demo.ice、interface.ice还有生成的目录都删了吧，留着碍眼。gradle项目的结构和maven一样，如果创建的项目没有src目录，执行以下步骤：</p>
+<a id="more"></a>
+<ol>
+<li><p>在build.gradle文件中添加如下task：</p>
+ <figure class="highlight gradle"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">task</span> <span class="string">"create-dirs"</span> &lt;&lt; &#123;</div><div class="line">       <span class="keyword">sourceSets</span>*.java.srcDirs*.<span class="keyword">each</span> &#123; it.mkdirs() &#125;</div><div class="line">       <span class="keyword">sourceSets</span>*.resources.srcDirs*.<span class="keyword">each</span> &#123; it.mkdirs() &#125;</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>在ice_hello目录下执行<code>gradle create-dirs</code>，随后会自动生成src目录、以及子目录，然后删除上述脚本。</p>
+</li>
+</ol>
+<p>最后添加在dependencies中添加ice的依赖：<code>compile(group: &#39;com.zeroc&#39;, name: &#39;ice&#39;, version: &#39;3.6.3&#39;)</code></p>
+<h3 id="接口文件"><a href="#接口文件" class="headerlink" title="接口文件"></a>接口文件</h3><p>在src/main目录下新建slice文件夹，用于存放基于Slice语言的*.ice文件，新建HelloWorld.ice：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">// 指定上层包名</div><div class="line">[[&quot;java:package:cn.didadu.generate&quot;]]</div><div class="line">// module和Java的Package对应</div><div class="line">module helloworld &#123;</div><div class="line">    interface HelloWorldService &#123;</div><div class="line">        string hello();</div><div class="line">    &#125;;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>这里我们多加了配置java:package，最终生成的java文件会在cn.didadu.generate.helloworld包下。<br>在ice_hello目录下执行<code>slice2java --output-dir ./src/main/java ./src/main/slice/HelloWorld.ice</code>，目前目录结构如下：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_4.png" alt="zeroc_ice_4"><br>暂且先不管这些文件到底是什么，我们接着看怎么用。</p>
+<h3 id="实现Service"><a href="#实现Service" class="headerlink" title="实现Service"></a>实现Service</h3><p>在cn.didadu下新建service包，存放我们将要实现的service类，新建HelloServiceImpl.java：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloWorldServiceImpl</span> <span class="keyword">extends</span> <span class="title">_HelloWorldServiceDisp</span> </span>&#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">hello</span><span class="params">(Current __current)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Hello World!"</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>HelloWorldServiceImpl继承自之前生成的文件。</p>
+<h3 id="实现提供服务逻辑"><a href="#实现提供服务逻辑" class="headerlink" title="实现提供服务逻辑"></a>实现提供服务逻辑</h3><p>在cn.didadu下新建ServerStarter.java，用于启动服务：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServerStart</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        Ice.Communicator ic = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="comment">// 初始化Communicator，该组件负责处理网络通信，实现RPC调用</span></div><div class="line">            ic = Ice.Util.initialize();</div><div class="line">            <span class="comment">// 创建提供服务的站点，缺省协议为TCP/IP，端口为10000</span></div><div class="line">            Ice.ObjectAdapter adapter = ic.</div><div class="line">                    createObjectAdapterWithEndpoints(<span class="string">"MyServiceAdapter"</span>, <span class="string">"default -p 10000"</span>);</div><div class="line">            <span class="comment">// 创建具体提供服务的实例</span></div><div class="line">            HelloWorldServiceImpl servant = <span class="keyword">new</span> HelloWorldServiceImpl();</div><div class="line">            <span class="comment">// 将服务实例添加到提供服务的站点</span></div><div class="line">            adapter.add(servant, Ice.Util.stringToIdentity(<span class="string">"HelloService"</span>));</div><div class="line">            <span class="comment">// 激活服务站点</span></div><div class="line">            adapter.activate();</div><div class="line">            System.out.println(<span class="string">"server started"</span>);</div><div class="line">            ic.waitForShutdown();</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            <span class="keyword">if</span> (ic != <span class="keyword">null</span>) &#123;</div><div class="line">                ic.destroy();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="实现客户端调用"><a href="#实现客户端调用" class="headerlink" title="实现客户端调用"></a>实现客户端调用</h3><p>在cn.didadu下新建Client.java，用于调用服务：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Client</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        Ice.Communicator ic = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="comment">// 初始化网络通信组件</span></div><div class="line">            ic = Ice.Util.initialize();</div><div class="line">            <span class="comment">// 通过名称、协议、端口，构造通用Proxy对象</span></div><div class="line">            Ice.ObjectPrx base = ic.stringToProxy(<span class="string">"HelloService:default -p 10000"</span>);</div><div class="line">            <span class="comment">// 将通用Proxy对象转为真实的服务(uncheckedCast(base)可以减少一次远程调用)</span></div><div class="line">            HelloWorldServicePrx prxy = HelloWorldServicePrxHelper.checkedCast(base);</div><div class="line">            <span class="keyword">if</span> (prxy == <span class="keyword">null</span>) &#123;</div><div class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"Invalid proxy"</span>);</div><div class="line">            &#125;</div><div class="line">            <span class="comment">// 调用服务</span></div><div class="line">            System.out.println(prxy.hello());</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            <span class="keyword">if</span> (ic != <span class="keyword">null</span>) &#123;</div><div class="line">                ic.destroy();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>至此，我们就跑通了Ice，当然只是非常简单的例子，没有什么实际用途。从目前个人的使用感受，以及开源社区的氛围来看，要把这个产品引入到实际项目中，并不是件容易的事儿。本篇就写到这里了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/RPC/" rel="tag"># RPC</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/08/尝试ZeorC-ICE之【初识】/" rel="next" title="尝试ZeorC ICE之【初识】">
+                <i class="fa fa-chevron-left"></i> 尝试ZeorC ICE之【初识】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/10/尝试ZeorC-ICE之【改造Hello-World】/" rel="prev" title="尝试ZeorC ICE之【改造Hello World】">
+                尝试ZeorC ICE之【改造Hello World】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装gradle"><span class="nav-number">1.</span> <span class="nav-text">安装gradle</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#新建项目"><span class="nav-number">2.</span> <span class="nav-text">新建项目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#接口文件"><span class="nav-number">3.</span> <span class="nav-text">接口文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现Service"><span class="nav-number">4.</span> <span class="nav-text">实现Service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现提供服务逻辑"><span class="nav-number">5.</span> <span class="nav-text">实现提供服务逻辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现客户端调用"><span class="nav-number">6.</span> <span class="nav-text">实现客户端调用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

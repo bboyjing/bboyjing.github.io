@@ -1,0 +1,770 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Redis," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本章节，构造分布式锁的目的既不是给同一个进程中的多个线程使用，也不是给同一台机器上的多个进程使用，而是由不同机器上的不同Redis客户端进行获取和释放的。 锁的重要性回忆一下之前学的Redis事物章节中模拟的市场购物场景，购买商品的时候使用了watch去监视市场以及买家的的个人信息来保证购买流程的正常进行。引用书上的性能测试数据来说明性能扩展的必要性，下表将展示市场在重负载情况下运行60秒的结果：">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis学习笔记十三【使用Redis构建应用程序组件-分布式锁】">
+<meta property="og:url" content="http://yoursite.com/2016/12/15/Redis学习笔记十三【使用Redis构建应用程序组件-分布式锁】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="本章节，构造分布式锁的目的既不是给同一个进程中的多个线程使用，也不是给同一台机器上的多个进程使用，而是由不同机器上的不同Redis客户端进行获取和释放的。 锁的重要性回忆一下之前学的Redis事物章节中模拟的市场购物场景，购买商品的时候使用了watch去监视市场以及买家的的个人信息来保证购买流程的正常进行。引用书上的性能测试数据来说明性能扩展的必要性，下表将展示市场在重负载情况下运行60秒的结果：">
+<meta property="og:updated_time" content="2016-12-15T01:28:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis学习笔记十三【使用Redis构建应用程序组件-分布式锁】">
+<meta name="twitter:description" content="本章节，构造分布式锁的目的既不是给同一个进程中的多个线程使用，也不是给同一台机器上的多个进程使用，而是由不同机器上的不同Redis客户端进行获取和释放的。 锁的重要性回忆一下之前学的Redis事物章节中模拟的市场购物场景，购买商品的时候使用了watch去监视市场以及买家的的个人信息来保证购买流程的正常进行。引用书上的性能测试数据来说明性能扩展的必要性，下表将展示市场在重负载情况下运行60秒的结果：">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/15/Redis学习笔记十三【使用Redis构建应用程序组件-分布式锁】/"/>
+
+
+
+
+
+  <title> Redis学习笔记十三【使用Redis构建应用程序组件-分布式锁】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/15/Redis学习笔记十三【使用Redis构建应用程序组件-分布式锁】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Redis学习笔记十三【使用Redis构建应用程序组件-分布式锁】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-15T10:10:39+08:00">
+                2016-12-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章节，构造分布式锁的目的既不是给同一个进程中的多个线程使用，也不是给同一台机器上的多个进程使用，而是由不同机器上的不同Redis客户端进行获取和释放的。</p>
+<h3 id="锁的重要性"><a href="#锁的重要性" class="headerlink" title="锁的重要性"></a>锁的重要性</h3><p>回忆一下之前学的Redis事物章节中模拟的市场购物场景，购买商品的时候使用了watch去监视市场以及买家的的个人信息来保证购买流程的正常进行。引用书上的性能测试数据来说明性能扩展的必要性，下表将展示市场在重负载情况下运行60秒的结果：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">卖家、买家数</th>
+<th style="text-align:center">上架商品数量</th>
+<th style="text-align:center">买入商品数量</th>
+<th style="text-align:center">购买重试次数</th>
+<th style="text-align:center">每次购买的平均等待时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1个卖家，1个买家</td>
+<td style="text-align:center">145000</td>
+<td style="text-align:center">27000</td>
+<td style="text-align:center">8000</td>
+<td style="text-align:center">14ms</td>
+</tr>
+<tr>
+<td style="text-align:center">5个卖家，1个买家</td>
+<td style="text-align:center">331000</td>
+<td style="text-align:center">&lt;200</td>
+<td style="text-align:center">5000</td>
+<td style="text-align:center">150ms</td>
+</tr>
+<tr>
+<td style="text-align:center">5个卖家，5个买家</td>
+<td style="text-align:center">206000</td>
+<td style="text-align:center">&lt;600</td>
+<td style="text-align:center">161000</td>
+<td style="text-align:center">498ms</td>
+</tr>
+</tbody>
+</table>
+<p>可以很明显看出watch的性能不具扩展性，下面将使用锁来保证市场在任意时刻只能上架或销售一件商品，看看性能会怎么样。</p>
+<a id="more"></a>
+<h3 id="简易锁"><a href="#简易锁" class="headerlink" title="简易锁"></a>简易锁</h3><p>接下来我们学习下第一版的锁实现，这个版本要锁的事就是正确地实现基本的加锁功能，而之后会学习如何处理过期的锁以及因为持有者崩溃而无法释放的锁。为了对数据进行排他访问程序首先要做的就是获取锁，setnx命令天生就适合用来实现锁的获取功能。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//获取锁</span></div><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">acquireLock</span><span class="params">(String lockName)</span></span>&#123;</div><div class="line">    <span class="keyword">long</span> acquireTimeout = <span class="number">10000</span>;</div><div class="line">    <span class="comment">//随机128位UUID作为键的值</span></div><div class="line">    String identifier = UUID.randomUUID().toString();</div><div class="line">    <span class="keyword">final</span> <span class="keyword">byte</span>[] rawKey = stringRedisTemplate.getStringSerializer().serialize(<span class="string">"lock:"</span> + lockName);</div><div class="line">    <span class="keyword">final</span> <span class="keyword">byte</span>[] rawVal = stringRedisTemplate.getStringSerializer().serialize(identifier);</div><div class="line">    <span class="keyword">long</span> end = System.currentTimeMillis() + acquireTimeout;</div><div class="line">    <span class="comment">//10秒内获取不到锁就返回</span></div><div class="line">    <span class="keyword">while</span> (System.currentTimeMillis() &lt; end)&#123;</div><div class="line">        RedisCallback&lt;Boolean&gt; redisCallback = redisConnection -&gt;</div><div class="line">                <span class="comment">/**</span></div><div class="line">                 * setnx命令的语义是将key的值设为value，当且仅当key不存在</div><div class="line">                 * 若key存在，不做任何动作，返回0(false)</div><div class="line">                 */</div><div class="line">                redisConnection.setNX(rawKey, rawVal);</div><div class="line">       <span class="keyword">if</span>(stringRedisTemplate.execute(redisCallback).booleanValue())&#123;</div><div class="line">           <span class="keyword">return</span> identifier;</div><div class="line">       &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>锁的创建已经就绪，使用很简单，我们改造下之前的purchaseItem方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">purchaseItemWithLock</span><span class="params">(String buyerId, String itemId, String sellerId)</span></span>&#123;</div><div class="line">    String locked = acquireLock(<span class="string">"market"</span>);</div><div class="line">    <span class="keyword">if</span>(locked == <span class="keyword">null</span>)&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125;<span class="keyword">else</span>&#123;</div><div class="line">        <span class="keyword">try</span>&#123;</div><div class="line">            System.out.println(<span class="string">"purchasing...."</span>);</div><div class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">        &#125;<span class="keyword">finally</span> &#123;</div><div class="line">            <span class="comment">//release lock</span></div><div class="line">            System.out.println(<span class="string">"release lock"</span>);</div><div class="line">            releaseLock(<span class="string">"market"</span>, locked);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在这个版本中锁没有超时功能，使用完毕一定要主动释放：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">releaseLock</span><span class="params">(String lockName, String identifier)</span> </span>&#123;</div><div class="line">    String lockKey = <span class="string">"lock:"</span> + lockName;</div><div class="line">    SessionCallback&lt;List&lt;Object&gt;&gt; sessionCallback =  <span class="keyword">new</span> SessionCallback&lt;List&lt;Object&gt;&gt;() &#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> List&lt;Object&gt; <span class="title">execute</span><span class="params">(RedisOperations operations)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</div><div class="line">            operations.watch(lockKey);</div><div class="line">            <span class="keyword">if</span>(identifier.equals(operations.opsForValue().get(lockKey)))&#123;</div><div class="line">                operations.multi();</div><div class="line">                operations.delete(lockKey);</div><div class="line">                <span class="keyword">return</span> operations.exec();</div><div class="line">            &#125;</div><div class="line">            <span class="comment">//若取出来的不是想要释放的锁，不作任何操作，返回空</span></div><div class="line">            operations.unwatch();</div><div class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">    List&lt;Object&gt; results = stringRedisTemplate.execute(sessionCallback);</div><div class="line">    <span class="keyword">return</span> results != <span class="keyword">null</span> ? <span class="keyword">true</span> : <span class="keyword">false</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>至此，已使用锁替代watch重新实现商品购买操作，下表依然引用书上的数据来展示锁替代的效果：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">卖家、买家数</th>
+<th style="text-align:center">上架商品数量</th>
+<th style="text-align:center">买入商品数量</th>
+<th style="text-align:center">购买重试次数</th>
+<th style="text-align:center">每次购买的平均等待时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1个卖家，1个买家</td>
+<td style="text-align:center">51000</td>
+<td style="text-align:center">50000</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1ms</td>
+</tr>
+<tr>
+<td style="text-align:center">5个卖家，1个买家</td>
+<td style="text-align:center">68000</td>
+<td style="text-align:center">13000</td>
+<td style="text-align:center">&lt;10</td>
+<td style="text-align:center">5ms</td>
+</tr>
+<tr>
+<td style="text-align:center">5个卖家，5个买家</td>
+<td style="text-align:center">21000</td>
+<td style="text-align:center">20500</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">14ms</td>
+</tr>
+</tbody>
+</table>
+<p>与之前的watch实现相比，锁实现的上架数量虽然有所减少，但是在买入商品时却不需要重试，并且上架商品数量和买入商品数量之间的比率，也跟卖家数量和买家数量之间的比率接近。可想而知，上架和买卖商品操作都需要获取锁来锁住市场，两个进程之间的竞争限制了商品买卖操作性能的进一步提升。要解决这个问题其实也很容易，就是使用细粒度锁。到目前为止我们考虑的只是如何实现与watch命令力度相同的锁，这种锁可以把整个市场都锁住。因为我们是自己手动来构建锁实现，并且我们关心的不是整个市场，而是市场里面谋面商品是否存在，所以我们实际上可以将加锁的力度变得更细一些。通过只锁住被买卖的商品而不是整个市场，可以减少锁竞争出现的几率并提升程序的性能。</p>
+<h3 id="带有超时限制特性的锁"><a href="#带有超时限制特性的锁" class="headerlink" title="带有超时限制特性的锁"></a>带有超时限制特性的锁</h3><p>前面提到过，目前的锁实现在持有者崩溃的时候不会自动释放，这将导致一直处于已被获取的状态。为了解决这个问题，在这一节中，将为锁加上超时功能。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">acquireLockWithTimeout</span><span class="params">(String lockName)</span></span>&#123;</div><div class="line">    <span class="comment">//10秒内获取不到锁就返回</span></div><div class="line">    <span class="keyword">long</span> acquireTimeout = <span class="number">10000</span>;</div><div class="line">    <span class="comment">//20秒后锁超时</span></div><div class="line">    <span class="keyword">long</span> lockTimeout = <span class="number">20000</span>;</div><div class="line">    String identifier = UUID.randomUUID().toString();</div><div class="line">    <span class="keyword">final</span> <span class="keyword">byte</span>[] rawKey = stringRedisTemplate.getStringSerializer().serialize(<span class="string">"lock:"</span> + lockName);</div><div class="line">    <span class="keyword">final</span> <span class="keyword">byte</span>[] rawVal = stringRedisTemplate.getStringSerializer().serialize(identifier);</div><div class="line">    <span class="keyword">long</span> end = System.currentTimeMillis() + acquireTimeout;</div><div class="line">    <span class="keyword">while</span> (System.currentTimeMillis() &lt; end) &#123;</div><div class="line">        RedisCallback&lt;Boolean&gt; redisCallback = redisConnection -&gt;&#123;</div><div class="line">            <span class="comment">//成功获取锁之后设置锁超时时间</span></div><div class="line">            <span class="keyword">if</span>(redisConnection.setNX(rawKey, rawVal))&#123;</div><div class="line">                redisConnection.expire(rawKey, lockTimeout);</div><div class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">            &#125;</div><div class="line">            <span class="comment">/**</span></div><div class="line">             * 锁获取失败之后检测锁是否有超时时间，如果没有则设置超时时间</div><div class="line">             * 这是为了防止程序在setNX和expire之间崩溃</div><div class="line">             */</div><div class="line">            <span class="keyword">if</span>(redisConnection.ttl(rawKey) == -<span class="number">1</span>)&#123;</div><div class="line">                redisConnection.expire(rawKey, lockTimeout);</div><div class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">        &#125;;</div><div class="line">        <span class="keyword">if</span>(stringRedisTemplate.execute(redisCallback).booleanValue())&#123;</div><div class="line">            <span class="keyword">return</span> identifier;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Redis/" rel="tag"># Redis</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/15/Redis学习笔记十二【使用Redis构建应用程序组件-自动补全】/" rel="next" title="Redis学习笔记十二【使用Redis构建应用程序组件--自动补全】">
+                <i class="fa fa-chevron-left"></i> Redis学习笔记十二【使用Redis构建应用程序组件--自动补全】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/16/Redis学习笔记十四【使用Redis构建应用程序组件-计数信号量】/" rel="prev" title="Redis学习笔记十四【使用Redis构建应用程序组件-计数信号量】">
+                Redis学习笔记十四【使用Redis构建应用程序组件-计数信号量】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#锁的重要性"><span class="nav-number">1.</span> <span class="nav-text">锁的重要性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简易锁"><span class="nav-number">2.</span> <span class="nav-text">简易锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#带有超时限制特性的锁"><span class="nav-number">3.</span> <span class="nav-text">带有超时限制特性的锁</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

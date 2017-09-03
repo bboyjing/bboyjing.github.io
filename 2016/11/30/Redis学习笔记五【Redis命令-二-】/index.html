@@ -1,0 +1,880 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Redis," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="散列(HASH)常用命令：    命令 描述     HMGET 从散列中获取一个或多个值   HMSET 为散列中的一个或多个键设值   HDEL 删除散列中一个或多个值，返回成功删除的键值对数量   HLEN 返回散列包含的键值对数量">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis学习笔记五【Redis命令(二)】">
+<meta property="og:url" content="http://yoursite.com/2016/11/30/Redis学习笔记五【Redis命令-二-】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="散列(HASH)常用命令：    命令 描述     HMGET 从散列中获取一个或多个值   HMSET 为散列中的一个或多个键设值   HDEL 删除散列中一个或多个值，返回成功删除的键值对数量   HLEN 返回散列包含的键值对数量">
+<meta property="og:updated_time" content="2016-12-06T00:45:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis学习笔记五【Redis命令(二)】">
+<meta name="twitter:description" content="散列(HASH)常用命令：    命令 描述     HMGET 从散列中获取一个或多个值   HMSET 为散列中的一个或多个键设值   HDEL 删除散列中一个或多个值，返回成功删除的键值对数量   HLEN 返回散列包含的键值对数量">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/11/30/Redis学习笔记五【Redis命令-二-】/"/>
+
+
+
+
+
+  <title> Redis学习笔记五【Redis命令(二)】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/11/30/Redis学习笔记五【Redis命令-二-】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Redis学习笔记五【Redis命令(二)】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-30T23:31:49+08:00">
+                2016-11-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="散列-HASH"><a href="#散列-HASH" class="headerlink" title="散列(HASH)"></a>散列(HASH)</h3><p>常用命令：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命令</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">HMGET</td>
+<td style="text-align:center">从散列中获取一个或多个值</td>
+</tr>
+<tr>
+<td style="text-align:left">HMSET</td>
+<td style="text-align:center">为散列中的一个或多个键设值</td>
+</tr>
+<tr>
+<td style="text-align:left">HDEL</td>
+<td style="text-align:center">删除散列中一个或多个值，返回成功删除的键值对数量</td>
+</tr>
+<tr>
+<td style="text-align:left">HLEN</td>
+<td style="text-align:center">返回散列包含的键值对数量</td>
+</tr>
+</tbody>
+</table>
+<a id="more"></a>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">//批量设值</div><div class="line">127.0.0.1:6379&gt; hmset hash-key k1 v1 k2 v2 k3 v3</div><div class="line">OK</div><div class="line">//批量获取值</div><div class="line">127.0.0.1:6379&gt; hmget hash-key k1 k2 k3</div><div class="line">1) "v1"</div><div class="line">2) "v2"</div><div class="line">3) "v3"</div><div class="line">//获取键值对数量</div><div class="line">127.0.0.1:6379&gt; hlen hash-key</div><div class="line">(integer) 3</div><div class="line">//删除键值对</div><div class="line">127.0.0.1:6379&gt; hdel hash-key k1 k2</div><div class="line">(integer) 2</div></pre></td></tr></table></figure>
+<p>下面再列出散列的其他几个批量操作命令:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命令</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">HEXISTS</td>
+<td style="text-align:center">检查给定键是否存在于散列中</td>
+</tr>
+<tr>
+<td style="text-align:left">HKEYS</td>
+<td style="text-align:center">获取散列包含的所有键</td>
+</tr>
+<tr>
+<td style="text-align:left">HVALS</td>
+<td style="text-align:center">获取散列包含的所有值</td>
+</tr>
+<tr>
+<td style="text-align:left">HGETALL</td>
+<td style="text-align:center">获取散列包含的所有键值对</td>
+</tr>
+<tr>
+<td style="text-align:left">HINCRBY</td>
+<td style="text-align:center">将键存储的值加上给定整数</td>
+</tr>
+<tr>
+<td style="text-align:left">HINCRBYFLOAT</td>
+<td style="text-align:center">将键存储的值加上给定浮点数</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; hmset hash-key2 k1 hello k2 world</div><div class="line">OK</div><div class="line">//获取散列中所有键</div><div class="line">127.0.0.1:6379&gt; hkeys hash-key2</div><div class="line">1) "k1"</div><div class="line">2) "k2"</div><div class="line">//检查给定键是否存在于散列中</div><div class="line">127.0.0.1:6379&gt; hexists hash-key2 num</div><div class="line">(integer) 0</div><div class="line">// 将键存储的值加1</div><div class="line">127.0.0.1:6379&gt; hincrby hash-key2 num 1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; hexists hash-key2 num</div><div class="line">(integer) 1</div></pre></td></tr></table></figure>
+<h3 id="有序集合-ZSET"><a href="#有序集合-ZSET" class="headerlink" title="有序集合(ZSET)"></a>有序集合(ZSET)</h3><p>常用的有序集合命令：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命令</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">ZADD</td>
+<td style="text-align:center">将带有给定分值的成员添加到有序集合</td>
+</tr>
+<tr>
+<td style="text-align:left">ZREM</td>
+<td style="text-align:center">移除给定元素</td>
+</tr>
+<tr>
+<td style="text-align:left">ZCARD</td>
+<td style="text-align:center">返回有序集合包含的成员数量</td>
+</tr>
+<tr>
+<td style="text-align:left">ZINCRBY</td>
+<td style="text-align:center">将member成员的分值加上给定值</td>
+</tr>
+<tr>
+<td style="text-align:left">ZCOUNT</td>
+<td style="text-align:center">返回分值结余min和max之间的成员数量</td>
+</tr>
+<tr>
+<td style="text-align:left">ZRANK</td>
+<td style="text-align:center">返回成员member在有序集合中的排名</td>
+</tr>
+<tr>
+<td style="text-align:left">ZSCORE</td>
+<td style="text-align:center">返回成员member的分值</td>
+</tr>
+<tr>
+<td style="text-align:left">ZRANGE</td>
+<td style="text-align:center">返回有序集合中排名介于start和stop之间的成员</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; zadd zset-key 3 a 2 b 1 c</div><div class="line">(integer) 3</div><div class="line">127.0.0.1:6379&gt; zcard zset-key</div><div class="line">(integer) 3</div><div class="line">//将c加3，返回c的当前分值</div><div class="line">127.0.0.1:6379&gt; zincrby zset-key 3 c</div><div class="line">"4"</div><div class="line">127.0.0.1:6379&gt; zscore zset-key b</div><div class="line">"2"</div><div class="line">//排名从0开始</div><div class="line">127.0.0.1:6379&gt; zrank zset-key c</div><div class="line">(integer) 2</div><div class="line">//返回分值0到3的member的数量</div><div class="line">127.0.0.1:6379&gt; zcount zset-key 0 3</div><div class="line">(integer) 2</div><div class="line">127.0.0.1:6379&gt; zrem zset-key b</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; zrange zset-key 0 -1 withscores</div><div class="line">1) "a"</div><div class="line">2) "3"</div><div class="line">3) "c"</div><div class="line">4) "4"</div></pre></td></tr></table></figure>
+<p>下面再展示另外一些非常有用的有序集合命令：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">命令</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">ZREVRANK</td>
+<td style="text-align:center">成员按分值逆序排</td>
+</tr>
+<tr>
+<td style="text-align:left">ZREVRANGE</td>
+<td style="text-align:center">返回有序集合中排名介于start和stop之间的成员，逆序</td>
+</tr>
+<tr>
+<td style="text-align:left">ZRANGEBYSCORE</td>
+<td style="text-align:center">返回有序集合中，分值介于min和max之间的所有成员</td>
+</tr>
+<tr>
+<td style="text-align:left">ZREVRANGEBYSCORE</td>
+<td style="text-align:center">返回有序集合中，分值介于min和max之间的所有成员，逆序</td>
+</tr>
+<tr>
+<td style="text-align:left">ZREMRANGEBYRANK</td>
+<td style="text-align:center">移除有序集合中排名介于min和max之间的所有成员</td>
+</tr>
+<tr>
+<td style="text-align:left">ZREMRANGEBYSCORE</td>
+<td style="text-align:center">移除有序集合中分值介于min和max之间的所有成员</td>
+</tr>
+<tr>
+<td style="text-align:left">ZINTERSTORE</td>
+<td style="text-align:center">对有序集合执行类似集合的交集运算</td>
+</tr>
+<tr>
+<td style="text-align:left">ZUNIONSTORE</td>
+<td style="text-align:center">对有序集合执行类似集合的并集运算</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; zadd zset-1 1 a 2 b 3 c</div><div class="line">(integer) 3</div><div class="line">127.0.0.1:6379&gt; zadd zset-2 4 b 1 c 0 d</div><div class="line">(integer) 1</div><div class="line">//zset-1 zset-2都包含的元素的分值求和</div><div class="line">127.0.0.1:6379&gt; zinterstore zset-sum 2 zset-1 zset-2</div><div class="line">(integer) 2</div><div class="line">127.0.0.1:6379&gt; zrange zset-sum 0 -1 withscores</div><div class="line">1) "c"</div><div class="line">2) "4"</div><div class="line">3) "b"</div><div class="line">4) "6"</div><div class="line">//zset-1 zset-2中所有的元素的分值求和</div><div class="line">127.0.0.1:6379&gt; zunionstore zset-union 2 zset-1 zset-2</div><div class="line">(integer) 4</div><div class="line">127.0.0.1:6379&gt; zrange zset-union 0 -1 withscores</div><div class="line">1) "d"</div><div class="line">2) "0"</div><div class="line">3) "a"</div><div class="line">4) "1"</div><div class="line">5) "c"</div><div class="line">6) "4"</div><div class="line">7) "b"</div><div class="line">8) "6"</div></pre></td></tr></table></figure>
+<p>ZINTERSTORE和ZUNIONSTORE的AGGREGATE可选参数为SUM|MIN|MAX，默认为SUM，MIN和MAX可自行测试。</p>
+<h3 id="发布订阅-publish-subscribe"><a href="#发布订阅-publish-subscribe" class="headerlink" title="发布订阅(publish/subscribe)"></a>发布订阅(publish/subscribe)</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">命令</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">SUBSCRIBE</td>
+<td style="text-align:center">订阅给定的一个或多个频道</td>
+</tr>
+<tr>
+<td style="text-align:left">UNSUBSCRIBE</td>
+<td style="text-align:center">退订给定的频道，若未指定，则退订所有频道</td>
+</tr>
+<tr>
+<td style="text-align:left">PUBLISH</td>
+<td style="text-align:center">向给定频道发送消息</td>
+</tr>
+<tr>
+<td style="text-align:left">PSUBSCRIBE</td>
+<td style="text-align:center">订阅给定模式相匹配的频道</td>
+</tr>
+<tr>
+<td style="text-align:left">PUNSUBSCRIBE</td>
+<td style="text-align:center">退订给定的模式相匹配的频道</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">//进程1订阅channel-1</div><div class="line">Reading messages... (press Ctrl-C to quit)</div><div class="line">1) "subscribe"</div><div class="line">2) "channel-1"</div><div class="line">3) (integer) 1</div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">//进程2发布消息</div><div class="line">127.0.0.1:6379&gt; publish channel-1 echo</div><div class="line">(integer) 1</div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">//进程1收到消息</div><div class="line">127.0.0.1:6379&gt; subscribe channel-1</div><div class="line">Reading messages... (press Ctrl-C to quit)</div><div class="line">1) "subscribe"</div><div class="line">2) "channel-1"</div><div class="line">3) (integer) 1</div><div class="line">1) "message"</div><div class="line">2) "channel-1"</div><div class="line">3) "echo"</div></pre></td></tr></table></figure>
+<p>由于网络的不稳定性，Redis消息订阅可能会存在丢失消息的风险，后面会学习使用其他方式来编写可靠的消息传递，易用性与可靠性之间的取舍需要使用者自行判断。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Redis/" rel="tag"># Redis</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/22/Redis学习笔记四【Redis命令-一-】/" rel="next" title="Redis学习笔记四【Redis命令(一)】">
+                <i class="fa fa-chevron-left"></i> Redis学习笔记四【Redis命令(一)】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/06/Redis学习笔记六【Redis命令-三-】/" rel="prev" title="Redis学习笔记六【Redis命令(三)】">
+                Redis学习笔记六【Redis命令(三)】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#散列-HASH"><span class="nav-number">1.</span> <span class="nav-text">散列(HASH)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#有序集合-ZSET"><span class="nav-number">2.</span> <span class="nav-text">有序集合(ZSET)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发布订阅-publish-subscribe"><span class="nav-number">3.</span> <span class="nav-text">发布订阅(publish/subscribe)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

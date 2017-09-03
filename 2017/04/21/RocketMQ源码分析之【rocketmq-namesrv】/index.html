@@ -1,0 +1,741 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,MQ," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本章节将对Name Server进行分析。 Name Server作用官方文档对Name Server有一个概括：  Name Server是一个几乎无状态节点，可集群部署，节点之间无任何信息同步。">
+<meta name="keywords" content="Java,MQ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RocketMQ源码分析之【rocketmq-namesrv】">
+<meta property="og:url" content="http://yoursite.com/2017/04/21/RocketMQ源码分析之【rocketmq-namesrv】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="本章节将对Name Server进行分析。 Name Server作用官方文档对Name Server有一个概括：  Name Server是一个几乎无状态节点，可集群部署，节点之间无任何信息同步。">
+<meta property="og:updated_time" content="2017-05-03T03:59:48.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RocketMQ源码分析之【rocketmq-namesrv】">
+<meta name="twitter:description" content="本章节将对Name Server进行分析。 Name Server作用官方文档对Name Server有一个概括：  Name Server是一个几乎无状态节点，可集群部署，节点之间无任何信息同步。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/04/21/RocketMQ源码分析之【rocketmq-namesrv】/"/>
+
+
+
+
+
+  <title> RocketMQ源码分析之【rocketmq-namesrv】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/21/RocketMQ源码分析之【rocketmq-namesrv】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                RocketMQ源码分析之【rocketmq-namesrv】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-21T14:04:19+08:00">
+                2017-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/RocketMQ/" itemprop="url" rel="index">
+                    <span itemprop="name">RocketMQ</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章节将对Name Server进行分析。</p>
+<h3 id="Name-Server作用"><a href="#Name-Server作用" class="headerlink" title="Name Server作用"></a>Name Server作用</h3><p>官方文档对Name Server有一个概括：</p>
+<blockquote>
+<p>Name Server是一个几乎无状态节点，可集群部署，节点之间无任何信息同步。</p>
+</blockquote>
+<a id="more"></a>
+<p>也就是说就是RocketMQ的注册中心，是专门为RocketMQ设计的轻量级命名服务，可集群横向扩展、无状态等特点，而且代码不到1000行。</p>
+<h3 id="Name-Server源码分析"><a href="#Name-Server源码分析" class="headerlink" title="Name Server源码分析"></a>Name Server源码分析</h3><p>Name Server功能的核心代码在namesrv子项目中，浏览了下，确实没有多少代码，真是屌。可以看下Quick Start中的Name Server的启动脚本：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> cat ./bin/mqnamesrv</div><div class="line">...</div><div class="line">sh $&#123;ROCKETMQ_HOME&#125;/bin/runserver.sh org.apache.rocketmq.namesrv.NamesrvStartup $@</div></pre></td></tr></table></figure></p>
+<p>脚本最后一行指定了启动类，我们就从这个类开始看起。</p>
+<h4 id="NamesrvStartup类分析"><a href="#NamesrvStartup类分析" class="headerlink" title="NamesrvStartup类分析"></a>NamesrvStartup类分析</h4><p>该类有两个成员变量：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 用于保存、读取配置文件</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> Properties properties = <span class="keyword">null</span>;</div><div class="line"><span class="comment">// 用于解析命令行输入参数</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> CommandLine commandLine = <span class="keyword">null</span>;</div></pre></td></tr></table></figure></p>
+<p>CommandLine是apache CLI提供的功能，这个在第一章已经打下基础了。该类所有的逻辑都在main0()方法中，下面把代码和注释都贴出来：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> NamesrvController <span class="title">main0</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">    <span class="comment">// 设置版本号[rocketmq.remoting.version -&gt; MQVersion.CURRENT_VERSION]</span></div><div class="line">    System.setProperty(RemotingCommand.REMOTING_VERSION_KEY, Integer.toString(MQVersion.CURRENT_VERSION));</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Netty接收缓冲区大小</div><div class="line">     * 设置的是ChannelOption.SO_SNDBUF参数</div><div class="line">     * 该参数对应于套接字选项中的SO_SNDBUF</div><div class="line">     */</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> == System.getProperty(NettySystemConfig.COM_ROCKETMQ_REMOTING_SOCKET_SNDBUF_SIZE)) &#123;</div><div class="line">        NettySystemConfig.socketSndbufSize = <span class="number">4096</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Netty发送缓冲区大小</div><div class="line">     * 设置的是ChannelOption.SO_RCVBUF参数</div><div class="line">     * 该参数对应于套接字选项中的SO_RCVBUF</div><div class="line">     */</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> == System.getProperty(NettySystemConfig.COM_ROCKETMQ_REMOTING_SOCKET_RCVBUF_SIZE)) &#123;</div><div class="line">        NettySystemConfig.socketRcvbufSize = <span class="number">4096</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        <span class="comment">// FastJson版本冲突检测，已被注释</span></div><div class="line">        <span class="comment">//PackageConflictDetect.detectFastjson();</span></div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 构造org.apache.commons.cli.Options</div><div class="line">         * 并且添加-h -n参数</div><div class="line">         * -h 打印帮助信息</div><div class="line">         * -h 指定Name Server地址</div><div class="line">         */</div><div class="line">        Options options = ServerUtil.buildCommandlineOptions(<span class="keyword">new</span> Options());</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 初始化成员变量commandLine</div><div class="line">         * 并且在Options中添加-c -p参数</div><div class="line">         * -c 指定Name Server配置文件</div><div class="line">         * -p 打印配置信息</div><div class="line">         */</div><div class="line">        commandLine =</div><div class="line">            ServerUtil.parseCmdLine(<span class="string">"mqnamesrv"</span>, args, buildCommandlineOptions(options),</div><div class="line">                <span class="keyword">new</span> PosixParser());</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> == commandLine) &#123;</div><div class="line">            System.exit(-<span class="number">1</span>);</div><div class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 初始化NamesrvConfig和NettyServerConfig</span></div><div class="line">        <span class="keyword">final</span> NamesrvConfig namesrvConfig = <span class="keyword">new</span> NamesrvConfig();</div><div class="line">        <span class="keyword">final</span> NettyServerConfig nettyServerConfig = <span class="keyword">new</span> NettyServerConfig();</div><div class="line">        <span class="comment">// Name Server的端口定为9876</span></div><div class="line">        nettyServerConfig.setListenPort(<span class="number">9876</span>);</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 如果命令带有-c参数，则读取文件内容，转换成全局Properties</div><div class="line">         * 通过反射，将Properties中的值赋值给NamesrvConfig、NettyServerConfig</div><div class="line">         */</div><div class="line">        <span class="keyword">if</span> (commandLine.hasOption(<span class="string">'c'</span>)) &#123;</div><div class="line">            String file = commandLine.getOptionValue(<span class="string">'c'</span>);</div><div class="line">            <span class="keyword">if</span> (file != <span class="keyword">null</span>) &#123;</div><div class="line">                InputStream in = <span class="keyword">new</span> BufferedInputStream(<span class="keyword">new</span> FileInputStream(file));</div><div class="line">                properties = <span class="keyword">new</span> Properties();</div><div class="line">                properties.load(in);</div><div class="line">                MixAll.properties2Object(properties, namesrvConfig);</div><div class="line">                MixAll.properties2Object(properties, nettyServerConfig);</div><div class="line"></div><div class="line">                namesrvConfig.setConfigStorePath(file);</div><div class="line"></div><div class="line">                System.out.printf(<span class="string">"load config properties file OK, "</span> + file + <span class="string">"%n"</span>);</div><div class="line">                in.close();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 如果命令带有-p参数，则打印出NamesrvConfig、NettyServerConfig的属性</span></div><div class="line">        <span class="keyword">if</span> (commandLine.hasOption(<span class="string">'p'</span>)) &#123;</div><div class="line">            MixAll.printObjectProperties(<span class="keyword">null</span>, namesrvConfig);</div><div class="line">            MixAll.printObjectProperties(<span class="keyword">null</span>, nettyServerConfig);</div><div class="line">            System.exit(<span class="number">0</span>);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 解析命令行参数，并加载到namesrvConfig配置中</div><div class="line">         * 通过debug发现，这一行在这里没用</div><div class="line">         * commandLine2Properties()方法中将参数全名和属性值转换成Properties</div><div class="line">         * 目前支持的参数的全名为configFile、help、namesrvAddr、printConfigItem</div><div class="line">         * 但是NamesrvConfig类中没有与之对应的set方法，所以不知道意义何在</div><div class="line">         */</div><div class="line">        MixAll.properties2Object(ServerUtil.commandLine2Properties(commandLine), namesrvConfig);</div><div class="line"></div><div class="line">        <span class="comment">// 判断ROCKETMQ_HOME不能为空</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> == namesrvConfig.getRocketmqHome()) &#123;</div><div class="line">            System.out.printf(<span class="string">"Please set the "</span> + MixAll.ROCKETMQ_HOME_ENV</div><div class="line">                + <span class="string">" variable in your environment to match the location of the RocketMQ installation%n"</span>);</div><div class="line">            System.exit(-<span class="number">2</span>);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 初始化Logback日志工厂</div><div class="line">         * RocketMQ默认使用Logback作为日志输出</div><div class="line">         */</div><div class="line">        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();</div><div class="line">        JoranConfigurator configurator = <span class="keyword">new</span> JoranConfigurator();</div><div class="line">        configurator.setContext(lc);</div><div class="line">        lc.reset();</div><div class="line">        configurator.doConfigure(namesrvConfig.getRocketmqHome() + <span class="string">"/conf/logback_namesrv.xml"</span>);</div><div class="line">        <span class="keyword">final</span> Logger log = LoggerFactory.getLogger(LoggerName.NAMESRV_LOGGER_NAME);</div><div class="line"></div><div class="line">        MixAll.printObjectProperties(log, namesrvConfig);</div><div class="line">        MixAll.printObjectProperties(log, nettyServerConfig);</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 初始化NamesrvController</div><div class="line">         * 该类是Name Server的主要控制类</div><div class="line">         */</div><div class="line">        <span class="keyword">final</span> NamesrvController controller = <span class="keyword">new</span> NamesrvController(namesrvConfig, nettyServerConfig);</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * remember all configs to prevent discard</div><div class="line">         * 将全局Properties的内容复制到NamesrvController.Configuration.allConfigs中</div><div class="line">         */</div><div class="line">        controller.getConfiguration().registerConfig(properties);</div><div class="line"></div><div class="line">        <span class="comment">// 初始化NamesrvController</span></div><div class="line">        <span class="keyword">boolean</span> initResult = controller.initialize();</div><div class="line">        <span class="keyword">if</span> (!initResult) &#123;</div><div class="line">            controller.shutdown();</div><div class="line">            System.exit(-<span class="number">3</span>);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 注册ShutdownHook</span></div><div class="line">        Runtime.getRuntime().addShutdownHook(<span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</div><div class="line">            <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> hasShutdown = <span class="keyword">false</span>;</div><div class="line">            <span class="keyword">private</span> AtomicInteger shutdownTimes = <span class="keyword">new</span> AtomicInteger(<span class="number">0</span>);</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</div><div class="line">                    log.info(<span class="string">"shutdown hook was invoked, "</span> + <span class="keyword">this</span>.shutdownTimes.incrementAndGet());</div><div class="line">                    <span class="keyword">if</span> (!<span class="keyword">this</span>.hasShutdown) &#123;</div><div class="line">                        <span class="keyword">this</span>.hasShutdown = <span class="keyword">true</span>;</div><div class="line">                        <span class="keyword">long</span> begineTime = System.currentTimeMillis();</div><div class="line">                        controller.shutdown();</div><div class="line">                        <span class="keyword">long</span> consumingTimeTotal = System.currentTimeMillis() - begineTime;</div><div class="line">                        log.info(<span class="string">"shutdown hook over, consuming time total(ms): "</span> + consumingTimeTotal);</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;, <span class="string">"ShutdownHook"</span>));</div><div class="line"></div><div class="line">        <span class="comment">// 启动Netty服务</span></div><div class="line">        controller.start();</div><div class="line"></div><div class="line">        String tip = <span class="string">"The Name Server boot success. serializeType="</span> +</div><div class="line">                RemotingCommand.getSerializeTypeConfigInThisServer();</div><div class="line">        log.info(tip);</div><div class="line">        System.out.printf(tip + <span class="string">"%n"</span>);</div><div class="line"></div><div class="line">        <span class="keyword">return</span> controller;</div><div class="line">    &#125; <span class="keyword">catch</span> (Throwable e) &#123;</div><div class="line">        e.printStackTrace();</div><div class="line">        System.exit(-<span class="number">1</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="NamesrvConfig类"><a href="#NamesrvConfig类" class="headerlink" title="NamesrvConfig类"></a>NamesrvConfig类</h4><p>该类存放Name Server一些属性配置：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NamesrvConfig</span> </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * RocketMQ安装目录</div><div class="line">     * 如果没有指定的话，默认值为系统环境变量ROCKETMQ_HOME</div><div class="line">     * 通过System.getenv获取，可以在~/.profile中export</div><div class="line">     * 或者可以在配置文件中指定rocketmqHome=***</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> String rocketmqHome = System.getProperty(MixAll.ROCKETMQ_HOME_PROPERTY, </div><div class="line">            System.getenv(MixAll.ROCKETMQ_HOME_ENV));</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * KV配置持久化地址</div><div class="line">     * 默认为System.getProperty("user.home")/namesrv/kvConfig.json文件</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> String kvConfigPath = System.getProperty(<span class="string">"user.home"</span>) + </div><div class="line">            File.separator + <span class="string">"namesrv"</span> + </div><div class="line">            File.separator + <span class="string">"kvConfig.json"</span>;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 持久化配置路径</div><div class="line">     * 默认为System.getProperty("user.home")/namesrv/namesrv.properties文件</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> String configStorePath = System.getProperty(<span class="string">"user.home"</span>) + </div><div class="line">            File.separator + <span class="string">"namesrv"</span> + </div><div class="line">            File.separator + <span class="string">"namesrv.properties"</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 下面三个属性暂不清楚是干嘛的</span></div><div class="line">    <span class="keyword">private</span> String productEnvName = <span class="string">"center"</span>;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> clusterTest = <span class="keyword">false</span>;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> orderMessageEnable = <span class="keyword">false</span>;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="NettyServerConfig类"><a href="#NettyServerConfig类" class="headerlink" title="NettyServerConfig类"></a>NettyServerConfig类</h4><p>Name Server Netty服务配置，RocketMQ底层通信采用使用netty4。如果要看懂源码，NIO和Netty的知识也是必不可少的，可以参考《Netty权威指南》，当然只是给个建议。下面把NettyServerConfig的属性列举下，这里也只是了解下属性的作用，更深层次的理解请参考Netty。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NettyServerConfig</span> <span class="keyword">implements</span> <span class="title">Cloneable</span> </span>&#123;</div><div class="line">    <span class="comment">// 默认监听端口</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> listenPort = <span class="number">8888</span>;</div><div class="line">    <span class="comment">// Netty服务工作线程数量</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> serverWorkerThreads = <span class="number">8</span>;</div><div class="line">    <span class="comment">// Netty服务异步回调线程池线程数量</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> serverCallbackExecutorThreads = <span class="number">0</span>;</div><div class="line">    <span class="comment">// Netty Selector线程数量</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> serverSelectorThreads = <span class="number">3</span>;</div><div class="line">    <span class="comment">// 控制单向的信号量</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> serverOnewaySemaphoreValue = <span class="number">256</span>;</div><div class="line">    <span class="comment">// 控制异步信号量</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> serverAsyncSemaphoreValue = <span class="number">64</span>;</div><div class="line">    <span class="comment">// 服务空闲心跳检测时间间隔 单位秒</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> serverChannelMaxIdleTimeSeconds = <span class="number">120</span>;</div><div class="line"></div><div class="line">    <span class="comment">// Netty发送缓冲区</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> serverSocketSndBufSize = NettySystemConfig.socketSndbufSize;</div><div class="line">    <span class="comment">// Netty接受缓冲区</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> serverSocketRcvBufSize = NettySystemConfig.socketRcvbufSize;</div><div class="line">    <span class="comment">// 是否使用Netty内存池</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> serverPooledByteBufAllocatorEnable = <span class="keyword">true</span>;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="NamesrvController类"><a href="#NamesrvController类" class="headerlink" title="NamesrvController类"></a>NamesrvController类</h4><p>先看下NamesrvController的构造函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">NamesrvController</span><span class="params">(NamesrvConfig namesrvConfig, NettyServerConfig nettyServerConfig)</span> </span>&#123;</div><div class="line">    <span class="comment">// Name Server配置</span></div><div class="line">    <span class="keyword">this</span>.namesrvConfig = namesrvConfig;</div><div class="line">    <span class="comment">// Netty配置</span></div><div class="line">    <span class="keyword">this</span>.nettyServerConfig = nettyServerConfig;</div><div class="line">    <span class="comment">// KV配置管理</span></div><div class="line">    <span class="keyword">this</span>.kvConfigManager = <span class="keyword">new</span> KVConfigManager(<span class="keyword">this</span>);</div><div class="line">    <span class="comment">// 路由信息管理</span></div><div class="line">    <span class="keyword">this</span>.routeInfoManager = <span class="keyword">new</span> RouteInfoManager();</div><div class="line">    <span class="comment">// Broker连接事件处理服务</span></div><div class="line">    <span class="keyword">this</span>.brokerHousekeepingService = <span class="keyword">new</span> BrokerHousekeepingService(<span class="keyword">this</span>);</div><div class="line">    <span class="comment">// 属性配置</span></div><div class="line">    <span class="keyword">this</span>.configuration = <span class="keyword">new</span> Configuration(</div><div class="line">        log,</div><div class="line">        <span class="keyword">this</span>.namesrvConfig, <span class="keyword">this</span>.nettyServerConfig</div><div class="line">    );</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 设置Configuration对象的storePathField字段</div><div class="line">     * 此处该字段被赋值为NamesrvConfig是的configStorePath字段</div><div class="line">     */</div><div class="line">    <span class="keyword">this</span>.configuration.setStorePathFromConfig(<span class="keyword">this</span>.namesrvConfig, <span class="string">"configStorePath"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>涉及到6个类的初始化，前两个已经看过了，剩下的应该是Name Server的核心内容了。NamesrvController类中还有其它方法，但是得先看下构造函数中剩下的4项是什么，再回过来看这个类。</p>
+<h4 id="KVConfigManager类"><a href="#KVConfigManager类" class="headerlink" title="KVConfigManager类"></a>KVConfigManager类</h4><p>KVConfigManager有三个主要成员变量：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">KVConfigManager</span> </span>&#123;</div><div class="line">    <span class="comment">// Name Server主要控制类</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> NamesrvController namesrvController;</div><div class="line">    <span class="comment">// 读写锁</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ReadWriteLock lock = <span class="keyword">new</span> ReentrantReadWriteLock();</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 以命名空间为单位存储的配置文件，存数示例如下：</div><div class="line">     * &#123;"configTable":&#123;"ORDER_TOPIC_CONFIG":&#123;"UnitTest":"test"&#125;&#125;&#125;%</div><div class="line">     * 此处的Namespace为ORDER_TOPIC_CONFIG，暂时不知道Namespace具体的含义</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> HashMap&lt;String<span class="comment">/* Namespace */</span>, HashMap&lt;String<span class="comment">/* Key */</span>, String<span class="comment">/* Value */</span>&gt;&gt; configTable =</div><div class="line">        <span class="keyword">new</span> HashMap&lt;String, HashMap&lt;String, String&gt;&gt;();</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>关于ReentrantReadWriteLock，该类中只用到了lockInterruptibly()方法，调用该方法会一直阻塞到获得锁，但是接受中断信号。</p>
+<h4 id="RouteInfoManager类"><a href="#RouteInfoManager类" class="headerlink" title="RouteInfoManager类"></a>RouteInfoManager类</h4><p>RouteInfoManager是管理路由信息的类，该类有7个主要成员变量：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RouteInfoManager</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger log = LoggerFactory.getLogger(LoggerName.NAMESRV_LOGGER_NAME);</div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">long</span> BROKER_CHANNEL_EXPIRED_TIME = <span class="number">1000</span> * <span class="number">60</span> * <span class="number">2</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 读写锁</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ReadWriteLock lock = <span class="keyword">new</span> ReentrantReadWriteLock();</div><div class="line">    <span class="comment">// Topic，以及对应的队列信息</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> HashMap&lt;String<span class="comment">/* topic */</span>, List&lt;QueueData&gt;&gt; topicQueueTable;</div><div class="line">    <span class="comment">// 以Broker Name为单位的Broker集合</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> HashMap&lt;String<span class="comment">/* brokerName */</span>, BrokerData&gt; brokerAddrTable;</div><div class="line">    <span class="comment">// 集群以及属于该进群的Broker列表</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> HashMap&lt;String<span class="comment">/* clusterName */</span>, Set&lt;String<span class="comment">/* brokerName */</span>&gt;&gt; clusterAddrTable;</div><div class="line">    <span class="comment">// 存活的Broker地址列表</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> HashMap&lt;String<span class="comment">/* brokerAddr */</span>, BrokerLiveInfo&gt; brokerLiveTable;</div><div class="line">    <span class="comment">// Broker对应的Filter Server列表</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> HashMap&lt;String<span class="comment">/* brokerAddr */</span>, List&lt;String&gt;<span class="comment">/* Filter Server */</span>&gt; filterServerTable;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="QueueData类"><a href="#QueueData类" class="headerlink" title="QueueData类"></a>QueueData类</h4><p>该类用于存放Topic对应的队列信息：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">QueueData</span> <span class="keyword">implements</span> <span class="title">Comparable</span>&lt;<span class="title">QueueData</span>&gt; </span>&#123;</div><div class="line">    <span class="comment">// 队列所属的Broker名称</span></div><div class="line">    <span class="keyword">private</span> String brokerName;</div><div class="line">    <span class="comment">// 读队列数量</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> readQueueNums;</div><div class="line">    <span class="comment">// 写队列数量</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> writeQueueNums;</div><div class="line">    <span class="comment">// Topic的读写权限(2是写 4是读 6是读写)</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> perm;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 该字段对应TopicConfig.topicSysFlag</div><div class="line">     * 由创建Topic时-u/-s参数指定，不知道有何作用</div><div class="line">     * 参照：https://github.com/alibaba/RocketMQ/issues/206</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> topicSynFlag;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="BrokerData类"><a href="#BrokerData类" class="headerlink" title="BrokerData类"></a>BrokerData类</h4><p>该类用于存放Broker信息：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BrokerData</span> <span class="keyword">implements</span> <span class="title">Comparable</span>&lt;<span class="title">BrokerData</span>&gt; </span>&#123;</div><div class="line">    <span class="comment">// Broker所属的集群</span></div><div class="line">    <span class="keyword">private</span> String cluster;</div><div class="line">    <span class="comment">// Broker名称</span></div><div class="line">    <span class="keyword">private</span> String brokerName;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Broker ID以及其地址</div><div class="line">     * 同一个brokerName下可以有一个Master和多个Slave，所以brokerAddrs是一个集合</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> HashMap&lt;Long<span class="comment">/* brokerId */</span>, String<span class="comment">/* broker address */</span>&gt; brokerAddrs;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="BrokerLiveInfo类"><a href="#BrokerLiveInfo类" class="headerlink" title="BrokerLiveInfo类"></a>BrokerLiveInfo类</h4><p>该类是RouteInfoManager的内部类，用于存放存活的Broker信息：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">BrokerLiveInfo</span> </span>&#123;</div><div class="line">    <span class="comment">// 最后一次更新时间</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">long</span> lastUpdateTimestamp;</div><div class="line">    <span class="comment">// 版本号</span></div><div class="line">    <span class="keyword">private</span> DataVersion dataVersion;</div><div class="line">    <span class="comment">// Netty的Channel</span></div><div class="line">    <span class="keyword">private</span> Channel channel;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * HA Broker的地址</div><div class="line">     * 是Slave从Master拉取数据时链接的地址，由brokerIp2+HA端口构成</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> String haServerAddr;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="BrokerHousekeepingService类"><a href="#BrokerHousekeepingService类" class="headerlink" title="BrokerHousekeepingService类"></a>BrokerHousekeepingService类</h4><p>该类负责Broker连接事件的处理，实现了ChannelEventListener，主要用来管理RouteInfoManager的brokerLiveTable。实现了三个方法，如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BrokerHousekeepingService</span> <span class="keyword">implements</span> <span class="title">ChannelEventListener</span> </span>&#123;</div><div class="line">    ...</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onChannelClose</span><span class="params">(String remoteAddr, Channel channel)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.namesrvController.getRouteInfoManager().onChannelDestroy(remoteAddr, channel);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onChannelException</span><span class="params">(String remoteAddr, Channel channel)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.namesrvController.getRouteInfoManager().onChannelDestroy(remoteAddr, channel);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onChannelIdle</span><span class="params">(String remoteAddr, Channel channel)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.namesrvController.getRouteInfoManager().onChannelDestroy(remoteAddr, channel);</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>从方法名字可以看出，都是和Channel相关，这里的Channel就是BrokerLiveInfo的channel变量，是Netty的原生类。总的来说，CHannel是Netty抽象出来的网络I/O读写相关的接口。上面三个方法都调用了RouteInfoManager的onChannelDestroy()方法，下面来分析下该方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RouteInfoManager</span> </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 清除离线的Broker信息</div><div class="line">     * <span class="doctag">@param</span> remoteAddr Broker的地址</div><div class="line">     * <span class="doctag">@param</span> channel Broker和Name Server之间的连接通道，是一个NioSocketChannel实例</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onChannelDestroy</span><span class="params">(String remoteAddr, Channel channel)</span> </span>&#123;</div><div class="line">        String brokerAddrFound = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">if</span> (channel != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    <span class="comment">/**</span></div><div class="line">                     * 通过channel从brokerLiveTable中找出对应的Broker地址</div><div class="line">                     * 由于只是读，所以只需要获取readLock()</div><div class="line">                     * 若该Broker已经从存活的Broker地址列表中被清除，则直接使用remoteAddr</div><div class="line">                     */</div><div class="line">                    <span class="keyword">this</span>.lock.readLock().lockInterruptibly();</div><div class="line">                    Iterator&lt;Entry&lt;String, BrokerLiveInfo&gt;&gt; itBrokerLiveTable =</div><div class="line">                        <span class="keyword">this</span>.brokerLiveTable.entrySet().iterator();</div><div class="line">                    <span class="keyword">while</span> (itBrokerLiveTable.hasNext()) &#123;</div><div class="line">                        Entry&lt;String, BrokerLiveInfo&gt; entry = itBrokerLiveTable.next();</div><div class="line">                        <span class="keyword">if</span> (entry.getValue().getChannel() == channel) &#123;</div><div class="line">                            brokerAddrFound = entry.getKey();</div><div class="line">                            <span class="keyword">break</span>;</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                &#125; <span class="keyword">finally</span> &#123;</div><div class="line">                    <span class="keyword">this</span>.lock.readLock().unlock();</div><div class="line">                &#125;</div><div class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">                log.error(<span class="string">"onChannelDestroy Exception"</span>, e);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> == brokerAddrFound) &#123;</div><div class="line">            brokerAddrFound = remoteAddr;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            log.info(<span class="string">"the broker's channel destroyed, &#123;&#125;, clean it's data structure at once"</span>,</div><div class="line">                    brokerAddrFound);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (brokerAddrFound != <span class="keyword">null</span> &amp;&amp; brokerAddrFound.length() &gt; <span class="number">0</span>) &#123;</div><div class="line"></div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    <span class="keyword">this</span>.lock.writeLock().lockInterruptibly();</div><div class="line">                    <span class="comment">// 从存活的Broker地址列表中清除该Broker</span></div><div class="line">                    <span class="keyword">this</span>.brokerLiveTable.remove(brokerAddrFound);</div><div class="line">                    <span class="comment">// 从Filter Server中清除该Broker</span></div><div class="line">                    <span class="keyword">this</span>.filterServerTable.remove(brokerAddrFound);</div><div class="line"></div><div class="line">                    <span class="comment">/**</span></div><div class="line">                     * 通过brokerAddrFound从Broker列表中找到该Broker，并删除</div><div class="line">                     * 删除的是BrokerData.brokerAddrs的元素</div><div class="line">                     * 上述操作之后，如果BrokerData.brokerAddrs空了，则从Broker列表中将Broker Name对应的元素删除</div><div class="line">                     * 删除的是成员变量brokerAddrTable的元素</div><div class="line">                     */</div><div class="line">                    String brokerNameFound = <span class="keyword">null</span>;</div><div class="line">                    <span class="keyword">boolean</span> removeBrokerName = <span class="keyword">false</span>;</div><div class="line">                    Iterator&lt;Entry&lt;String, BrokerData&gt;&gt; itBrokerAddrTable =</div><div class="line">                        <span class="keyword">this</span>.brokerAddrTable.entrySet().iterator();</div><div class="line">                    <span class="keyword">while</span> (itBrokerAddrTable.hasNext() &amp;&amp; (<span class="keyword">null</span> == brokerNameFound)) &#123;</div><div class="line">                        BrokerData brokerData = itBrokerAddrTable.next().getValue();</div><div class="line"></div><div class="line">                        Iterator&lt;Entry&lt;Long, String&gt;&gt; it = brokerData.getBrokerAddrs().entrySet().iterator();</div><div class="line">                        <span class="keyword">while</span> (it.hasNext()) &#123;</div><div class="line">                            Entry&lt;Long, String&gt; entry = it.next();</div><div class="line">                            Long brokerId = entry.getKey();</div><div class="line">                            String brokerAddr = entry.getValue();</div><div class="line">                            <span class="keyword">if</span> (brokerAddr.equals(brokerAddrFound)) &#123;</div><div class="line">                                brokerNameFound = brokerData.getBrokerName();</div><div class="line">                                it.remove();</div><div class="line">                                log.info(<span class="string">"remove brokerAddr[&#123;&#125;, &#123;&#125;] from brokerAddrTable, because channel destroyed"</span>,</div><div class="line">                                    brokerId, brokerAddr);</div><div class="line">                                <span class="keyword">break</span>;</div><div class="line">                            &#125;</div><div class="line">                        &#125;</div><div class="line"></div><div class="line">                        <span class="keyword">if</span> (brokerData.getBrokerAddrs().isEmpty()) &#123;</div><div class="line">                            removeBrokerName = <span class="keyword">true</span>;</div><div class="line">                            itBrokerAddrTable.remove();</div><div class="line">                            log.info(<span class="string">"remove brokerName[&#123;&#125;] from brokerAddrTable, because channel destroyed"</span>,</div><div class="line">                                brokerData.getBrokerName());</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    <span class="comment">/**</span></div><div class="line">                     * 如果该Broker Name下没有节点提供服务(已经从brokerAddrTable中清除)</div><div class="line">                     * 从Broker集群中删除该Broker信息</div><div class="line">                     * 如果集群下没有提供服务的Broker，则从集群列表中删除该进群信息</div><div class="line">                     * 删除的是成员变量clusterAddrTable的元素</div><div class="line">                     */</div><div class="line">                    <span class="keyword">if</span> (brokerNameFound != <span class="keyword">null</span> &amp;&amp; removeBrokerName) &#123;</div><div class="line">                        Iterator&lt;Entry&lt;String, Set&lt;String&gt;&gt;&gt; it = <span class="keyword">this</span>.clusterAddrTable.entrySet().iterator();</div><div class="line">                        <span class="keyword">while</span> (it.hasNext()) &#123;</div><div class="line">                            Entry&lt;String, Set&lt;String&gt;&gt; entry = it.next();</div><div class="line">                            String clusterName = entry.getKey();</div><div class="line">                            Set&lt;String&gt; brokerNames = entry.getValue();</div><div class="line">                            <span class="keyword">boolean</span> removed = brokerNames.remove(brokerNameFound);</div><div class="line">                            <span class="keyword">if</span> (removed) &#123;</div><div class="line">                                log.info(<span class="string">"remove brokerName[&#123;&#125;], clusterName[&#123;&#125;] from clusterAddrTable, because channel destroyed"</span>,</div><div class="line">                                    brokerNameFound, clusterName);</div><div class="line"></div><div class="line">                                <span class="keyword">if</span> (brokerNames.isEmpty()) &#123;</div><div class="line">                                    log.info(<span class="string">"remove the clusterName[&#123;&#125;] from clusterAddrTable, because channel destroyed and no broker in this cluster"</span>,</div><div class="line">                                        clusterName);</div><div class="line">                                    it.remove();</div><div class="line">                                &#125;</div><div class="line"></div><div class="line">                                <span class="keyword">break</span>;</div><div class="line">                            &#125;</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    <span class="comment">/**</span></div><div class="line">                     * 如果该Broker Name下没有节点提供服务(已经从brokerAddrTable中清除)</div><div class="line">                     * 从Topic列表中删除该Broker Name的信息，删除的是topicQueueTable的value的元素</div><div class="line">                     * 如果Topic没有可提供服务的Broker了，则删除Topic的信息，删除的是topicQueueTable的元素</div><div class="line">                     */</div><div class="line">                    <span class="keyword">if</span> (removeBrokerName) &#123;</div><div class="line">                        Iterator&lt;Entry&lt;String, List&lt;QueueData&gt;&gt;&gt; itTopicQueueTable =</div><div class="line">                            <span class="keyword">this</span>.topicQueueTable.entrySet().iterator();</div><div class="line">                        <span class="keyword">while</span> (itTopicQueueTable.hasNext()) &#123;</div><div class="line">                            Entry&lt;String, List&lt;QueueData&gt;&gt; entry = itTopicQueueTable.next();</div><div class="line">                            String topic = entry.getKey();</div><div class="line">                            List&lt;QueueData&gt; queueDataList = entry.getValue();</div><div class="line"></div><div class="line">                            Iterator&lt;QueueData&gt; itQueueData = queueDataList.iterator();</div><div class="line">                            <span class="keyword">while</span> (itQueueData.hasNext()) &#123;</div><div class="line">                                QueueData queueData = itQueueData.next();</div><div class="line">                                <span class="keyword">if</span> (queueData.getBrokerName().equals(brokerNameFound)) &#123;</div><div class="line">                                    itQueueData.remove();</div><div class="line">                                    log.info(<span class="string">"remove topic[&#123;&#125; &#123;&#125;], from topicQueueTable, because channel destroyed"</span>,</div><div class="line">                                        topic, queueData);</div><div class="line">                                &#125;</div><div class="line">                            &#125;</div><div class="line"></div><div class="line">                            <span class="keyword">if</span> (queueDataList.isEmpty()) &#123;</div><div class="line">                                itTopicQueueTable.remove();</div><div class="line">                                log.info(<span class="string">"remove topic[&#123;&#125;] all queue, from topicQueueTable, because channel destroyed"</span>,</div><div class="line">                                    topic);</div><div class="line">                            &#125;</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">                &#125; <span class="keyword">finally</span> &#123;</div><div class="line">                    <span class="keyword">this</span>.lock.writeLock().unlock();</div><div class="line">                &#125;</div><div class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">                log.error(<span class="string">"onChannelDestroy Exception"</span>, e);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="Configuration类"><a href="#Configuration类" class="headerlink" title="Configuration类"></a>Configuration类</h4><p>Configuration类的构造函数接受变元参数，类型为Object，主要看下其registerConfig()方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Configuration</span> </span>&#123;</div><div class="line">    ...</div><div class="line">     <span class="function"><span class="keyword">public</span> Configuration <span class="title">registerConfig</span><span class="params">(Object configObject)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            readWriteLock.writeLock().lockInterruptibly();</div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                <span class="comment">/**</span></div><div class="line">                 * 通过反射将Config对象转为Properties</div><div class="line">                 * Property的 k,v -&gt; 对象的变量名,变量的值</div><div class="line">                 */</div><div class="line">                Properties registerProps = MixAll.object2Properties(configObject);</div><div class="line">                <span class="comment">// 将registerProps中的元素merge到成员变量allConfigs中</span></div><div class="line">                merge(registerProps, <span class="keyword">this</span>.allConfigs);</div><div class="line">                <span class="comment">// 将Config对象添加成员变量configObjectList中</span></div><div class="line">                configObjectList.add(configObject);</div><div class="line">            &#125; <span class="keyword">finally</span> &#123;</div><div class="line">                readWriteLock.writeLock().unlock();</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">            log.error(<span class="string">"registerConfig lock error"</span>);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="Name-Server初始化"><a href="#Name-Server初始化" class="headerlink" title="Name Server初始化"></a>Name Server初始化</h4><p>之前NamesrvController类我们只看了它的构造函数，Name Server在启动时候调用了3个核心的方法，分行为initialize()、start()、shutdown()，这三个方法均在NamesrvController类中，涉及到Name Server的初始化、启动和关闭。先来看下初始化：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NamesrvController</span> </span>&#123;</div><div class="line">    ...</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 初始化NamesrvController</div><div class="line">     * <span class="doctag">@return</span></div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">initialize</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">// 从kvConfigPath加载文件内容至KVConfigManager</span></div><div class="line">        <span class="keyword">this</span>.kvConfigManager.load();</div><div class="line">        <span class="comment">// 初始化RemotingServer</span></div><div class="line">        <span class="keyword">this</span>.remotingServer = <span class="keyword">new</span> NettyRemotingServer(<span class="keyword">this</span>.nettyServerConfig, <span class="keyword">this</span>.brokerHousekeepingService);</div><div class="line">        <span class="comment">// workerThread线程池，默认线程数为8</span></div><div class="line">        <span class="keyword">this</span>.remotingExecutor =</div><div class="line">            Executors.newFixedThreadPool(nettyServerConfig.getServerWorkerThreads(), <span class="keyword">new</span> ThreadFactoryImpl(<span class="string">"RemotingExecutorThread_"</span>));</div><div class="line">        <span class="comment">// 注册Netty处理逻辑</span></div><div class="line">        <span class="keyword">this</span>.registerProcessor();</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 延迟5秒启动、每10秒执行一次的定时任务</div><div class="line">         * 用于扫描不存活的Broker</div><div class="line">         */</div><div class="line">        <span class="keyword">this</span>.scheduledExecutorService.scheduleAtFixedRate(<span class="keyword">new</span> Runnable() &#123;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                NamesrvController.<span class="keyword">this</span>.routeInfoManager.scanNotActiveBroker();</div><div class="line">            &#125;</div><div class="line">        &#125;, <span class="number">5</span>, <span class="number">10</span>, TimeUnit.SECONDS);</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 延迟1分钟启动、每10分钟执行一次的定时任务</div><div class="line">         * 作用式打印出kvConfig配置</div><div class="line">         */</div><div class="line">        <span class="keyword">this</span>.scheduledExecutorService.scheduleAtFixedRate(<span class="keyword">new</span> Runnable() &#123;</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                NamesrvController.<span class="keyword">this</span>.kvConfigManager.printAllPeriodically();</div><div class="line">            &#125;</div><div class="line">        &#125;, <span class="number">1</span>, <span class="number">10</span>, TimeUnit.MINUTES);</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="NettyRemotingServer类"><a href="#NettyRemotingServer类" class="headerlink" title="NettyRemotingServer类"></a>NettyRemotingServer类</h4><p>在NamesrvController的initialize()方法中初始化了该类的一个实例，很容易看出该类与Netty息息相关，我们慢慢看，一旦遇到不明白的，就发散开学习。该类的构造函数中首先调用了父类的构造函数，其父类为NettyRemotingAbstract类，先看下父类的构造函数。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">NettyRemotingAbstract</span> </span>&#123;</div><div class="line">    ...</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * <span class="doctag">@param</span> permitsOneway 控制单向信号量</div><div class="line">     * <span class="doctag">@param</span> permitsAsync  控制异步信号量</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NettyRemotingAbstract</span><span class="params">(<span class="keyword">final</span> <span class="keyword">int</span> permitsOneway, <span class="keyword">final</span> <span class="keyword">int</span> permitsAsync)</span> </span>&#123;</div><div class="line">        <span class="comment">// 创建公平的信号量</span></div><div class="line">        <span class="keyword">this</span>.semaphoreOneway = <span class="keyword">new</span> Semaphore(permitsOneway, <span class="keyword">true</span>);</div><div class="line">        <span class="keyword">this</span>.semaphoreAsync = <span class="keyword">new</span> Semaphore(permitsAsync, <span class="keyword">true</span>);</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>上面用到了Semaphore，简单解释下，Java中Semaphore可以控制某个资源可被同时访问的个数，其默认值分别为256和64。下面看下自己的构造函数：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NettyRemotingServer</span> <span class="keyword">extends</span> <span class="title">NettyRemotingAbstract</span> <span class="keyword">implements</span> <span class="title">RemotingServer</span> </span>&#123;</div><div class="line">    ...</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NettyRemotingServer</span><span class="params">(<span class="keyword">final</span> NettyServerConfig nettyServerConfig, <span class="keyword">final</span> ChannelEventListener channelEventListener)</span> </span>&#123;</div><div class="line">        <span class="comment">// 设置单向信号量和异步信号量</span></div><div class="line">        <span class="keyword">super</span>(nettyServerConfig.getServerOnewaySemaphoreValue(), nettyServerConfig.getServerAsyncSemaphoreValue());</div><div class="line">        <span class="comment">// Netty原生类，Netty的主要启动类</span></div><div class="line">        <span class="keyword">this</span>.serverBootstrap = <span class="keyword">new</span> ServerBootstrap();</div><div class="line">        <span class="keyword">this</span>.nettyServerConfig = nettyServerConfig;</div><div class="line">        <span class="keyword">this</span>.channelEventListener = channelEventListener;</div><div class="line"></div><div class="line">        <span class="comment">// 判断Netty服务异步回调线程池线程数量，默认值为4</span></div><div class="line">        <span class="keyword">int</span> publicThreadNums = nettyServerConfig.getServerCallbackExecutorThreads();</div><div class="line">        <span class="keyword">if</span> (publicThreadNums &lt;= <span class="number">0</span>) &#123;</div><div class="line">            publicThreadNums = <span class="number">4</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 初始化线程数固定的线程池，并自定义线程名称</span></div><div class="line">        <span class="keyword">this</span>.publicExecutor = Executors.newFixedThreadPool(publicThreadNums, <span class="keyword">new</span> ThreadFactory() &#123;</div><div class="line">            <span class="keyword">private</span> AtomicInteger threadIndex = <span class="keyword">new</span> AtomicInteger(<span class="number">0</span>);</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> Thread <span class="title">newThread</span><span class="params">(Runnable r)</span> </span>&#123;</div><div class="line">                <span class="keyword">return</span> <span class="keyword">new</span> Thread(r, <span class="string">"NettyServerPublicExecutor_"</span> + <span class="keyword">this</span>.threadIndex.incrementAndGet());</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 创建单个线程的NIO线程组</div><div class="line">         * 该EventLoop线程组负责处理客户端的TCP连接请求</div><div class="line">         */</div><div class="line">        <span class="keyword">this</span>.eventLoopGroupBoss = <span class="keyword">new</span> NioEventLoopGroup(<span class="number">1</span>, <span class="keyword">new</span> ThreadFactory() &#123;</div><div class="line">            <span class="keyword">private</span> AtomicInteger threadIndex = <span class="keyword">new</span> AtomicInteger(<span class="number">0</span>);</div><div class="line"></div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> Thread <span class="title">newThread</span><span class="params">(Runnable r)</span> </span>&#123;</div><div class="line">                <span class="keyword">return</span> <span class="keyword">new</span> Thread(r, String.format(<span class="string">"NettyBoss_%d"</span>, <span class="keyword">this</span>.threadIndex.incrementAndGet()));</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 创建固定数量的线程组，默认3个</div><div class="line">         * 如果是Linux平台，并且useEpollNativeSelector属性为true时使用EpollEventLoopGroup，否则使用NioEventLoopGroup</div><div class="line">         * 该EventLoop线程组真正负责I/O读写操作</div><div class="line">         */</div><div class="line">        <span class="keyword">if</span> (RemotingUtil.isLinuxPlatform() <span class="comment">//</span></div><div class="line">            &amp;&amp; nettyServerConfig.isUseEpollNativeSelector()) &#123;</div><div class="line">            <span class="keyword">this</span>.eventLoopGroupSelector = <span class="keyword">new</span> EpollEventLoopGroup(nettyServerConfig.getServerSelectorThreads(), <span class="keyword">new</span> ThreadFactory() &#123;</div><div class="line">                <span class="keyword">private</span> AtomicInteger threadIndex = <span class="keyword">new</span> AtomicInteger(<span class="number">0</span>);</div><div class="line">                <span class="keyword">private</span> <span class="keyword">int</span> threadTotal = nettyServerConfig.getServerSelectorThreads();</div><div class="line"></div><div class="line">                <span class="meta">@Override</span></div><div class="line">                <span class="function"><span class="keyword">public</span> Thread <span class="title">newThread</span><span class="params">(Runnable r)</span> </span>&#123;</div><div class="line">                    <span class="keyword">return</span> <span class="keyword">new</span> Thread(r, String.format(<span class="string">"NettyServerEPOLLSelector_%d_%d"</span>, threadTotal, <span class="keyword">this</span>.threadIndex.incrementAndGet()));</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="keyword">this</span>.eventLoopGroupSelector = <span class="keyword">new</span> NioEventLoopGroup(nettyServerConfig.getServerSelectorThreads(), <span class="keyword">new</span> ThreadFactory() &#123;</div><div class="line">                <span class="keyword">private</span> AtomicInteger threadIndex = <span class="keyword">new</span> AtomicInteger(<span class="number">0</span>);</div><div class="line">                <span class="keyword">private</span> <span class="keyword">int</span> threadTotal = nettyServerConfig.getServerSelectorThreads();</div><div class="line"></div><div class="line">                <span class="meta">@Override</span></div><div class="line">                <span class="function"><span class="keyword">public</span> Thread <span class="title">newThread</span><span class="params">(Runnable r)</span> </span>&#123;</div><div class="line">                    <span class="keyword">return</span> <span class="keyword">new</span> Thread(r, String.format(<span class="string">"NettyServerNIOSelector_%d_%d"</span>, threadTotal, <span class="keyword">this</span>.threadIndex.incrementAndGet()));</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>NamesrvController类的initialize()方法中调用了私有的registerProcessor()方法，该方法的作用是向NettyRemotingServer注册处理逻辑：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NamesrvController</span> </span>&#123;</div><div class="line">    ...</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 注册Netty服务端业务处理逻辑</div><div class="line">     * NamesrvConfig的clusterTest字段暂时不知道何用，先就看false分支</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">registerProcessor</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (namesrvConfig.isClusterTest()) &#123;</div><div class="line">            <span class="keyword">this</span>.remotingServer.registerDefaultProcessor(</div><div class="line">                    <span class="keyword">new</span> ClusterTestRequestProcessor(<span class="keyword">this</span>, namesrvConfig.getProductEnvName()),</div><div class="line">                    <span class="keyword">this</span>.remotingExecutor);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="keyword">this</span>.remotingServer.registerDefaultProcessor(<span class="keyword">new</span> DefaultRequestProcessor(<span class="keyword">this</span>), <span class="keyword">this</span>.remotingExecutor);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>registerDefaultProcessor()方法给NettyRemotingServer的成员变量defaultEventExecutorGroup赋值，NettyRemotingServer启动的时候注册了NettyServerHandler，NettyServerHandler重写了channelRead0()方法，当服务端接收到请求时调用该方法，其中最终调用了NettyRemotingAbstract类的processMessageReceived()方法，该方法中使用到了defaultRequestProcessor对象。这些方法后面会分析到，这里重点看下上述代码中的两个参数。</p>
+<ul>
+<li>DefaultRequestProcessor类：默认的请求处理类</li>
+<li>remotingExecutor：workerThread线程池</li>
+</ul>
+<h4 id="DefaultRequestProcessor类"><a href="#DefaultRequestProcessor类" class="headerlink" title="DefaultRequestProcessor类"></a>DefaultRequestProcessor类</h4><p>该类实现自NettyRequestProcessor接口，重写了接口的两个方法，processRequest()和rejectRequest()，rejectRequest()方法比较简单，函数体直接返回false，此处表示始终不拒绝请求。processRequest()方法中根据请求的类型执行不同的操作，请求类型的定义在RequestCode中，<a href="https://code.aliyun.com/alibaba/RocketMQ/blob/4252fcc9738ce96b339af8ef272f1ee53f945008/rocketmq-common/src/main/java/com/alibaba/rocketmq/common/protocol/RequestCode.java" target="_blank" rel="external">阿里云</a>上对该类有注释。processRequest()的描述如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DefaultRequestProcessor</span> <span class="keyword">implements</span> <span class="title">NettyRequestProcessor</span> </span>&#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> RemotingCommand <span class="title">processRequest</span><span class="params">(ChannelHandlerContext ctx, RemotingCommand request)</span> </span></div><div class="line">            <span class="keyword">throws</span> RemotingCommandException &#123;</div><div class="line">        ...</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>该方法的内容暂不细看了，其中包含了很多针对性的动作操作，比如注册Broker等。有一点需要扩展开的是，该方法的入参和返回值有一个共同的类RemotingCommand，该类封装了RocketMQ的网络通信协议，当然，涉及到通信协议相关的不止这一个类，下面就把这一块来理一理。</p>
+<h4 id="RocketMQ网络通信协议"><a href="#RocketMQ网络通信协议" class="headerlink" title="RocketMQ网络通信协议"></a>RocketMQ网络通信协议</h4><p>无论是发消息、拉取消息、发送心跳、修改配置等所有网络通讯层协议都使用同一套协议。并且无论请求还是响应，协议是一样的。协议格式如下：<br>&lt;length&gt; &lt;header length&gt; &lt;header data&gt; &lt;body data&gt;</p>
+<ul>
+<li>length：4个字节的int型数据，用来存储header length、header data、body data的总和</li>
+<li>header length：4个字节的int型数据，用来存储header data的长度</li>
+<li>header data：存储报文头部的数据</li>
+<li>body data：存储报文体的数据</li>
+</ul>
+<p>下面看下Header相关字段：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RemotingCommand</span> </span>&#123;</div><div class="line">    ...</div><div class="line">    <span class="comment">// 以下是Hear相关字段</span></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Request ：请求操作码，对应RequestCode，通过switch匹配处理逻辑</div><div class="line">     * Response：相应吗，对应ResponseCode，0表示成功，非0表示错误码</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> code;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Request ：标记请求方的语言类型，默认JAVA</div><div class="line">     * Response：应答方所使用的语言，默认JAVA</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> LanguageCode language = LanguageCode.JAVA;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Request ：请求方的版本号</div><div class="line">     * Response：应答方的版本号</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> version = <span class="number">0</span>;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Request ：同一个连接上标记是哪次请求。</div><div class="line">     *           服务响应时会返回这个请求标示码，以达到请求方多线程中复用连接，在收到响应的时候找到对应的请求</div><div class="line">     * Response：应答方不做修改，原值返回</div><div class="line">     * 该值的类型是AtomicInteger，获取了当前值，然后再Increment</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> opaque = requestId.getAndIncrement();</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 标记通信的类型，借助下面两个字段，通过2位的bit mask来标记</div><div class="line">     * private static final int RPC_TYPE = 0;</div><div class="line">     * private static final int RPC_ONEWAY = 1</div><div class="line">     * 低位为0表示是请求方，为1是表示应大方</div><div class="line">     * 高位为0时表示普通的需要等待结果的RPC请求，高位为1时表示单向请求</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> flag = <span class="number">0</span>;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Request ：传输的自定义文本</div><div class="line">     * Response：错误详细描述信息</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> String remark;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * Request ：请求自定义字段</div><div class="line">     * Response：应答自定义字段</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> HashMap&lt;String, String&gt; extFields;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 自定义请求头</div><div class="line">     * 当数据需要网络传输时，customHeader会转为extFields</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">transient</span> CommandCustomHeader customHeader;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">markOnewayRPC</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> bits = <span class="number">1</span> &lt;&lt; RPC_ONEWAY;</div><div class="line">        <span class="keyword">this</span>.flag |= bits;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@JSONField</span>(serialize = <span class="keyword">false</span>)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isOnewayRPC</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> bits = <span class="number">1</span> &lt;&lt; RPC_ONEWAY;</div><div class="line">        <span class="keyword">return</span> (<span class="keyword">this</span>.flag &amp; bits) == bits;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">markResponseType</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> bits = <span class="number">1</span> &lt;&lt; RPC_TYPE;</div><div class="line">        <span class="keyword">this</span>.flag |= bits;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="meta">@JSONField</span>(serialize = <span class="keyword">false</span>)</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isResponseType</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> bits = <span class="number">1</span> &lt;&lt; RPC_TYPE;</div><div class="line">        <span class="keyword">return</span> (<span class="keyword">this</span>.flag &amp; bits) == bits;</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>相关encode和decode方法也在RemotingCommand类中，默认序列化成json格式，序列化框架采用自家的fastjson，详细代码就不看了。</p>
+<h4 id="Name-Server启动"><a href="#Name-Server启动" class="headerlink" title="Name Server启动"></a>Name Server启动</h4><p>Name Server的启动调用了NamesrvController类的start()方法，其方法简单，直接调用了成员变量remotingServer的start()方法，该变量就是NettyRemotingServer类，下面就来看下最终的start()方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NettyRemotingServer</span> <span class="keyword">extends</span> <span class="title">NettyRemotingAbstract</span> <span class="keyword">implements</span> <span class="title">RemotingServer</span> </span>&#123;</div><div class="line">    ...</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">// 构造执行编码相关任务的线程池，默认线程数为8</span></div><div class="line">        <span class="keyword">this</span>.defaultEventExecutorGroup = <span class="keyword">new</span> DefaultEventExecutorGroup(</div><div class="line">                nettyServerConfig.getServerWorkerThreads(),</div><div class="line">                <span class="keyword">new</span> ThreadFactory() &#123;</div><div class="line"></div><div class="line">                    <span class="keyword">private</span> AtomicInteger threadIndex = <span class="keyword">new</span> AtomicInteger(<span class="number">0</span>);</div><div class="line"></div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> Thread <span class="title">newThread</span><span class="params">(Runnable r)</span> </span>&#123;</div><div class="line">                        <span class="keyword">return</span> <span class="keyword">new</span> Thread(r, <span class="string">"NettyServerCodecThread_"</span> + <span class="keyword">this</span>.threadIndex.incrementAndGet());</div><div class="line">                    &#125;</div><div class="line">                &#125;);</div><div class="line"></div><div class="line">        <span class="comment">// 初始化Netty启动类</span></div><div class="line">        ServerBootstrap childHandler = <span class="keyword">this</span>.serverBootstrap</div><div class="line">                <span class="comment">// group方法设置NIO线程组</span></div><div class="line">                .group(<span class="keyword">this</span>.eventLoopGroupBoss, <span class="keyword">this</span>.eventLoopGroupSelector)</div><div class="line">                <span class="comment">// 设置Channel为NioServerSocketChannel</span></div><div class="line">                .channel(NioServerSocketChannel.class)</div><div class="line">                <span class="comment">// 服务端接收客户端连接数上限</span></div><div class="line">                .option(ChannelOption.SO_BACKLOG, <span class="number">1024</span>)</div><div class="line">                <span class="comment">// 允许公用本地地址和端口</span></div><div class="line">                .option(ChannelOption.SO_REUSEADDR, <span class="keyword">true</span>)</div><div class="line">                <span class="comment">// 不允许长连接</span></div><div class="line">                .option(ChannelOption.SO_KEEPALIVE, <span class="keyword">false</span>)</div><div class="line">                <span class="comment">// 禁止使用Nagle算法，使用于小数据即时传输</span></div><div class="line">                .childOption(ChannelOption.TCP_NODELAY, <span class="keyword">true</span>)</div><div class="line">                <span class="comment">// 设置发送缓冲区大小</span></div><div class="line">                .option(ChannelOption.SO_SNDBUF, nettyServerConfig.getServerSocketSndBufSize())</div><div class="line">                <span class="comment">// 设置接缓冲区大小</span></div><div class="line">                .option(ChannelOption.SO_RCVBUF, nettyServerConfig.getServerSocketRcvBufSize())</div><div class="line">                <span class="comment">// 设置Netty监听的端口</span></div><div class="line">                .localAddress(<span class="keyword">new</span> InetSocketAddress(<span class="keyword">this</span>.nettyServerConfig.getListenPort()))</div><div class="line">                <span class="comment">// 绑定I/O事件的处理类</span></div><div class="line">                .childHandler(<span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() &#123;</div><div class="line">                    <span class="meta">@Override</span></div><div class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(SocketChannel ch)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">                        ch.pipeline().addLast(</div><div class="line">                                <span class="comment">// 执行编码相关任务的线程池</span></div><div class="line">                                defaultEventExecutorGroup,</div><div class="line">                                <span class="comment">// 编码器</span></div><div class="line">                                <span class="keyword">new</span> NettyEncoder(),</div><div class="line">                                <span class="comment">/**</span></div><div class="line">                                 * 解码器，基于LengthFieldBasedFrameDecoder</div><div class="line">                                 * 支持自动的TCP粘包和板报处理，只需要给出标识消息长度的字段偏移量和消息长度自身所占的字节数</div><div class="line">                                 */</div><div class="line">                                <span class="keyword">new</span> NettyDecoder(),</div><div class="line">                                <span class="comment">/**</span></div><div class="line">                                 * 心跳检测，默认120秒</div><div class="line">                                 * 当客户端连接空闲指定时间之后，触发userEventTriggered()方法</div><div class="line">                                 * userEventTriggered()方法在NettyConnetManageHandler类中实现，具体行为就是关闭空闲的通道</div><div class="line">                                 *</div><div class="line">                                 */</div><div class="line">                                <span class="keyword">new</span> IdleStateHandler(<span class="number">0</span>, <span class="number">0</span>, nettyServerConfig.getServerChannelMaxIdleTimeSeconds()),</div><div class="line">                                <span class="comment">// Netty连接管理Handler</span></div><div class="line">                                <span class="keyword">new</span> NettyConnetManageHandler(),</div><div class="line">                                <span class="comment">// 具体的业务处理Handler</span></div><div class="line">                                <span class="keyword">new</span> NettyServerHandler());</div><div class="line">                    &#125;</div><div class="line">                &#125;);</div><div class="line"></div><div class="line">        <span class="comment">// 使用Netty内存池，至于这里的内存池不详细分析了，以后如果看Netty源码再说</span></div><div class="line">        <span class="keyword">if</span> (nettyServerConfig.isServerPooledByteBufAllocatorEnable()) &#123;</div><div class="line">            childHandler.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="comment">// 绑定端口，同步等待成功</span></div><div class="line">            ChannelFuture sync = <span class="keyword">this</span>.serverBootstrap.bind().sync();</div><div class="line">            <span class="comment">// 获取绑定的地址和端口</span></div><div class="line">            InetSocketAddress addr = (InetSocketAddress) sync.channel().localAddress();</div><div class="line">            <span class="keyword">this</span>.port = addr.getPort();</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e1) &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"this.serverBootstrap.bind().sync() InterruptedException"</span>, e1);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 如果channelEventListener不为空，则启动nettyEventExecuter</div><div class="line">         * 在Name Server启动环节，此处的channelEventListener是BrokerHousekeepingService实例</div><div class="line">         * nettyEventExecuter的作用就是根据Channel的状态来调用channelEventListener的方法</div><div class="line">         */</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.channelEventListener != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">this</span>.nettyEventExecuter.start();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 定时任务，3秒后启动，每秒执行一次</div><div class="line">         * 用于处理responseTable，来实现异步回调，支持客户端invokeAsync</div><div class="line">         */</div><div class="line">        <span class="keyword">this</span>.timer.scheduleAtFixedRate(<span class="keyword">new</span> TimerTask() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    NettyRemotingServer.<span class="keyword">this</span>.scanResponseTable();</div><div class="line">                &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">                    log.error(<span class="string">"scanResponseTable exception"</span>, e);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;, <span class="number">1000</span> * <span class="number">3</span>, <span class="number">1000</span>);</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="Name-Server关闭"><a href="#Name-Server关闭" class="headerlink" title="Name Server关闭"></a>Name Server关闭</h4><p>Name Server的关闭就没啥好说的了，调用的是NamesrvController的shutdown()方法，按次序把所有线程池关关掉就可以了。</p>
+<p>Name Server的源码就看到这里，有些地方还没有完全理解透彻，随着源码的深入，应该能了解到RocketMQ的全貌。目前感触比较深的是，Netty一定要熟悉，要不然那些线程之间的协作就没法理解清楚。本人对Netty也是一知半解，后期这个知识点将是重中之重。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/MQ/" rel="tag"># MQ</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/18/RocketMQ源码分析之【rocketmq-srvutil】/" rel="next" title="RocketMQ源码分析之【rocketmq-srvutil】">
+                <i class="fa fa-chevron-left"></i> RocketMQ源码分析之【rocketmq-srvutil】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/27/跟开涛学架构一【Nginx负载均衡】/" rel="prev" title="跟开涛学架构一【Nginx负载均衡】">
+                跟开涛学架构一【Nginx负载均衡】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Name-Server作用"><span class="nav-number">1.</span> <span class="nav-text">Name Server作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Name-Server源码分析"><span class="nav-number">2.</span> <span class="nav-text">Name Server源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NamesrvStartup类分析"><span class="nav-number">2.1.</span> <span class="nav-text">NamesrvStartup类分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NamesrvConfig类"><span class="nav-number">2.2.</span> <span class="nav-text">NamesrvConfig类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NettyServerConfig类"><span class="nav-number">2.3.</span> <span class="nav-text">NettyServerConfig类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NamesrvController类"><span class="nav-number">2.4.</span> <span class="nav-text">NamesrvController类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#KVConfigManager类"><span class="nav-number">2.5.</span> <span class="nav-text">KVConfigManager类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RouteInfoManager类"><span class="nav-number">2.6.</span> <span class="nav-text">RouteInfoManager类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#QueueData类"><span class="nav-number">2.7.</span> <span class="nav-text">QueueData类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#BrokerData类"><span class="nav-number">2.8.</span> <span class="nav-text">BrokerData类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#BrokerLiveInfo类"><span class="nav-number">2.9.</span> <span class="nav-text">BrokerLiveInfo类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#BrokerHousekeepingService类"><span class="nav-number">2.10.</span> <span class="nav-text">BrokerHousekeepingService类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Configuration类"><span class="nav-number">2.11.</span> <span class="nav-text">Configuration类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Name-Server初始化"><span class="nav-number">2.12.</span> <span class="nav-text">Name Server初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NettyRemotingServer类"><span class="nav-number">2.13.</span> <span class="nav-text">NettyRemotingServer类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DefaultRequestProcessor类"><span class="nav-number">2.14.</span> <span class="nav-text">DefaultRequestProcessor类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RocketMQ网络通信协议"><span class="nav-number">2.15.</span> <span class="nav-text">RocketMQ网络通信协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Name-Server启动"><span class="nav-number">2.16.</span> <span class="nav-text">Name Server启动</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Name-Server关闭"><span class="nav-number">2.17.</span> <span class="nav-text">Name Server关闭</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

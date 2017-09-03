@@ -1,0 +1,713 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Neo4j," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="管理唯一性遍历的唯一性问题决定在遍历期间能访问一个节点多少次。在Neo4j的遍历Api中有几个不同的唯一性设置，它们能作用于遍历中，这个问题之前已经稍微探讨过，这一节来详细了解下。12345678910111213//首先构造数据create(jane:HUMAN&amp;#123;name : &amp;apos;1.Jane&amp;apos;&amp;#125;),      (john:HUMAN&amp;#123;name :">
+<meta name="keywords" content="Neo4j">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Neo4j学习笔记八【深度遍历（二）】">
+<meta property="og:url" content="http://yoursite.com/2016/07/13/Neo4j学习笔记八【深度遍历（二）】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="管理唯一性遍历的唯一性问题决定在遍历期间能访问一个节点多少次。在Neo4j的遍历Api中有几个不同的唯一性设置，它们能作用于遍历中，这个问题之前已经稍微探讨过，这一节来详细了解下。12345678910111213//首先构造数据create(jane:HUMAN&amp;#123;name : &amp;apos;1.Jane&amp;apos;&amp;#125;),      (john:HUMAN&amp;#123;name :">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/picture12_1.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/picture13.png">
+<meta property="og:updated_time" content="2016-07-21T02:45:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Neo4j学习笔记八【深度遍历（二）】">
+<meta name="twitter:description" content="管理唯一性遍历的唯一性问题决定在遍历期间能访问一个节点多少次。在Neo4j的遍历Api中有几个不同的唯一性设置，它们能作用于遍历中，这个问题之前已经稍微探讨过，这一节来详细了解下。12345678910111213//首先构造数据create(jane:HUMAN&amp;#123;name : &amp;apos;1.Jane&amp;apos;&amp;#125;),      (john:HUMAN&amp;#123;name :">
+<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/picture12_1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/07/13/Neo4j学习笔记八【深度遍历（二）】/"/>
+
+
+
+
+
+  <title> Neo4j学习笔记八【深度遍历（二）】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/13/Neo4j学习笔记八【深度遍历（二）】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Neo4j学习笔记八【深度遍历（二）】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-13T18:08:55+08:00">
+                2016-07-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Neo4j/" itemprop="url" rel="index">
+                    <span itemprop="name">Neo4j</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="管理唯一性"><a href="#管理唯一性" class="headerlink" title="管理唯一性"></a>管理唯一性</h3><p>遍历的唯一性问题决定在遍历期间能访问一个节点多少次。在Neo4j的遍历Api中有几个不同的唯一性设置，它们能作用于遍历中，这个问题之前已经稍微探讨过，这一节来详细了解下。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">//首先构造数据</div><div class="line">create(jane:HUMAN&#123;name : &apos;1.Jane&apos;&#125;),</div><div class="line">      (john:HUMAN&#123;name : &apos;2.John&apos;&#125;),</div><div class="line">      (kate:HUMAN&#123;name : &apos;3.Kate&apos;&#125;),</div><div class="line">      (jack:HUMAN&#123;name : &apos;4.Jack&apos;&#125;),</div><div class="line">      (leeo:HUMAN&#123;name : &apos;5.Leeo&apos;&#125;),</div><div class="line">      (emma:HUMAN&#123;name : &apos;6.Emma&apos;&#125;),</div><div class="line">      (jane)-[:KNOWS]-&gt;(john),</div><div class="line">      (jane)-[:KNOWS]-&gt;(kate),</div><div class="line">      (john)-[:KNOWS]-&gt;(kate),</div><div class="line">      (john)-[:KNOWS]-&gt;(jack),</div><div class="line">      (john)-[:KNOWS]-&gt;(leeo),</div><div class="line">      (kate)-[:KNOWS]-&gt;(emma);</div></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<p>数据展示图如下：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/picture12_1.png" alt="图12"></p>
+<h4 id="NODE-GLOBAL唯一性"><a href="#NODE-GLOBAL唯一性" class="headerlink" title="NODE_GLOBAL唯一性"></a>NODE_GLOBAL唯一性</h4><p>NODE_GLOBAL意味着每个节点只能访问一次并且在遍历期间只能访问一次<br>下面我们解决一个问题：找出将用户1（Jane）介绍给用户5（Leeo）的直接联系人<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">    File file = <span class="keyword">new</span> File(<span class="string">"/opt/neo4j-community-3.0.3/data/databases/graph.db"</span>);</div><div class="line">    GraphDatabaseService graphDB = <span class="keyword">new</span> GraphDatabaseFactory().newEmbeddedDatabase(file);</div><div class="line"></div><div class="line">    <span class="keyword">try</span>(Transaction tx = graphDB.beginTx())&#123;</div><div class="line">        <span class="comment">//获取目标起始节点和目标节点</span></div><div class="line">        Node jane = graphDB.getNodeById(<span class="number">89l</span>);</div><div class="line">        Node leeo = graphDB.getNodeById(<span class="number">93l</span>);</div><div class="line"></div><div class="line">        <span class="comment">//创建KNOWS关系遍历</span></div><div class="line">        TraversalDescription traversalDescription = graphDB.traversalDescription()</div><div class="line">                .relationships(MyRelationshipTypes.KNOWS)</div><div class="line">                .evaluator(path -&gt; &#123;</div><div class="line">                    Node currentNode = path.endNode();</div><div class="line">                    <span class="comment">//当到达目标节点Leeo时，停止遍历</span></div><div class="line">                    <span class="keyword">if</span>(currentNode.getId() == leeo.getId())&#123;</div><div class="line">                        <span class="keyword">return</span> Evaluation.EXCLUDE_AND_PRUNE;</div><div class="line">                    &#125;</div><div class="line">                    <span class="comment">//在当前节点和目标节点（Leeo）之间查找直接路径</span></div><div class="line">                     Path singlePath = GraphAlgoFactory</div><div class="line">                                .shortestPath(PathExpanders.forType(MyRelationshipTypes.KNOWS), <span class="number">1</span>)</div><div class="line">                                .findSinglePath(currentNode, leeo);</div><div class="line">                    <span class="keyword">if</span>(singlePath != <span class="keyword">null</span>)&#123;</div><div class="line">                        <span class="comment">//当前节点能直接能到达目标节点，将该节点包含在结果中并继续遍历</span></div><div class="line">                        <span class="keyword">return</span> Evaluation.INCLUDE_AND_CONTINUE;</div><div class="line">                    &#125;<span class="keyword">else</span>&#123;</div><div class="line">                        <span class="comment">//当前节点不能直接达到目标节点，丢弃该节点并继续遍历</span></div><div class="line">                        <span class="keyword">return</span> Evaluation.EXCLUDE_AND_CONTINUE;</div><div class="line">                    &#125;</div><div class="line">                &#125;)</div><div class="line">                .uniqueness(Uniqueness.NODE_GLOBAL);</div><div class="line"></div><div class="line">        Iterable&lt;Node&gt; nodes = traversalDescription.traverse(jane).nodes();</div><div class="line">        <span class="keyword">for</span>(Node n : nodes)&#123;</div><div class="line">            System.out.println(n.getProperty(<span class="string">"name"</span>));</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        tx.success();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    graphDB.shutdown();</div><div class="line">&#125;</div><div class="line"><span class="comment">//输出结果</span></div><div class="line"><span class="number">2</span>.John</div></pre></td></tr></table></figure></p>
+<p>可以通过查看上图确认John时Jane网络中唯一能将塔介绍给Ben的人。</p>
+<h4 id="NODE-PATH唯一性"><a href="#NODE-PATH唯一性" class="headerlink" title="NODE_PATH唯一性"></a>NODE_PATH唯一性</h4><p>NODE_PATH意味着同一个节点在不同路径中可以多次被访问，但在同一路径中只能被访问一次<br>上面的程序进需要修改一行代码<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">.uniqueness(Uniqueness.NODE_PATH);</div><div class="line">...</div><div class="line"><span class="comment">//输出结果</span></div><div class="line"><span class="number">2</span>.John</div><div class="line"><span class="number">2</span>.John</div></pre></td></tr></table></figure></p>
+<p>从结果看出同一个节点John被遍历了两次，表示有两条路径可以到达目的地，下面修改下遍历查询，将之打印节点name属性修改成打印整个遍历路径，所用的代码之前已经贴出来过，这里直接使用就浩。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line">PathPrinter pathPrinter = <span class="keyword">new</span> PathPrinter( <span class="string">"name"</span> );</div><div class="line">String output = <span class="string">""</span>;</div><div class="line"><span class="keyword">for</span> ( Path path : traversalDescription.traverse(jane) ) &#123;</div><div class="line">    output += Paths.pathToString( path, pathPrinter );</div><div class="line">    output += <span class="string">"\n"</span>;</div><div class="line">&#125;</div><div class="line">System.out.println(output);</div><div class="line">...</div><div class="line"><span class="comment">//输出结果</span></div><div class="line">(<span class="number">1</span>.Jane)--[KNOWS]--&gt;(<span class="number">3</span>.Kate)&lt;--[KNOWS]--(<span class="number">2</span>.John)</div><div class="line">(<span class="number">1</span>.Jane)--[KNOWS]--&gt;(<span class="number">2</span>.John)</div></pre></td></tr></table></figure></p>
+<p>可以清楚的看出为什么会有两个John节点，它们来自不同的路径。<br>但是发现一个问题，再次修改成.uniqueness(Uniqueness.NODE_GLOBAL)，并且打印出全路径，会发现输出结果为：<br>(1.Jane)–[KNOWS]–&gt;(3.Kate)&lt;–[KNOWS]–(2.John)<br>也就是说Neo4j并没有优先遍历最短路劲，也许是我想多了。</p>
+<h4 id="其他唯一性"><a href="#其他唯一性" class="headerlink" title="其他唯一性"></a>其他唯一性</h4><ul>
+<li>RELATIONSHIP_GLOBAL 图中每一个关系只能别访问一次</li>
+<li>RELATIONSHIP_PATH 与NODE_PATH类似</li>
+<li>NODE_RECENT 记忆访问过的节点有一个上线</li>
+<li>NODE_LEVEL 确保处于同一级的节点在遍历期间只能被访问一次</li>
+<li>RELATIONSHIP_LEVEL 确保处于统一级的关系在遍历期间只能被访问一次</li>
+</ul>
+<p>其他唯一性使用场景可能不多，暂不深究了。</p>
+<h3 id="双向遍历"><a href="#双向遍历" class="headerlink" title="双向遍历"></a>双向遍历</h3><p>双向遍历是指分别从起始节点和结束节点同事开始遍历图，当这两个遍历相遇时（称作碰撞点），就完成了遍历，并且可以确定整个路径。<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/picture13.png" alt="图13"><br>下面给出一个双向遍历的例子，以本章构造的数据为例，从起始节点1.John，遍历到结束节点5.Leeo<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">    File file = <span class="keyword">new</span> File(<span class="string">"/opt/neo4j-community-3.0.3/data/databases/graph.db"</span>);</div><div class="line">    GraphDatabaseService graphDB = <span class="keyword">new</span> GraphDatabaseFactory().newEmbeddedDatabase(file);</div><div class="line"></div><div class="line">    <span class="keyword">try</span>(Transaction tx = graphDB.beginTx())&#123;</div><div class="line">        <span class="comment">//获取目标起始节点和目标节点</span></div><div class="line">        Node jane = graphDB.getNodeById(<span class="number">89l</span>);</div><div class="line">        Node leeo = graphDB.getNodeById(<span class="number">93l</span>);</div><div class="line"></div><div class="line">        <span class="comment">//初始化双向遍历描述BidirectionalTraversalDescription</span></div><div class="line">        BidirectionalTraversalDescription description = graphDB.bidirectionalTraversalDescription()</div><div class="line">                <span class="comment">//设置遍历描述的起始侧遍历出</span></div><div class="line">                .startSide(</div><div class="line">                        graphDB.traversalDescription()</div><div class="line">                                .relationships(MyRelationshipTypes.KNOWS)</div><div class="line">                                .uniqueness(Uniqueness.NODE_PATH)</div><div class="line">                )</div><div class="line">                <span class="comment">//设置遍历描述的结束侧节点遍历进的方向</span></div><div class="line">                .endSide(</div><div class="line">                        graphDB.traversalDescription()</div><div class="line">                                .relationships(MyRelationshipTypes.KNOWS)</div><div class="line">                                .uniqueness(Uniqueness.NODE_PATH)</div><div class="line">                )</div><div class="line">                <span class="comment">//设置碰撞评估函数为包含找到的所有碰撞点</span></div><div class="line">                .collisionEvaluator(path -&gt; Evaluation.INCLUDE_AND_CONTINUE)</div><div class="line">                <span class="comment">//设置侧选择器为在两个遍历方向交替变换</span></div><div class="line">                .sideSelector(SideSelectorPolicies.ALTERNATING, <span class="number">100</span>);</div><div class="line"></div><div class="line">        PathPrinter pathPrinter = <span class="keyword">new</span> PathPrinter( <span class="string">"name"</span> );</div><div class="line">        String output = <span class="string">""</span>;</div><div class="line">        <span class="keyword">for</span> ( Path path : description.traverse(jane, leeo) ) &#123;</div><div class="line">            output += Paths.pathToString( path, pathPrinter );</div><div class="line">            output += <span class="string">"\n"</span>;</div><div class="line">        &#125;</div><div class="line">        System.out.println(output);</div><div class="line"></div><div class="line">        tx.success();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    graphDB.shutdown();</div><div class="line">&#125;</div><div class="line"><span class="comment">//输出结果</span></div><div class="line">(<span class="number">1</span>.Jane)--[KNOWS]--&gt;(<span class="number">2</span>.John)--[KNOWS]--&gt;(<span class="number">5</span>.Leeo)</div><div class="line">(<span class="number">1</span>.Jane)--[KNOWS]--&gt;(<span class="number">3</span>.Kate)&lt;--[KNOWS]--(<span class="number">2</span>.John)--[KNOWS]--&gt;(<span class="number">5</span>.Leeo)</div></pre></td></tr></table></figure></p>
+<p>到此，深度遍历一章结束，在具体项目中该如何去遍历，还得自己琢磨了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Neo4j/" rel="tag"># Neo4j</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/13/Neo4j学习笔记七【深度遍历（一）】/" rel="next" title="Neo4j学习笔记七【深度遍历（一）】">
+                <i class="fa fa-chevron-left"></i> Neo4j学习笔记七【深度遍历（一）】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/07/15/Neo4j学习笔记九【Spring-Data-Neo4j】/" rel="prev" title="Neo4j学习笔记九【Spring Data Neo4j】">
+                Neo4j学习笔记九【Spring Data Neo4j】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#管理唯一性"><span class="nav-number">1.</span> <span class="nav-text">管理唯一性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NODE-GLOBAL唯一性"><span class="nav-number">1.1.</span> <span class="nav-text">NODE_GLOBAL唯一性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NODE-PATH唯一性"><span class="nav-number">1.2.</span> <span class="nav-text">NODE_PATH唯一性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他唯一性"><span class="nav-number">1.3.</span> <span class="nav-text">其他唯一性</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#双向遍历"><span class="nav-number">2.</span> <span class="nav-text">双向遍历</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

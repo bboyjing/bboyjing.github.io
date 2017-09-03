@@ -1,0 +1,735 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,RPC," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本章我们来稍微了解下Ice概念和原理，前面已经跑通过一个小例子，再回过来看概念和原理，可能会容易理解一些。作为一个复杂的RPC平台，Ice也创造了很多概念和术语，其中一个名词就是Slice，这个前面已经学习过了，但现在也只是会用，具体生成那一坨文件还没有细看。下面我们从几个基本概念来看下。 Ice Object关于Ice Object，截取《ZeroC Ice权威指南》中的一句话:">
+<meta name="keywords" content="Java,RPC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="尝试ZeorC ICE之【了解Ice概念和原理】">
+<meta property="og:url" content="http://yoursite.com/2017/03/11/尝试ZeorC-ICE之【了解Ice概念和原理】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="本章我们来稍微了解下Ice概念和原理，前面已经跑通过一个小例子，再回过来看概念和原理，可能会容易理解一些。作为一个复杂的RPC平台，Ice也创造了很多概念和术语，其中一个名词就是Slice，这个前面已经学习过了，但现在也只是会用，具体生成那一坨文件还没有细看。下面我们从几个基本概念来看下。 Ice Object关于Ice Object，截取《ZeroC Ice权威指南》中的一句话:">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_5.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_6.png">
+<meta property="og:updated_time" content="2017-03-13T00:34:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="尝试ZeorC ICE之【了解Ice概念和原理】">
+<meta name="twitter:description" content="本章我们来稍微了解下Ice概念和原理，前面已经跑通过一个小例子，再回过来看概念和原理，可能会容易理解一些。作为一个复杂的RPC平台，Ice也创造了很多概念和术语，其中一个名词就是Slice，这个前面已经学习过了，但现在也只是会用，具体生成那一坨文件还没有细看。下面我们从几个基本概念来看下。 Ice Object关于Ice Object，截取《ZeroC Ice权威指南》中的一句话:">
+<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_5.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/11/尝试ZeorC-ICE之【了解Ice概念和原理】/"/>
+
+
+
+
+
+  <title> 尝试ZeorC ICE之【了解Ice概念和原理】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/11/尝试ZeorC-ICE之【了解Ice概念和原理】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                尝试ZeorC ICE之【了解Ice概念和原理】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-11T11:15:13+08:00">
+                2017-03-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ZeroC-Ice/" itemprop="url" rel="index">
+                    <span itemprop="name">ZeroC Ice</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章我们来稍微了解下Ice概念和原理，前面已经跑通过一个小例子，再回过来看概念和原理，可能会容易理解一些。作为一个复杂的RPC平台，Ice也创造了很多概念和术语，其中一个名词就是Slice，这个前面已经学习过了，但现在也只是会用，具体生成那一坨文件还没有细看。下面我们从几个基本概念来看下。</p>
+<h3 id="Ice-Object"><a href="#Ice-Object" class="headerlink" title="Ice Object"></a>Ice Object</h3><p>关于Ice Object，截取《ZeroC Ice权威指南》中的一句话:</p>
+<a id="more"></a>
+<blockquote>
+<p>拥有一个对象标识符Object Identity来区别与其他类型对象，Ice对象模型中要求对象标识符是全局唯一的，即没有任何对象的标识符相同。一个Ice Object在服务端具体化为一个Servant实例，，即我们用某种具体编程语言实现的一个Slice接口并新建的某个对象就是一个Servant。</p>
+</blockquote>
+<p>看一段代码就清楚了，我们先来截取Server.java中的一段代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 创建提供服务的站点，缺省协议为TCP/IP，端口为10000</span></div><div class="line">Ice.ObjectAdapter adapter = ic.</div><div class="line">        createObjectAdapterWithEndpoints(<span class="string">"MyServiceAdapter"</span>, <span class="string">"default -p 10000"</span>);</div><div class="line"><span class="comment">// 创建具体提供服务的实例</span></div><div class="line">HelloWorldServiceImpl servant = <span class="keyword">new</span> HelloWorldServiceImpl();</div><div class="line"><span class="comment">// 将服务实例添加到提供服务的站点</span></div><div class="line">adapter.add(servant, Ice.Util.stringToIdentity(<span class="string">"HelloService"</span>));</div><div class="line">adapter.activate();</div></pre></td></tr></table></figure></p>
+<p>再看ObjectAdapter的add()方法申明：<code>Ice.ObjectPrx add(Ice.Object servant, Identity id);</code>，可见第一个参数就是Ice.Object类型，Identity也能从第二个参数体现出来。这么看来，是否可以理解成HelloWorldServiceImpl就是一个Ice Object；而new HelloWorldServiceImpl()就是一个Servant实例？这个只是我个人的理解，不能确定。</p>
+<h3 id="ObjectAdapter"><a href="#ObjectAdapter" class="headerlink" title="ObjectAdapter"></a>ObjectAdapter</h3><p>从Ice Object中引用的代码来看，Object Adapter像是Ice Object的宿主，提供了Ice Object的访问地址(Endpoint)，并且负责完成请求处理转发的流程。下面来看下Object Adapter具有的功能：</p>
+<ul>
+<li>提供一个或多个通信端点(Endpoints)，客户端通过这些断点中的某个端点，连接到一个具体的Ice Object对象，一个Endpoint由服务端所使用的通信协议、IP地址、端口等信息组成，例如default -h 192.168.0.1 -p 10000，表示采用默认协议(TCP)，绑定在192.168.0.1的10000端口上。</li>
+<li>绑定一个或多个Servant，每个Servant与一个Ice Object映射，将客户端针对某个Ice Object的请求委派到对应的Servant上，并完成整个请求流程的处理过程，包括底层通信。从代码看就是adapter.add()方法实现的功能。</li>
+</ul>
+<h3 id="Ice-Proxy"><a href="#Ice-Proxy" class="headerlink" title="Ice Proxy"></a>Ice Proxy</h3><p>先引用下客户端调用的代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 通过名称、协议、端口，构造通用Proxy对象</span></div><div class="line">Ice.ObjectPrx base = ic.stringToProxy(<span class="string">"HelloService:default -p 10000"</span>);</div><div class="line"><span class="comment">// 将通用Proxy对象转为真实的服务(uncheckedCast(base)可以减少一次远程调用)</span></div><div class="line">HelloWorldServicePrx prxy = HelloWorldServicePrxHelper.checkedCast(base);</div><div class="line">prxy.hello()</div></pre></td></tr></table></figure></p>
+<p>Ice Proxy是Ice Object在客户端的代表，简单来说，Proxy是客户端用来访问远程某个Ice Object的本地代理。Proxy存在于客户端的进程地址空间，当客户端调用远程对象的某个方法时，Ice运行时期的客户端代码库会完成如下工作：</p>
+<ul>
+<li>定位远程对象Ice Object</li>
+<li>如果Ice Object所在的Server处于关闭状态，则自动激活此Server，并激活远程对象。注：这一点暂时没有试出来</li>
+<li>将方法的入参通过Socket传输到远程对象</li>
+<li>等待调用完成</li>
+<li>将方法的出参返回给客户端，若发生异常则抛出调用异常</li>
+</ul>
+<p>作为远程Ice Object的本地代理，Proxy还持有如下重要信息：</p>
+<ul>
+<li>远程Server的地址信息，用来初始化通信，可以通过ic.stringToProxy()方法初始化</li>
+<li>用来定位Ice Object的对象标识符：object identity，从代码来看该信息封装在checkedCast()方法中</li>
+<li>可选的Facet标识符，用来确定引用Ice Object的哪个接口</li>
+<li>一个具体的Proxy可以用一个包括Endpoint信息的字符串描述，比如HelloService:default -p 10000，表示在远端的TCP端口10000上绑定的一个HelloService对象的Proxy。</li>
+</ul>
+<p>目前直观的感觉是一个Proxy对应一个Endpoint，也就是一个访问地址。Proxy有Direct Proxy与Indirect Proxy两种。前者是直接绑定某个远端Object的访问地址，就像上面引用的代码一样，这种情况下地址是写死的。后者则不绑定远程Object的某个具体通信地址，但是Endpoint的名称一定是有的，由于没有远程对象的地址信息，因此，需要借助寻址服务Location Service来获取对应的Ice Object的通信地址。如果要真的使用该产品的话，我想客户端肯定是采用Indirect Proxy这种方式来发现服务。</p>
+<h3 id="Location-Service"><a href="#Location-Service" class="headerlink" title="Location Service"></a>Location Service</h3><p>Location Service其实就是利用了Ice的注册表来实现Object Identity到Endpoint的查询服务，通俗的讲也就是服务的发现。Ice的注册表中保持了Ice Object、Object Proxy、Server等相关信息，属于IceGrid体系的重要组成部分，这种注册表组件也是大多数分布式系统的关键组件之一。<br>理解Indirect Proxy对于理解和掌握Ice来说非常重要，因为在IceGrid这种分布式框架中，所有Proxy都是Indirect的，从而实现了复杂的负载均衡和故障恢复机制。其调用过程如下：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_5.png" alt="zeroc_ice_5"></p>
+<ul>
+<li>客户端发起对远程Ice Object的方法InitialOp的调用</li>
+<li>客户端寻址，Indirect Proxy向Location Service发出查询命令，Location Service收到请求后从注册表Registry中获取对应Object的地址信息并返回</li>
+<li>客户端Ice Proxy直接跟远程对象建立通信连接，实现调用</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>最后总结下上面学到的术语，并加以补充。在Ice中，Ice Object、Object Adapter、Servant属于服务端的概念，它们存在于一个Ice Server中，这个Server容器通常是一个IceBox进程，暂且可以理解为一个Tomcat。ASM(Active Servant Map)是一个对象标识符(Object Identity)到对应Servant的查询表，也就是Ice Object到Servant的映射表，当一个客户端在某个Endpoint上发起对某个Ice Object的请求访问时，ASM用来快速定位到具体的Servant上，以便高效地委派请求。下面给出一张示意图：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_6.png" alt="zeroc_ice_6"><br>再看下Ice中另外一个重要概念–Replication，即让Object Adapter拥有多个访问地址，其目标是在多个机器上部署相同的Server来实现服务的负载均衡和容错机制，具体如何使用，我们后面再说。</p>
+<p>本章节就到此结束，算初步了解了Ice的一些概念和原理，具体如何使用，后面将借助一些案例来学习。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/RPC/" rel="tag"># RPC</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/10/尝试ZeorC-ICE之【改造Hello-World】/" rel="next" title="尝试ZeorC ICE之【改造Hello World】">
+                <i class="fa fa-chevron-left"></i> 尝试ZeorC ICE之【改造Hello World】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/13/尝试ZeorC-ICE之【在线预定图书项目-一-】/" rel="prev" title="尝试ZeorC ICE之【在线预定图书项目(一)】">
+                尝试ZeorC ICE之【在线预定图书项目(一)】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Ice-Object"><span class="nav-number">1.</span> <span class="nav-text">Ice Object</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ObjectAdapter"><span class="nav-number">2.</span> <span class="nav-text">ObjectAdapter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ice-Proxy"><span class="nav-number">3.</span> <span class="nav-text">Ice Proxy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Location-Service"><span class="nav-number">4.</span> <span class="nav-text">Location Service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

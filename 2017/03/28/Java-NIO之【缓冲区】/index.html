@@ -1,0 +1,757 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,NIO," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="平时写业务代码不一定会直接涉及到底层IO的使用，但是作为一个有点思想的码农，就算用不到，至少也应该知道。所以准备系统地学习下Java NIO，为日后看框架源码打下点基础。本系列博客学习的依据是前人翻译的《Java NIO》中文版，网友对该书褒贬不一，可能各个人群的需求不一样，确实重口难调。但是，没有经历过，怎么知道对自己是否合适。废话不多说了，摆好姿势，开始学习了。先建个项目，用于存放测试用力，本">
+<meta name="keywords" content="Java,NIO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java NIO之【缓冲区】">
+<meta property="og:url" content="http://yoursite.com/2017/03/28/Java-NIO之【缓冲区】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="平时写业务代码不一定会直接涉及到底层IO的使用，但是作为一个有点思想的码农，就算用不到，至少也应该知道。所以准备系统地学习下Java NIO，为日后看框架源码打下点基础。本系列博客学习的依据是前人翻译的《Java NIO》中文版，网友对该书褒贬不一，可能各个人群的需求不一样，确实重口难调。但是，没有经历过，怎么知道对自己是否合适。废话不多说了，摆好姿势，开始学习了。先建个项目，用于存放测试用力，本">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/nio_1.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/nio_2.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/nio_3.png">
+<meta property="og:updated_time" content="2017-03-27T18:52:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java NIO之【缓冲区】">
+<meta name="twitter:description" content="平时写业务代码不一定会直接涉及到底层IO的使用，但是作为一个有点思想的码农，就算用不到，至少也应该知道。所以准备系统地学习下Java NIO，为日后看框架源码打下点基础。本系列博客学习的依据是前人翻译的《Java NIO》中文版，网友对该书褒贬不一，可能各个人群的需求不一样，确实重口难调。但是，没有经历过，怎么知道对自己是否合适。废话不多说了，摆好姿势，开始学习了。先建个项目，用于存放测试用力，本">
+<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/nio_1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/28/Java-NIO之【缓冲区】/"/>
+
+
+
+
+
+  <title> Java NIO之【缓冲区】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/28/Java-NIO之【缓冲区】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Java NIO之【缓冲区】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-28T10:40:55+08:00">
+                2017-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NIO/" itemprop="url" rel="index">
+                    <span itemprop="name">NIO</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>平时写业务代码不一定会直接涉及到底层IO的使用，但是作为一个有点思想的码农，就算用不到，至少也应该知道。所以准备系统地学习下Java NIO，为日后看框架源码打下点基础。本系列博客学习的依据是前人翻译的《Java NIO》中文版，网友对该书褒贬不一，可能各个人群的需求不一样，确实重口难调。但是，没有经历过，怎么知道对自己是否合适。废话不多说了，摆好姿势，开始学习了。先建个项目，用于存放测试用力，本人的项目位于<a href="https://github.com/bboyjing/nio_learn" target="_blank" rel="external">Github</a>。</p>
+<a id="more"></a>
+<p>Buffer类是java.nio的构造基础，简单来说，Buffer对象就是用来存放数据的。先看下，Buffer的直接继承关系：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/nio_1.png" alt="nio_1"><br>从图中可以看出，Byffer的子类基本上是跟Java基本数据类型密切相关的。打开IntBuffer.java看下源码，其中有一个成员变量<code>final int[] hb;</code>，这就是存放数据的数组。所以Buffer类的底层实现可以认为就是数组，但是同时做了一些扩展。</p>
+<h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><p>所有的缓冲区都包含四个重要的属性。</p>
+<ul>
+<li>容量(capacity)：缓冲区能够容纳的数据元素的最大数量，这一容量在缓冲区创建时被设定,并且永远不能被改变</li>
+<li>上限(limit)：缓冲区的第一个不能被读或写的元素，或者说，缓冲区存储元素个数的上限</li>
+<li>位置(position)：下一个要被读或写的元素的索引，初始值为0</li>
+<li>标记(mark)：备忘位置，初始值为-1，表示未定义。通过调用某些方法给该标记设值</li>
+</ul>
+<p>这四个属性之间的关系是：mark &lt;= position &lt;= limit &lt;= capacity，下面展示一个新创建的容量为10的ByteBuffer：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/nio_2.png" alt="nio_2"><br>从图中可以看出，初始时mark未被定义，position被设成0，limit和capacity被设为10，由于数组下标从0开始，所以该buffer可访问的地址为0~9，limit和capacity指向的10号位是不可访问的。</p>
+<h3 id="缓冲区API"><a href="#缓冲区API" class="headerlink" title="缓冲区API"></a>缓冲区API</h3><p>Buffer类定义了一些公共的API，看了下源码，这些API基本上都是对属性的设值。可想而知，对位置的操作是使用Buffer类的关键，下面挑一个来看下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 清空缓冲区</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Buffer <span class="title">clear</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="comment">// 将起始位置设置成0</span></div><div class="line">    position = <span class="number">0</span>;</div><div class="line">    <span class="comment">// 将上限设置成容量最大值</span></div><div class="line">    limit = capacity;</div><div class="line">    <span class="comment">// 将mark设置成未定义</span></div><div class="line">    mark = -<span class="number">1</span>;</div><div class="line">    <span class="comment">// 返回当前Buffer实例</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>从上述API可以看出两个特点：</p>
+<ol>
+<li>对于缓冲区的某些操作不是直接操作数据，而是通过标志位来实现。比如clear()方法，不是清空数组中的数据，而是将position设成0等，来表示该缓冲区已经清空。</li>
+<li>API的返回值为Buffer引用，这样可以通过级联调用的方式来使用，能产生简洁、优美、易读的代码。比如：buffer.mark().position(5).reset( )</li>
+</ol>
+<p>另外一些常用的API如下：</p>
+<h4 id="存取"><a href="#存取" class="headerlink" title="存取"></a>存取</h4><p>存取方法不在Buffer类中，因为涉及到数据类型，所以get()、put()方法被置于Buffer的子类中。比如说IntBuffer的get()方法最终是在HeapIntBuffer中实现：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 获取缓冲区中下一个位置的值</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> hb[ix(nextGetIndex())];</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="填充"><a href="#填充" class="headerlink" title="填充"></a>填充</h4><p>我们先看一个例子，在项目中新建个类，该示例位于HelloBuffer.java中。我们将代表“Hello”字符串的ASCII码载入一个名为buffer的ByteBuffer对象中：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">    ByteBuffer buffer = ByteBuffer.allocate(<span class="number">10</span>);</div><div class="line">    buffer.put((<span class="keyword">byte</span>)<span class="string">'H'</span>).put((<span class="keyword">byte</span>)<span class="string">'e'</span>).put((<span class="keyword">byte</span>)<span class="string">'l'</span>).put((<span class="keyword">byte</span>)<span class="string">'l'</span>).put((<span class="keyword">byte</span>)<span class="string">'o'</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里有两点点需要注意下：</p>
+<ol>
+<li>上例中每个字符都必须强转成byte</li>
+<li>该缓冲区存的单位是字节，而char在java中占2个字节，这里强转会丢掉前八位，仅做测试用。</li>
+</ol>
+<p>5次调用put()之后缓冲区的状态如下图：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/nio_3.png" alt="nio_3"><br>这类图以后就不画了，太烦了。通过如下代码可以修改buffer中的值：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 将位置0的值替换为M，不会影响当前position</span></div><div class="line">buffer.put(<span class="number">0</span>, (<span class="keyword">byte</span>)<span class="string">'M'</span>);</div><div class="line"><span class="comment">// 继续操作buffer</span></div><div class="line">buffer.put((<span class="keyword">byte</span>)<span class="string">'w'</span>);</div></pre></td></tr></table></figure></p>
+<h4 id="翻转"><a href="#翻转" class="headerlink" title="翻转"></a>翻转</h4><p>要读取写完的buffer，需要先对buffer进行翻转动作，Buffer类提供flip()函数正是提供该功能，我们先来看下该函数实现代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Buffer <span class="title">flip</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="comment">// 将limit设置成当前position所在的位置，也就是缓冲区的第一个不能被读或写的元素</span></div><div class="line">    limit = position;</div><div class="line">    <span class="comment">// 将position指向第0位</span></div><div class="line">    position = <span class="number">0</span>;</div><div class="line">    <span class="comment">// 将mark设置成未定义</span></div><div class="line">    mark = -<span class="number">1</span>;</div><div class="line">    <span class="comment">// 返回buffer引用</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>经过翻转之后，表示该缓冲区从0~limit-1是可读的。</p>
+<h4 id="释放"><a href="#释放" class="headerlink" title="释放"></a>释放</h4><p>Buffer类提供hasRemaining()函数，用于查看缓冲区是否已达上限，该函数实现很简单，只是判断下position是否小于上限：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">hasRemaining</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> position &lt; limit;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>综上所述，一个简单的、完整的填充、读取缓冲区的代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">    ByteBuffer buffer = ByteBuffer.allocate(<span class="number">10</span>);</div><div class="line">    buffer.put((<span class="keyword">byte</span>)<span class="string">'H'</span>).put((<span class="keyword">byte</span>)<span class="string">'e'</span>).put((<span class="keyword">byte</span>)<span class="string">'l'</span>).put((<span class="keyword">byte</span>)<span class="string">'l'</span>).put((<span class="keyword">byte</span>)<span class="string">'o'</span>);</div><div class="line"></div><div class="line">    <span class="comment">// 将位置0的值替换为M，不会影响当前position</span></div><div class="line">    buffer.put(<span class="number">0</span>, (<span class="keyword">byte</span>)<span class="string">'M'</span>);</div><div class="line">    <span class="comment">// 继续操作buffer</span></div><div class="line">    buffer.put((<span class="keyword">byte</span>)<span class="string">'w'</span>);</div><div class="line"></div><div class="line">    <span class="comment">// 翻转Buffer</span></div><div class="line">    buffer.flip();</div><div class="line">    <span class="keyword">while</span>(buffer.hasRemaining())&#123;</div><div class="line">        System.out.println(buffer.get());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="压缩"><a href="#压缩" class="headerlink" title="压缩"></a>压缩</h4><p>有时候我们可能只想从缓冲区中释放一部分数据，然后接着填充，为了实现这一功能，未读的数据元素的第一个的下标要移到第0位，看源码是通过复制的方式实现的：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> ByteBuffer <span class="title">compact</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="comment">// 复制未读的元素</span></div><div class="line">    System.arraycopy(hb, ix(position()), hb, ix(<span class="number">0</span>), remaining());</div><div class="line">    <span class="comment">// 设置新标记位</span></div><div class="line">    position(remaining());</div><div class="line">    limit(capacity());</div><div class="line">    discardMark();</div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="标记"><a href="#标记" class="headerlink" title="标记"></a>标记</h4><p>也就是mark属性起作用的时候，通过reset()方法，可以将buffer重置到标记位，我们来看下reset()方法：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">public final Buffer reset() &#123;</div><div class="line">    <span class="keyword">int</span> m = mark;</div><div class="line">    <span class="keyword">if</span> (m &lt; <span class="number">0</span>)</div><div class="line">        throw <span class="built_in">new</span> InvalidMarkException();</div><div class="line">    <span class="comment">// 很简单，就是将position位置设置成mark</span></div><div class="line">    position = m;</div><div class="line">    <span class="keyword">return</span> this;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="比较"><a href="#比较" class="headerlink" title="比较"></a>比较</h4><p>通过equals()函数可以测试两个缓冲区是否相等，下面是达成两个缓冲区相等的条件：</p>
+<ul>
+<li>两个缓冲区中的对象类型相同。</li>
+<li>两个缓冲区都剩余相同数量的元素。Buffer的容量不需要相同，而且缓冲区中剩余元素的索引也不必相同。</li>
+<li>在每个缓冲区应被get()函数返回的剩余数据元素序列必须一致。</li>
+</ul>
+<p>还提供compareTo()函数让两个缓冲区进行比较，这里不多说了，后面如果用到再详细看。</p>
+<h4 id="批量移动"><a href="#批量移动" class="headerlink" title="批量移动"></a>批量移动</h4><p>缓冲区的设计目的就是为了能够高效地传输数据，所以buffer API提供了向缓冲区内外批量移动数据元素的函数。get()和put()都有提供，我们先了解下有这个功能，用的时候知道尽量调用高效API就是了。</p>
+<h3 id="创建缓冲区"><a href="#创建缓冲区" class="headerlink" title="创建缓冲区"></a>创建缓冲区</h3><p>上面的一个小例子中，我们已经知道了如何创建缓冲区，这里我们以CharBuffer为例，再来详细说明下。创建缓冲区有两种方式：</p>
+<ol>
+<li>通过静态工厂方法allocate()来创建实例。比如要分配一个容量为100个char变量的Charbuffer：<code>CharBuffer charBuffer = CharBuffer.allocate(100)</code>，这段代码隐含地从堆空间中分配了一个char型数组作为备份存储器来存储100个char变量。</li>
+<li>通过wrap()函数来创建实例。比如<code>CharBuffer charBuffer = CharBuffer.wrap(myArray);</code>，warp()函数中没有对myArray进行深拷贝，所以程序对myArray的操作和对缓冲去的操作会相互影响。</li>
+</ol>
+<p>通过allocate()和wrap()函数创建的缓冲区都是间接的，是JVM托管的。从CharBuffer的子类HeapCharBuffer的名字也可以猜出来，是分配在JVM堆中的。</p>
+<h3 id="复制缓冲区"><a href="#复制缓冲区" class="headerlink" title="复制缓冲区"></a>复制缓冲区</h3><p>缓冲区提供duplicate()函数，来复制一个缓冲区。需要注意的是，复制一个缓冲区会创建一个新的Buffer对象，但不复制数据。原始缓冲区和副本都会操作同样的数据元素。</p>
+<h3 id="字节缓冲区"><a href="#字节缓冲区" class="headerlink" title="字节缓冲区"></a>字节缓冲区</h3><p>字节是操作系统及其I/O设备使用的基本数据类型，当在JVM和操作系统间传递数据时，将其他的数据类型拆分成字节是很有必要的。所以我们着重来看下字节缓冲区。</p>
+<h4 id="字节序"><a href="#字节序" class="headerlink" title="字节序"></a>字节序</h4><p>非字节类型的基本数据，都是以连续字节序列的形式存储在内存中的。例如32位int值0x037fb4c7，可能以下面两种方式存储在内存中(假设内存从左往右地址递增)：</p>
+<ul>
+<li>大端字节序：c7 b4 7f 03，高位存储在内存地址高位。</li>
+<li>小端字节序：03 7f b4 c7，高位存储在内存地址低位。</li>
+</ul>
+<p>在java.nio中，字节顺序由ByteOrder类封装，Java默认的字节序是ByteOrder.BIG_ENDIAN，也就是大端序。</p>
+<h4 id="直接缓冲区"><a href="#直接缓冲区" class="headerlink" title="直接缓冲区"></a>直接缓冲区</h4><p>简单来说，直接缓冲区使用的内存是通过调用本地操作系统方面的代码分配的，绕过了标准的JVM堆栈。直接缓冲区是I/O的最佳选择,但可能比创建非直接缓冲区要花费更高的成本。直接缓冲区的内存区域不受GC支配，因为它们位于标准的JVM堆栈之外。使用直接缓冲区或间接缓冲区的性能权衡会因JVM,操作系统,以及代码设计而产生巨大差异。关于两者的选择，作者给出了一条建议：先使其工作，再加快其运行。言外之意就是，没事儿别瞎折腾，先使用间接缓冲区就可以了。但还是要知道下直接缓冲区是怎么创建的，通过ByteBuffer.allocateDirect()创建即可。</p>
+<h4 id="视图缓冲区"><a href="#视图缓冲区" class="headerlink" title="视图缓冲区"></a>视图缓冲区</h4><p>视图缓冲区通过已存在的缓冲区对象实例的工厂方法来创建。这种视图对象维护它自己的属性、容量、位置、上界和标记，但是和原来的缓冲区共享数据元素。但是ByteBuffer类允许创建视图来将byte型缓冲区字节数据映射为其它原始数据类型。例如，asLongBuffer()函数创建一个将八个字节(64位)数据当成一个long型数据来存取的视图缓冲区。我们用一个小例子来演示下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BufferCharView</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        <span class="comment">// 创建容量为7的ByteBuffer实例，并手动指定字节序</span></div><div class="line">        ByteBuffer byteBuffer = ByteBuffer.allocate (<span class="number">7</span>).order(ByteOrder.BIG_ENDIAN);</div><div class="line">        <span class="comment">// 创建CharBuffer类型的视图缓冲区</span></div><div class="line">        CharBuffer charBuffer = byteBuffer.asCharBuffer( );</div><div class="line"></div><div class="line">        <span class="comment">// 填充原始缓冲区</span></div><div class="line">        byteBuffer.put (<span class="number">0</span>, (<span class="keyword">byte</span>)<span class="number">0</span>);</div><div class="line">        byteBuffer.put (<span class="number">1</span>, (<span class="keyword">byte</span>)<span class="string">'H'</span>);</div><div class="line">        byteBuffer.put (<span class="number">2</span>, (<span class="keyword">byte</span>)<span class="number">0</span>);</div><div class="line">        byteBuffer.put (<span class="number">3</span>, (<span class="keyword">byte</span>)<span class="string">'i'</span>);</div><div class="line">        byteBuffer.put (<span class="number">4</span>, (<span class="keyword">byte</span>)<span class="number">0</span>);</div><div class="line">        byteBuffer.put (<span class="number">5</span>, (<span class="keyword">byte</span>)<span class="string">'!'</span>);</div><div class="line">        byteBuffer.put (<span class="number">6</span>, (<span class="keyword">byte</span>)<span class="number">0</span>);</div><div class="line"></div><div class="line">        println (byteBuffer);</div><div class="line">        println (charBuffer);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">println</span> <span class="params">(Buffer buffer)</span></span>&#123;</div><div class="line">        System.out.println (<span class="string">"pos="</span> + buffer.position( )</div><div class="line">                + <span class="string">", limit="</span> + buffer.limit( )</div><div class="line">                + <span class="string">", capacity="</span> + buffer.capacity( )</div><div class="line">                + <span class="string">": '"</span> + buffer.toString( ) + <span class="string">"'"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">输出如下(基础ByteBuffer对象对象中的两个字节映射成CHarBuffer对象的一个字符)：</div><div class="line">pos=<span class="number">0</span>, limit=<span class="number">7</span>, capacity=<span class="number">7</span>: <span class="string">'java.nio.HeapByteBuffer[pos=0 lim=7 cap=7]'</span></div><div class="line">pos=<span class="number">0</span>, limit=<span class="number">3</span>, capacity=<span class="number">3</span>: <span class="string">'Hi!'</span></div></pre></td></tr></table></figure></p>
+<h4 id="数据元素视图"><a href="#数据元素视图" class="headerlink" title="数据元素视图"></a>数据元素视图</h4><p>ByteBuffer类提供一个不太重要的机制来以多字节数据类型的形式存取byte数据组。比如说getInt()函数被调用，从当前位置开始的四个字节会被包装成一个int类型的变量，然后作为函数的返回值返回。</p>
+<h4 id="内存映射缓冲区"><a href="#内存映射缓冲区" class="headerlink" title="内存映射缓冲区"></a>内存映射缓冲区</h4><p>映射缓冲区是带有存储在文件,通过内存映射来存取数据元素的字节缓冲区。映射缓冲区通常是直接存取内存的,只能通过 FileChannel 类创建。映射缓冲区的用法和直接缓冲区类似,但是MappedByteBuffer对象可以处理独立于文件存取形式的的许多特定字符。(MappedByteBuffer是ByteBuffer专门用于内存映射文件的一种特例，是ByteBuffer的子类)。这个具体后面再看。</p>
+<p>缓冲区到这儿就算学完了，当然有些API并没有完全列出来，但是我们已经知道了其实现原理，针对性地去看源码也就不是什么事儿了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/NIO/" rel="tag"># NIO</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/27/尝试ZeorC-ICE之【从还未入门到放弃】/" rel="next" title="尝试ZeorC-ICE之【从还未入门到放弃】">
+                <i class="fa fa-chevron-left"></i> 尝试ZeorC-ICE之【从还未入门到放弃】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/30/Java-NIO之【通道】/" rel="prev" title="Java NIO之【通道】">
+                Java NIO之【通道】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#属性"><span class="nav-number">1.</span> <span class="nav-text">属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓冲区API"><span class="nav-number">2.</span> <span class="nav-text">缓冲区API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#存取"><span class="nav-number">2.1.</span> <span class="nav-text">存取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#填充"><span class="nav-number">2.2.</span> <span class="nav-text">填充</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#翻转"><span class="nav-number">2.3.</span> <span class="nav-text">翻转</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#释放"><span class="nav-number">2.4.</span> <span class="nav-text">释放</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#压缩"><span class="nav-number">2.5.</span> <span class="nav-text">压缩</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#标记"><span class="nav-number">2.6.</span> <span class="nav-text">标记</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#比较"><span class="nav-number">2.7.</span> <span class="nav-text">比较</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#批量移动"><span class="nav-number">2.8.</span> <span class="nav-text">批量移动</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建缓冲区"><span class="nav-number">3.</span> <span class="nav-text">创建缓冲区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#复制缓冲区"><span class="nav-number">4.</span> <span class="nav-text">复制缓冲区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字节缓冲区"><span class="nav-number">5.</span> <span class="nav-text">字节缓冲区</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#字节序"><span class="nav-number">5.1.</span> <span class="nav-text">字节序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#直接缓冲区"><span class="nav-number">5.2.</span> <span class="nav-text">直接缓冲区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#视图缓冲区"><span class="nav-number">5.3.</span> <span class="nav-text">视图缓冲区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据元素视图"><span class="nav-number">5.4.</span> <span class="nav-text">数据元素视图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#内存映射缓冲区"><span class="nav-number">5.5.</span> <span class="nav-text">内存映射缓冲区</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

@@ -1,0 +1,708 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Mysql,Mycat," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="上一章我们对Mycat配置有了个初步的了解，现在我们就基于之前的配置，并且模拟一个简单的订单场景，来跑通Mycat。假设我们构建2000万条订单数据，需要以id mod运算之后存储到两台Mysql中，下面我们就一步一步的来实现。 启动Docker中的两台Mysql容器123456#因为之前已经启动过容器，如果没有主动删除过，先查看下其状态sudo docker ps -a#若容器处于Exited状">
+<meta name="keywords" content="Mysql,Mycat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】">
+<meta property="og:url" content="http://yoursite.com/2016/08/04/Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="上一章我们对Mycat配置有了个初步的了解，现在我们就基于之前的配置，并且模拟一个简单的订单场景，来跑通Mycat。假设我们构建2000万条订单数据，需要以id mod运算之后存储到两台Mysql中，下面我们就一步一步的来实现。 启动Docker中的两台Mysql容器123456#因为之前已经启动过容器，如果没有主动删除过，先查看下其状态sudo docker ps -a#若容器处于Exited状">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/mycat_5.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/mycat_6.png">
+<meta property="og:updated_time" content="2016-08-09T10:22:50.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】">
+<meta name="twitter:description" content="上一章我们对Mycat配置有了个初步的了解，现在我们就基于之前的配置，并且模拟一个简单的订单场景，来跑通Mycat。假设我们构建2000万条订单数据，需要以id mod运算之后存储到两台Mysql中，下面我们就一步一步的来实现。 启动Docker中的两台Mysql容器123456#因为之前已经启动过容器，如果没有主动删除过，先查看下其状态sudo docker ps -a#若容器处于Exited状">
+<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/mycat_5.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/08/04/Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】/"/>
+
+
+
+
+
+  <title> Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/08/04/Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-04T10:20:01+08:00">
+                2016-08-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mycat/" itemprop="url" rel="index">
+                    <span itemprop="name">Mycat</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一章我们对Mycat配置有了个初步的了解，现在我们就基于之前的配置，并且模拟一个简单的订单场景，来跑通Mycat。假设我们构建2000万条订单数据，需要以id mod运算之后存储到两台Mysql中，下面我们就一步一步的来实现。</p>
+<h3 id="启动Docker中的两台Mysql容器"><a href="#启动Docker中的两台Mysql容器" class="headerlink" title="启动Docker中的两台Mysql容器"></a>启动Docker中的两台Mysql容器</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>因为之前已经启动过容器，如果没有主动删除过，先查看下其状态</div><div class="line">sudo docker ps -a</div><div class="line"><span class="meta"></span></div><div class="line">#若容器处于Exited状态下，将其启动即可(示例是本人自己的CONTAINER ID)</div><div class="line">sudo docker start d1f418414648</div><div class="line">sudo docker start 9d9674cc4fa7</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<h3 id="连接两台Mysql并分别新建数据库order-db"><a href="#连接两台Mysql并分别新建数据库order-db" class="headerlink" title="连接两台Mysql并分别新建数据库order_db"></a>连接两台Mysql并分别新建数据库order_db</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">mysql -h127.0.0.1 -P3306 -uroot -pbboyjing</div><div class="line">create database order_db;</div><div class="line">exit</div><div class="line"></div><div class="line">mysql -h127.0.0.1 -P3316 -uroot -pbboyjing</div><div class="line">create database order_db;</div><div class="line">exit</div></pre></td></tr></table></figure>
+<h3 id="启动Mycat"><a href="#启动Mycat" class="headerlink" title="启动Mycat"></a>启动Mycat</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>进入Mycat安装目录</div><div class="line">cd /opt/mycat</div><div class="line"><span class="meta">#</span>启动Mycat</div><div class="line">bin/mycat start</div></pre></td></tr></table></figure>
+<h3 id="通过Mysql客户端连接Mycat"><a href="#通过Mysql客户端连接Mycat" class="headerlink" title="通过Mysql客户端连接Mycat"></a>通过Mysql客户端连接Mycat</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>查看启动日志（出现connected successfuly MySQLConnection表示启动成功）</div><div class="line">vim logs/mycat.log</div><div class="line"><span class="meta"></span></div><div class="line">#由日志可以看出Mycat端口为8066和9066，其中8066为数据端口、9066为管理端口</div><div class="line"><span class="meta">#</span>下面我们通过server.xml中配置的用户来连接Mycat，出现mysql交互界面表示连接成功</div><div class="line">mysql -h127.0.0.1 -P8066 -uroot -pbboyjing</div><div class="line"><span class="meta"></span></div><div class="line">#查看databases</div><div class="line"><span class="meta">mysql&gt;</span> show databases;</div><div class="line">+----------+</div><div class="line">| DATABASE |</div><div class="line">+----------+</div><div class="line">| OrderDB  |</div><div class="line">+----------+</div><div class="line"><span class="meta">#</span>出现的是server.xml中配置的逻辑库（schema）</div></pre></td></tr></table></figure>
+<p>到此表示Mycat服务正常启动，并且通过Mysql客户端可以连通，上面最后一步show databases的结果如下图所示：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/mycat_5.png" alt="图5"></p>
+<h3 id="设计Order表"><a href="#设计Order表" class="headerlink" title="设计Order表"></a>设计Order表</h3><p>简单地设计一张order表，位于order_db库中，表结构如下：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`order`</span> (</div><div class="line">  <span class="string">`id`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="string">`status`</span> tinyint(<span class="number">4</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="string">`price`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="string">`create_time`</span> <span class="built_in">bigint</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>)</div><div class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8</div></pre></td></tr></table></figure></p>
+<p>基于上一步Mysql客户端中操作<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>切换至OrderDB库</div><div class="line"><span class="meta">mysql&gt;</span> use OrderDB;</div><div class="line"><span class="meta"></span></div><div class="line">#执行简表语句，成功后会在两台Mysql中都新建相同的order表</div><div class="line"><span class="meta">mysql&gt;</span> CREATE TABLE `order` (</div><div class="line">    -&gt;   `id` int(11) NOT NULL,</div><div class="line">    -&gt;   `status` tinyint(4) NOT NULL,</div><div class="line">    -&gt;   `price` int(11) NOT NULL,</div><div class="line">    -&gt;   `create_time` bigint(20) NOT NULL,</div><div class="line">    -&gt;   PRIMARY KEY (`id`)</div><div class="line">    -&gt; ) ENGINE=InnoDB DEFAULT CHARSET=utf8;</div></pre></td></tr></table></figure></p>
+<p>成功的输出如下：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/mycat_6.png" alt="图6"></p>
+<p>环境准备工作已经差不多了，下面一章将准备新建一个Java项目来使用Mycat。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+          
+            <a href="/tags/Mycat/" rel="tag"># Mycat</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/07/27/Mysql分库分表之Mycat学习笔记二【配置初探】/" rel="next" title="Mysql分库分表之Mycat学习笔记二【配置初探】">
+                <i class="fa fa-chevron-left"></i> Mysql分库分表之Mycat学习笔记二【配置初探】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/09/SpringBoot自定义参数验证/" rel="prev" title="SpringBoot自定义参数验证">
+                SpringBoot自定义参数验证 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#启动Docker中的两台Mysql容器"><span class="nav-number">1.</span> <span class="nav-text">启动Docker中的两台Mysql容器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#连接两台Mysql并分别新建数据库order-db"><span class="nav-number">2.</span> <span class="nav-text">连接两台Mysql并分别新建数据库order_db</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动Mycat"><span class="nav-number">3.</span> <span class="nav-text">启动Mycat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过Mysql客户端连接Mycat"><span class="nav-number">4.</span> <span class="nav-text">通过Mysql客户端连接Mycat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设计Order表"><span class="nav-number">5.</span> <span class="nav-text">设计Order表</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

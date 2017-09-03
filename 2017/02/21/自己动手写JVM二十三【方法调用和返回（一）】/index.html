@@ -1,0 +1,709 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JVM,Go," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本章开始将实现方法调用和返回，在此基础上，还会讨论类和对象的初始化。 方法调用概述从调用角度来看，方法可以分为两类：静态方法和实例方法。静态方法通过类来调用，实例方法则通过对象引用来调用。静态方法时静态绑定的，也就是说，最终调用的时哪个方法在编译期就已经确定了。实例方法则支持动态绑定，最终要调用哪个方法可能要推迟到运行期才知道。在Java7之前，Java虚拟机规范一共提供了4条方法调用指令。其中i">
+<meta name="keywords" content="JVM,Go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自己动手写JVM二十三【方法调用和返回（一）】">
+<meta property="og:url" content="http://yoursite.com/2017/02/21/自己动手写JVM二十三【方法调用和返回（一）】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="本章开始将实现方法调用和返回，在此基础上，还会讨论类和对象的初始化。 方法调用概述从调用角度来看，方法可以分为两类：静态方法和实例方法。静态方法通过类来调用，实例方法则通过对象引用来调用。静态方法时静态绑定的，也就是说，最终调用的时哪个方法在编译期就已经确定了。实例方法则支持动态绑定，最终要调用哪个方法可能要推迟到运行期才知道。在Java7之前，Java虚拟机规范一共提供了4条方法调用指令。其中i">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_43.png">
+<meta property="og:updated_time" content="2017-02-21T19:06:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="自己动手写JVM二十三【方法调用和返回（一）】">
+<meta name="twitter:description" content="本章开始将实现方法调用和返回，在此基础上，还会讨论类和对象的初始化。 方法调用概述从调用角度来看，方法可以分为两类：静态方法和实例方法。静态方法通过类来调用，实例方法则通过对象引用来调用。静态方法时静态绑定的，也就是说，最终调用的时哪个方法在编译期就已经确定了。实例方法则支持动态绑定，最终要调用哪个方法可能要推迟到运行期才知道。在Java7之前，Java虚拟机规范一共提供了4条方法调用指令。其中i">
+<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_43.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/21/自己动手写JVM二十三【方法调用和返回（一）】/"/>
+
+
+
+
+
+  <title> 自己动手写JVM二十三【方法调用和返回（一）】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/21/自己动手写JVM二十三【方法调用和返回（一）】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                自己动手写JVM二十三【方法调用和返回（一）】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-21T17:04:21+08:00">
+                2017-02-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章开始将实现方法调用和返回，在此基础上，还会讨论类和对象的初始化。</p>
+<h3 id="方法调用概述"><a href="#方法调用概述" class="headerlink" title="方法调用概述"></a>方法调用概述</h3><p>从调用角度来看，方法可以分为两类：静态方法和实例方法。静态方法通过类来调用，实例方法则通过对象引用来调用。静态方法时静态绑定的，也就是说，最终调用的时哪个方法在编译期就已经确定了。实例方法则支持动态绑定，最终要调用哪个方法可能要推迟到运行期才知道。<br>在Java7之前，Java虚拟机规范一共提供了4条方法调用指令。其中invokestatic指令来调用静态方法。invokespecial指令用来调用无需动态绑定的实例方法，包括构造函数、私有方法和通过supper关键字调用超类方法。剩下的情况则属于动态绑定。如果是针对接口类型的引用调用方法，就使用invokeinterfase指令，否则使用invokevirtual指令。本章将实现这四条指令，为了更好地支持动态类语言，Java7增加了一条方法调用指令invokedynamic，本章不讨论该指令。在深入讨论各条方法调用指令的细节之前，先简单了解下Java虚拟机是如何调用方法的。</p>
+<a id="more"></a>
+<p>首先，方法调用指令需要n+1个操作数，其中第一个操作数时uint16索引，在字节码中紧跟在指令操作码的后面。通过这个索引，可以从当前类的运行时常量池中知道到一个方法符号引用，解析这个符号引用就可以得到一个方法。注意，这个方法并不一定就是最终要调用的方法，所以可能还需要一个查找过程才能找到最终要调用的方法。剩下的n个操作数时要传递给被调用方法的参数，从操作数栈中弹出。如果要执行的是Java方法，下一步是给这个方法创建一个新的帧，并把它推到Java虚拟机栈顶。传递参数之后，新的方法就可以开始执行了。方法的最后一条指令时某个返回指令，这个指令负责把方法的返回值推入前一帧的操作数栈顶，然后把当前帧从Java虚拟机栈中弹出。</p>
+<h3 id="解析方法符号引用"><a href="#解析方法符号引用" class="headerlink" title="解析方法符号引用"></a>解析方法符号引用</h3><p>非接口方法符号引用和接口方法符号引用的解析规则是不同的，因此下面分开讨论这两种符号引用。</p>
+<h4 id="非接口方法符号引用"><a href="#非接口方法符号引用" class="headerlink" title="非接口方法符号引用"></a>非接口方法符号引用</h4><p>修改/rtdata/heap/cp_methodref.go文件，实现ResolveMethod()方法：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 解析非接口方法符号引用</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *MethodRef)</span> <span class="title">ResolvedMethod</span><span class="params">()</span> *<span class="title">Method</span></span> &#123;</div><div class="line">	<span class="keyword">if</span> self.method == <span class="literal">nil</span> &#123;</div><div class="line">		self.resolveMethodRef()</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> self.method</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *MethodRef)</span> <span class="title">resolveMethodRef</span><span class="params">()</span></span> &#123;</div><div class="line">	<span class="comment">// 获取当前Class指针</span></div><div class="line">	d := self.cp.class</div><div class="line">	<span class="comment">// 解析方法符号引用之前需要先解析方法所属的类</span></div><div class="line">	c := self.ResolvedClass()</div><div class="line">	<span class="comment">// 判断方法所属类是否是接口</span></div><div class="line">	<span class="keyword">if</span> c.IsInterface() &#123;</div><div class="line">		<span class="built_in">panic</span>(<span class="string">"java.lang.IncompatibleClassChangeError"</span>)</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// 根据方法名和描述符查找方法</span></div><div class="line">	method := lookupMethod(c, self.name, self.descriptor)</div><div class="line">	<span class="keyword">if</span> method == <span class="literal">nil</span> &#123;</div><div class="line">		<span class="built_in">panic</span>(<span class="string">"java.lang.NoSuchMethodError"</span>)</div><div class="line">	&#125;</div><div class="line">	<span class="comment">// 判断方法方法权限</span></div><div class="line">	<span class="keyword">if</span> !method.isAccessibleTo(d) &#123;</div><div class="line">		<span class="built_in">panic</span>(<span class="string">"java.lang.IllegalAccessError"</span>)</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	self.method = method</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>LookupMethodInClass()和lookupMethodInInterfaces()单独定义在/rtdata/heap/method_loopup.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">LookupMethodInClass</span><span class="params">(class *Class, name, descriptor <span class="keyword">string</span>)</span> *<span class="title">Method</span></span> &#123;</div><div class="line">	<span class="comment">// 通过名称和描述符，从class以及superClass链中寻找方法</span></div><div class="line">	<span class="keyword">for</span> c := class; c != <span class="literal">nil</span>; c = c.superClass &#123;</div><div class="line">		<span class="keyword">for</span> _, method := <span class="keyword">range</span> c.methods &#123;</div><div class="line">			<span class="keyword">if</span> method.name == name &amp;&amp; method.descriptor == descriptor &#123;</div><div class="line">				<span class="keyword">return</span> method</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> <span class="literal">nil</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">lookupMethodInInterfaces</span><span class="params">(ifaces []*Class, name, descriptor <span class="keyword">string</span>)</span> *<span class="title">Method</span></span> &#123;</div><div class="line">	<span class="keyword">for</span> _, iface := <span class="keyword">range</span> ifaces &#123;</div><div class="line">		<span class="comment">// 先遍历当前接口的方法</span></div><div class="line">		<span class="keyword">for</span> _, method := <span class="keyword">range</span> iface.methods &#123;</div><div class="line">			<span class="keyword">if</span> method.name == name &amp;&amp; method.descriptor == descriptor &#123;</div><div class="line">				<span class="keyword">return</span> method</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="comment">// 如果没找到，再递归遍历当前接口实现的接口</span></div><div class="line">		method := lookupMethodInInterfaces(iface.interfaces, name, descriptor)</div><div class="line">		<span class="keyword">if</span> method != <span class="literal">nil</span> &#123;</div><div class="line">			<span class="keyword">return</span> method</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">return</span> <span class="literal">nil</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="接口方法符号引用"><a href="#接口方法符号引用" class="headerlink" title="接口方法符号引用"></a>接口方法符号引用</h4><p>修改/rtdata/heap/cp_interface_methodref.go，实现ResolveInterfaceMethod()方法：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 解析接口方法符号引用</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *InterfaceMethodRef)</span> <span class="title">ResolvedInterfaceMethod</span><span class="params">()</span> *<span class="title">Method</span></span> &#123;</div><div class="line">	<span class="keyword">if</span> self.method == <span class="literal">nil</span> &#123;</div><div class="line">		self.resolveInterfaceMethodRef()</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> self.method</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *InterfaceMethodRef)</span> <span class="title">resolveInterfaceMethodRef</span><span class="params">()</span></span> &#123;</div><div class="line">	<span class="comment">// 获取当前Class指针</span></div><div class="line">	d := self.cp.class</div><div class="line">	<span class="comment">// 解析方法符号引用之前需要先解析方法所属的类</span></div><div class="line">	c := self.ResolvedClass()</div><div class="line">	<span class="comment">// 判断方法所属类是否是接口</span></div><div class="line">	<span class="keyword">if</span> !c.IsInterface() &#123;</div><div class="line">		<span class="built_in">panic</span>(<span class="string">"java.lang.IncompatibleClassChangeError"</span>)</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// 根据方法名和描述符查找方法</span></div><div class="line">	method := lookupInterfaceMethod(c, self.name, self.descriptor)</div><div class="line">	<span class="keyword">if</span> method == <span class="literal">nil</span> &#123;</div><div class="line">		<span class="built_in">panic</span>(<span class="string">"java.lang.NoSuchMethodError"</span>)</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// 判断方法方法权限</span></div><div class="line">	<span class="keyword">if</span> !method.isAccessibleTo(d) &#123;</div><div class="line">		<span class="built_in">panic</span>(<span class="string">"java.lang.IllegalAccessError"</span>)</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	self.method = method</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">lookupInterfaceMethod</span><span class="params">(iface *Class, name, descriptor <span class="keyword">string</span>)</span> *<span class="title">Method</span></span> &#123;</div><div class="line">	<span class="comment">// 先从当前接口中查找方法</span></div><div class="line">	<span class="keyword">for</span> _, method := <span class="keyword">range</span> iface.methods &#123;</div><div class="line">		<span class="keyword">if</span> method.name == name &amp;&amp; method.descriptor == descriptor &#123;</div><div class="line">			<span class="keyword">return</span> method</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// 若没有找到，则递归当前接口实现的接口链</span></div><div class="line">	<span class="keyword">return</span> lookupMethodInInterfaces(iface.interfaces, name, descriptor)</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="方法调用和参数传递"><a href="#方法调用和参数传递" class="headerlink" title="方法调用和参数传递"></a>方法调用和参数传递</h3><p>在定位到需要调用的方法之后，Java虚拟机要给这个方法创建一个新的帧并把它推入Java虚拟机栈顶，然后传递参数。这个逻辑对于本章要实现的4条方法调用指令来说基本上相同，为了避免重复代码，在单独的文件中实现这个逻辑。在/instructions/base包下创建method_invoke_logic.go文件，在其中实现InvokeMethod()方法：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">InvokeMethod</span><span class="params">(invokerFrame *rtdata.Frame, method *heap.Method)</span></span> &#123;</div><div class="line">	<span class="comment">// 获取当前线程</span></div><div class="line">	thread := invokerFrame.Thread()</div><div class="line">	<span class="comment">// 创建新的帧</span></div><div class="line">	newFrame := thread.NewFrame(method)</div><div class="line">	<span class="comment">// 将新创建的帧推入Java虚拟机栈</span></div><div class="line">	thread.PushFrame(newFrame)</div><div class="line"></div><div class="line">	argSlotSlot := <span class="keyword">int</span>(method.ArgSlotCount())</div><div class="line">	<span class="keyword">if</span> argSlotSlot &gt; <span class="number">0</span> &#123;</div><div class="line">		<span class="keyword">for</span> i := argSlotSlot - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i-- &#123;</div><div class="line">			slot := invokerFrame.OperandStack().PopSlot()</div><div class="line">			newFrame.LocalVars().SetSlot(<span class="keyword">uint</span>(i), slot)</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>重点讨论下参数的传递过程，从argSlotSlot开始，ArgSlotCount()函数确定方法的参数在局部变量表中占用多少位置。要注意的是，这个数量并不一定等于从Java代码中看到的参数个数，原因有两个：第一，long和duble类型的参数要占用两个位置；第二，对于实例方法，Java编译器会在参数列表的前面添加一个参数，这个隐藏的参数就是this引用。假设实际的参数占据n个位置，依次把这n个变量从调用者的操作数栈中弹出，放进被调用方法的局部变量表中，参数传递就完成了。<br>下面先在LocalVars结构体中新增setSlot()函数，修改/rtdata/local_vars.go文件。代码中没有对long和double类型做特殊处理，因为操作的是Slot结构体，所以没问题。<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self LocalVars)</span> <span class="title">SetSlot</span><span class="params">(index <span class="keyword">uint</span>, slot Slot)</span></span> &#123;</div><div class="line">	self[index] = slot</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>下面忽略long和double类型参数，分别看一下静态方法和实例方法的参数传递的过程：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_43.png" alt="jvmgo_43"><br>那么ArgSlotCount()方法到底返回什么呢，我们直接看代码，修改/rtdata/heap/method.go文件，修改Method结构体：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> Method <span class="keyword">struct</span> &#123;</div><div class="line">	...</div><div class="line">	<span class="comment">// 方法的参数所占的Slot数量</span></div><div class="line">	argSlotCount <span class="keyword">uint</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">newMethods</span><span class="params">(class *Class, cfMethods []*classfile.MemberInfo)</span> []*<span class="title">Method</span></span> &#123;</div><div class="line">	...</div><div class="line">		methods[i].calcArgSlotCount()</div><div class="line">	...</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 计算方法参数占用的slot数量</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Method)</span> <span class="title">calcArgSlotCount</span><span class="params">()</span></span> &#123;</div><div class="line">	<span class="comment">// 分解方法描述符</span></div><div class="line">	parsedDescriptor := parseMethodDescriptor(self.descriptor)</div><div class="line">	<span class="keyword">for</span> _, paramType := <span class="keyword">range</span> parsedDescriptor.parameterTypes &#123;</div><div class="line">		self.argSlotCount++</div><div class="line">		<span class="comment">// long和double占两个slot</span></div><div class="line">		<span class="keyword">if</span> paramType == <span class="string">"J"</span> || paramType == <span class="string">"D"</span> &#123;</div><div class="line">			self.argSlotCount++</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">if</span> !self.IsStatic() &#123;</div><div class="line">		<span class="comment">// 如果不是静态方法，给隐藏的参数this添加一个slot位置</span></div><div class="line">		self.argSlotCount++</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 获取方法的参数所占的Slot数量</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Method)</span> <span class="title">ArgSlotCount</span><span class="params">()</span> <span class="title">uint</span></span> &#123;</div><div class="line">	<span class="keyword">return</span> self.argSlotCount</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>其中parameterTypes定义在/rtdata/heap/method_descriptor.go文件中，parseMethodDescriptor()方法位于/rtdata/heap/method_descriptor_parser.go文件中。这块代码我也没细看，就不解释了，有兴趣的话自行到项目里看。</p>
+<p>下节继续。。。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JVM/" rel="tag"># JVM</a>
+          
+            <a href="/tags/Go/" rel="tag"># Go</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/16/自己动手写JVM二十二【类和对象（五）】/" rel="next" title="自己动手写JVM二十二【类和对象（五）】">
+                <i class="fa fa-chevron-left"></i> 自己动手写JVM二十二【类和对象（五）】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/21/自己动手写JVM二十四【方法调用和返回（二）】/" rel="prev" title="自己动手写JVM二十四【方法调用和返回（二）】">
+                自己动手写JVM二十四【方法调用和返回（二）】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#方法调用概述"><span class="nav-number">1.</span> <span class="nav-text">方法调用概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解析方法符号引用"><span class="nav-number">2.</span> <span class="nav-text">解析方法符号引用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#非接口方法符号引用"><span class="nav-number">2.1.</span> <span class="nav-text">非接口方法符号引用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#接口方法符号引用"><span class="nav-number">2.2.</span> <span class="nav-text">接口方法符号引用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法调用和参数传递"><span class="nav-number">3.</span> <span class="nav-text">方法调用和参数传递</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

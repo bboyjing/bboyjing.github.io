@@ -1,0 +1,751 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Redis," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="多个客户端在互相发送和接收消息的时候，通常会使用以下两种方式来传递消息。第一种时消息推送，也就是由消息发送者来确保所有接受者已经成功接收到了消息，Redis内置了PUBLISH和SUBSCRIBE命令可以实现；第二种时消息拉取，这种方法要求接收者自己去获取存储在某种mailbox里的消息。尽管消息推送非常有用，但是客户端因为某些原因而没办法一直保持在线的时候，采用这一消息传递方法的程序就会出现各种">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis学习笔记十六【使用Redis构建应用程序组件-消息拉取】">
+<meta property="og:url" content="http://yoursite.com/2016/12/28/Redis学习笔记十六【使用Redis构建应用程序组件-消息拉取】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="多个客户端在互相发送和接收消息的时候，通常会使用以下两种方式来传递消息。第一种时消息推送，也就是由消息发送者来确保所有接受者已经成功接收到了消息，Redis内置了PUBLISH和SUBSCRIBE命令可以实现；第二种时消息拉取，这种方法要求接收者自己去获取存储在某种mailbox里的消息。尽管消息推送非常有用，但是客户端因为某些原因而没办法一直保持在线的时候，采用这一消息传递方法的程序就会出现各种">
+<meta property="og:updated_time" content="2017-01-17T01:39:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis学习笔记十六【使用Redis构建应用程序组件-消息拉取】">
+<meta name="twitter:description" content="多个客户端在互相发送和接收消息的时候，通常会使用以下两种方式来传递消息。第一种时消息推送，也就是由消息发送者来确保所有接受者已经成功接收到了消息，Redis内置了PUBLISH和SUBSCRIBE命令可以实现；第二种时消息拉取，这种方法要求接收者自己去获取存储在某种mailbox里的消息。尽管消息推送非常有用，但是客户端因为某些原因而没办法一直保持在线的时候，采用这一消息传递方法的程序就会出现各种">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/28/Redis学习笔记十六【使用Redis构建应用程序组件-消息拉取】/"/>
+
+
+
+
+
+  <title> Redis学习笔记十六【使用Redis构建应用程序组件-消息拉取】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/28/Redis学习笔记十六【使用Redis构建应用程序组件-消息拉取】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Redis学习笔记十六【使用Redis构建应用程序组件-消息拉取】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-28T11:28:46+08:00">
+                2016-12-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>多个客户端在互相发送和接收消息的时候，通常会使用以下两种方式来传递消息。第一种时消息推送，也就是由消息发送者来确保所有接受者已经成功接收到了消息，Redis内置了PUBLISH和SUBSCRIBE命令可以实现；第二种时消息拉取，这种方法要求接收者自己去获取存储在某种mailbox里的消息。尽管消息推送非常有用，但是客户端因为某些原因而没办法一直保持在线的时候，采用这一消息传递方法的程序就会出现各种各样的问题。本章节将尝试编写不同的消息拉取方式，来替代PUBLISH和SUBSCRIBE。</p>
+<a id="more"></a>
+<h3 id="单接收者消息的发送与订阅替代品"><a href="#单接收者消息的发送与订阅替代品" class="headerlink" title="单接收者消息的发送与订阅替代品"></a>单接收者消息的发送与订阅替代品</h3><p>假设现在打算开发一个移动通信程序，这个应用通过连接服务器来发送和接受雷系短信或彩信的消息，基本上就是一个文字短信和图片彩信的替代品。每条消息都只会被发送至一个客户端，这一点极大地简化了我们要解决的问题。可以为每个移动客户端使用一个列表结构，发送者会把消息放到接受者的列表中，而接受者客户端则通过发送请求来获取最新的消息。数据格式如下：</p>
+<ul>
+<li>key<ul>
+<li>mailbox:bboyjing</li>
+</ul>
+</li>
+<li>list value<ul>
+<li>“{“sendder”:”dora”,”msg”:”Hi I’m dora.”}”</li>
+<li>××××××</li>
+</ul>
+</li>
+</ul>
+<p>该示例的代码实现比较简单，之前也已经学过如何对列表进行推入和弹出操作，这里就不再给出代码实现了。</p>
+<h3 id="多接受者消息的发送与订阅替代品"><a href="#多接受者消息的发送与订阅替代品" class="headerlink" title="多接受者消息的发送与订阅替代品"></a>多接受者消息的发送与订阅替代品</h3><p>单个接受者的消息传递已经满足不了需求，现在要实现一个群组聊天功能，和之前一样，因为应用程序的客户端可能会载人和时候进行连接或者断开连接，所以还是不能使用内置的PUBLISH和SUBSCRIBE。<br>每个新创建的群组都会有一些初始用户，每个用户都可以按照自己的意愿来参加或者离开群组。群组使用有序集合来记录参加群组的用户，其中有序集合的成员为用户的名字，分值时用户在群组内接收到的最大消息ID。用户也会使用有序集合来记录自己参加的所有群组，其中有序集合的成员为群组ID，分值是用户在群组内接收到的最大消息ID。数据格式如下：</p>
+<ul>
+<li>key<ul>
+<li>chat:001</li>
+</ul>
+</li>
+<li>zset value<ul>
+<li>member : john | score : 5</li>
+<li>member : jeff | score : 6</li>
+</ul>
+</li>
+<li>key<ul>
+<li>chat:002</li>
+</ul>
+</li>
+<li>zset value<ul>
+<li>member : michelle | score : 10</li>
+<li>member : jason | score : 10</li>
+<li>member : jenny | score : 11</li>
+</ul>
+</li>
+<li>key<ul>
+<li>member:jason</li>
+</ul>
+</li>
+<li>zset value<ul>
+<li>member : 001 | score : 5</li>
+<li>member : 002 | score : 6</li>
+</ul>
+</li>
+<li>key<ul>
+<li>member:jeff</li>
+</ul>
+</li>
+<li>zset value<ul>
+<li>member : 001 | score : 6</li>
+</ul>
+</li>
+</ul>
+<p>以上数据例子表示jason和jeff都参加了001群组，其中用户jason看了6条群组消息中的5条。</p>
+<h4 id="创建群组聊天会话"><a href="#创建群组聊天会话" class="headerlink" title="创建群组聊天会话"></a>创建群组聊天会话</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">createChat</span><span class="params">(String sender, Set&lt;String&gt; recipients, String message)</span> </span>&#123;</div><div class="line">    <span class="comment">//通过全局计数器来获取一个新的群组ID</span></div><div class="line">    Long chatId = stringRedisTemplate.opsForValue().increment(<span class="string">"ids:chat:"</span>, <span class="number">1l</span>);</div><div class="line"></div><div class="line">    <span class="comment">//将发送者也添加到群组成员中</span></div><div class="line">    recipients.add(sender);</div><div class="line"></div><div class="line">    stringRedisTemplate.execute(<span class="keyword">new</span> SessionCallback&lt;List&lt;Object&gt;&gt;() &#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> List&lt;Object&gt; <span class="title">execute</span><span class="params">(RedisOperations operations)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</div><div class="line">            operations.multi();</div><div class="line">            recipients.forEach(recipient -&gt; &#123;</div><div class="line">                <span class="comment">//将用户添加到群组中，并将这些用户在群组中最大已读消息ID初始化为0</span></div><div class="line">                stringRedisTemplate.opsForZSet().add(<span class="string">"chat:"</span> + chatId, recipient, <span class="number">0</span>);</div><div class="line">                <span class="comment">//将群组ID添加到用户已参加群组的有序集合中</span></div><div class="line">                stringRedisTemplate.opsForZSet().add(<span class="string">"member:"</span> + recipient, String.valueOf(chatId),<span class="number">0</span>);</div><div class="line">            &#125;);</div><div class="line">            <span class="keyword">return</span> operations.exec();</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line"></div><div class="line">    <span class="comment">//发送一条初始化消息</span></div><div class="line">    <span class="keyword">return</span> <span class="string">""</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="发送消息"><a href="#发送消息" class="headerlink" title="发送消息"></a>发送消息</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">sendMessage</span><span class="params">(String chatId, String sender, String message)</span> </span>&#123;</div><div class="line">    <span class="comment">// 使用锁来消除竞争条件，保证消息的读取和插入的顺序一致</span></div><div class="line">    String identifier = timeoutLockService.acquireLockWithTimeout(<span class="string">"chat:"</span> + chatId);</div><div class="line">    <span class="keyword">if</span> (identifier == <span class="keyword">null</span>)&#123;</div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Couldn't get the lock"</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">try</span>&#123;</div><div class="line">        <span class="comment">//获取消息ID</span></div><div class="line">        Long messageId = stringRedisTemplate.opsForValue().increment(<span class="string">"ids:message:"</span> + chatId, <span class="number">1l</span>);</div><div class="line">        <span class="comment">//将消息添加到消息有序集合中</span></div><div class="line">        JSONObject values = <span class="keyword">new</span> JSONObject();</div><div class="line">        values.put(<span class="string">"id"</span>, messageId);</div><div class="line">        values.put(<span class="string">"ts"</span>, System.currentTimeMillis());</div><div class="line">        values.put(<span class="string">"sender"</span>, sender);</div><div class="line">        values.put(<span class="string">"message"</span>, message);</div><div class="line">        stringRedisTemplate.opsForZSet().add(<span class="string">"msgs:"</span> + chatId, values.toJSONString(), messageId);</div><div class="line">    &#125;<span class="keyword">finally</span> &#123;</div><div class="line">        firstLockService.releaseLock(<span class="string">"chat:"</span> + chatId, identifier);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> chatId;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="获取消息"><a href="#获取消息" class="headerlink" title="获取消息"></a>获取消息</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fetchPendingMessages</span><span class="params">(String recipient)</span> </span>&#123;</div><div class="line">    <span class="comment">// 获取组员的群组ID以及在各组中目前收到的消息的最大ID</span></div><div class="line">    Set&lt;ZSetOperations.TypedTuple&lt;String&gt;&gt; memberSet =</div><div class="line">            stringRedisTemplate.opsForZSet().rangeWithScores(<span class="string">"member:"</span> + recipient, <span class="number">0</span>, -<span class="number">1</span>);</div><div class="line"></div><div class="line">    <span class="comment">// 获取各聊天组未读消息(分值大于上面获取的最大消息ID)</span></div><div class="line">    List&lt;Object&gt; results = stringRedisTemplate.execute(<span class="keyword">new</span> SessionCallback&lt;List&lt;Object&gt;&gt;() &#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> List&lt;Object&gt; <span class="title">execute</span><span class="params">(RedisOperations operations)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</div><div class="line">            operations.multi();</div><div class="line">            memberSet.forEach(member -&gt; &#123;</div><div class="line">                String chatId = member.getValue();</div><div class="line">                <span class="keyword">double</span> messageId = member.getScore();</div><div class="line">                operations.opsForZSet().rangeByScore(<span class="string">"msgs:"</span> + chatId, ++messageId, Double.MAX_VALUE);</div><div class="line">            &#125;);</div><div class="line">            <span class="keyword">return</span> operations.exec();</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line"></div><div class="line">    <span class="comment">//遍历未读消息</span></div><div class="line">    stringRedisTemplate.execute(<span class="keyword">new</span> SessionCallback&lt;List&lt;Object&gt;&gt;() &#123;</div><div class="line">        <span class="function"><span class="keyword">public</span> List&lt;Object&gt; <span class="title">execute</span><span class="params">(RedisOperations operations)</span> <span class="keyword">throws</span> DataAccessException </span>&#123;</div><div class="line">            operations.multi();</div><div class="line">            <span class="keyword">int</span> i = <span class="number">0</span>;</div><div class="line">            <span class="keyword">for</span>(ZSetOperations.TypedTuple&lt;String&gt; member : memberSet)&#123;</div><div class="line">                Set&lt;String&gt; messages = (Set&lt;String&gt;) results.get(i++);</div><div class="line">                System.out.println(<span class="string">"聊天组："</span> + member.getValue() + <span class="string">"，有如下未读消息"</span>);</div><div class="line">                messages.forEach(message -&gt;</div><div class="line">                        System.out.println(JSONObject.parseObject(message).getString(<span class="string">"message"</span>)));</div><div class="line">                <span class="comment">//修改群组成员读取的最大消息ID</span></div><div class="line">                operations.opsForZSet().incrementScore(</div><div class="line">                        <span class="string">"member:"</span> + recipient,</div><div class="line">                        member.getValue(),</div><div class="line">                        messages.size());</div><div class="line">                <span class="comment">//修改群组有序集合中成员读取的最大消息ID</span></div><div class="line">                operations.opsForZSet().incrementScore(</div><div class="line">                        <span class="string">"chat:"</span> + member.getValue(),</div><div class="line">                        recipient,</div><div class="line">                        messages.size());</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> operations.exec();</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="加入群组和离开群组"><a href="#加入群组和离开群组" class="headerlink" title="加入群组和离开群组"></a>加入群组和离开群组</h4><p>加入和离开群组只需要初始化或者删除一些数据，比较简单，就不给出例子了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Redis/" rel="tag"># Redis</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/26/自己动手写JVM二【搜索class文件】/" rel="next" title="自己动手写JVM二【搜索class文件】">
+                <i class="fa fa-chevron-left"></i> 自己动手写JVM二【搜索class文件】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/03/自己动手写JVM三【解析class文件（一）】/" rel="prev" title="自己动手写JVM三【解析class文件（一）】">
+                自己动手写JVM三【解析class文件（一）】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#单接收者消息的发送与订阅替代品"><span class="nav-number">1.</span> <span class="nav-text">单接收者消息的发送与订阅替代品</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多接受者消息的发送与订阅替代品"><span class="nav-number">2.</span> <span class="nav-text">多接受者消息的发送与订阅替代品</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建群组聊天会话"><span class="nav-number">2.1.</span> <span class="nav-text">创建群组聊天会话</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发送消息"><span class="nav-number">2.2.</span> <span class="nav-text">发送消息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取消息"><span class="nav-number">2.3.</span> <span class="nav-text">获取消息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加入群组和离开群组"><span class="nav-number">2.4.</span> <span class="nav-text">加入群组和离开群组</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

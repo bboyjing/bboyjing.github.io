@@ -1,0 +1,729 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JVM,Go," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本章将实现线程共享的运行时数据区，包括方法去和运行时常量池。将进一步处理ClassFile结构体，把它加以转换，放进方法去以后供后续使用。还会初步讨论类和对象的设计，实现一个简单的类加载器，并且实现类和对象相关的部分指令。本章实现代码位于/rtdata/heap包下，先将之间定义的object.go文件移到heap包下，注意修改包名，以及使用到Object结构体的文件(slot.go、local_">
+<meta name="keywords" content="JVM,Go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自己动手写JVM十八【类和对象（一）】">
+<meta property="og:url" content="http://yoursite.com/2017/02/08/自己动手写JVM十八【类和对象（一）】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="本章将实现线程共享的运行时数据区，包括方法去和运行时常量池。将进一步处理ClassFile结构体，把它加以转换，放进方法去以后供后续使用。还会初步讨论类和对象的设计，实现一个简单的类加载器，并且实现类和对象相关的部分指令。本章实现代码位于/rtdata/heap包下，先将之间定义的object.go文件移到heap包下，注意修改包名，以及使用到Object结构体的文件(slot.go、local_">
+<meta property="og:updated_time" content="2017-02-15T05:29:22.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="自己动手写JVM十八【类和对象（一）】">
+<meta name="twitter:description" content="本章将实现线程共享的运行时数据区，包括方法去和运行时常量池。将进一步处理ClassFile结构体，把它加以转换，放进方法去以后供后续使用。还会初步讨论类和对象的设计，实现一个简单的类加载器，并且实现类和对象相关的部分指令。本章实现代码位于/rtdata/heap包下，先将之间定义的object.go文件移到heap包下，注意修改包名，以及使用到Object结构体的文件(slot.go、local_">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/08/自己动手写JVM十八【类和对象（一）】/"/>
+
+
+
+
+
+  <title> 自己动手写JVM十八【类和对象（一）】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/08/自己动手写JVM十八【类和对象（一）】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                自己动手写JVM十八【类和对象（一）】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-08T10:15:09+08:00">
+                2017-02-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章将实现线程共享的运行时数据区，包括方法去和运行时常量池。将进一步处理ClassFile结构体，把它加以转换，放进方法去以后供后续使用。还会初步讨论类和对象的设计，实现一个简单的类加载器，并且实现类和对象相关的部分指令。本章实现代码位于/rtdata/heap包下，先将之间定义的object.go文件移到heap包下，注意修改包名，以及使用到Object结构体的文件(slot.go、local_vars.go、operand_stack.go)。</p>
+<h3 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h3><p>方法区是运行时数据区的一块逻辑区域，由多个线程共享。方法区主要存放从class文件获取的类信息，此外，类变量也存放在方法区中。当Java虚拟机第一次使用某个类时，它会搜索类路径，找到相应的class文件，然后读取并解析class文件，把相关信息放进方法区。至于方法区到底位于何处，是固定大小还是动态调整，是否参与垃圾回收，以及如何在方法区内存放类数据等，Java虚拟机规范并没有明确规定。下面先来看看有哪些信息需要放进方法区。</p>
+<!--原作者把本章代码放到/rtdata/heap包下，虽然Java虚拟机规范把方法区描述为堆的一个逻辑部分，但是它却有一个别名叫作Non-heap(非堆)，目的应该是与Java堆区分开。所以我们把方法区这部分实现放到/rtdata/nonheap包下，-->
+<a id="more"></a>
+<h4 id="类信息"><a href="#类信息" class="headerlink" title="类信息"></a>类信息</h4><p>使用结构体来表示要放进方法区内的信息，结构体位于class.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> Class <span class="keyword">struct</span> &#123;</div><div class="line">	accessFlags       <span class="keyword">uint16</span></div><div class="line">	name              <span class="keyword">string</span></div><div class="line">	superClassName    <span class="keyword">string</span></div><div class="line">	interfaceNames    []<span class="keyword">string</span></div><div class="line">	constantPool      *ConstantPool</div><div class="line">	fields            []*Field</div><div class="line">	methods           []*Method</div><div class="line">	loader            *ClassLoader</div><div class="line">	superClass        *Class</div><div class="line">	interfaces        []*Class</div><div class="line">	instanceSlotCount <span class="keyword">uint</span></div><div class="line">	staticSlotCount   <span class="keyword">uint</span></div><div class="line">	staticVars        Slots</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>我们逐个来看下Class结构体中每一项代表什么。</p>
+<ul>
+<li>accessFlags是类的访问标志，总共16bit。在解析class文件章节的类访问标志中已经讲过，这里不赘述了，我们把各个标志作为常量定义到access_flags.go文件中，代码就不贴出来了。</li>
+<li>name存放类的名称，格式类似java/lang/Object。</li>
+<li>superClassName存放超类的名称，格式类似java/lang/Object。</li>
+<li>interfaceNames存放接口的名称数组，格式类似[java/lang/Object,…]。</li>
+<li>constantPool存放运行时常量池，后面再详细讲。</li>
+<li>fields存放字段表</li>
+<li>methods存放方法表</li>
+<li>loader存放类加载器指针</li>
+<li>superClass存放类的超类指针</li>
+<li>interfaces存放类的接口指针</li>
+<li>instanceSlotCount存放实例变量占据的空间大小</li>
+<li>staticSlotCount类变量占据的空间大小</li>
+<li>staticVars存放静态变量</li>
+</ul>
+<p>其中accessFlags、name、superClassName、interfaceNames、constantPool可以直接从ClassFile中读取，其余剩下的字段下面会逐一学习，等都学完再回过来完善class.go文件。</p>
+<h4 id="字段信息"><a href="#字段信息" class="headerlink" title="字段信息"></a>字段信息</h4><p>字段和方法都属于类的成员，它们有一些相同的信息(访问标志、名字、描述符)。为了避免重复代码，创建一个结构体存放这些信息，该结构体位于class_member.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 字段和方法公用结构体</span></div><div class="line"><span class="keyword">type</span> ClassMember <span class="keyword">struct</span> &#123;</div><div class="line">	<span class="comment">// 访问标志</span></div><div class="line">	accessFlags <span class="keyword">uint16</span></div><div class="line">	<span class="comment">// 名字</span></div><div class="line">	name        <span class="keyword">string</span></div><div class="line">	<span class="comment">// 描述符</span></div><div class="line">	descriptor  <span class="keyword">string</span></div><div class="line">	<span class="comment">// 当前类指针，可以通过字段或方法访问到它所属的类</span></div><div class="line">	class       *Class</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 从class文件中复制数据</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ClassMember)</span> <span class="title">copyMemberInfo</span><span class="params">(memberInfo *classfile.MemberInfo)</span></span> &#123;</div><div class="line">	self.accessFlags = memberInfo.AccessFlags()</div><div class="line">	self.name = memberInfo.Name()</div><div class="line">	self.descriptor = memberInfo.Descriptor()</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 省略判断访问标识和属性的Getter方法，参照项目源码</span></div></pre></td></tr></table></figure></p>
+<p>字段信息结构体位于filed.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 字段信息结构体</span></div><div class="line"><span class="keyword">type</span> Field <span class="keyword">struct</span> &#123;</div><div class="line">	<span class="comment">// 字段和方法公用结构体</span></div><div class="line">	ClassMember</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 初始化字段信息</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">newFields</span><span class="params">(class *Class, cfFields []*classfile.MemberInfo)</span> []*<span class="title">Field</span></span> &#123;</div><div class="line">	fields := <span class="built_in">make</span>([]*Field, <span class="built_in">len</span>(cfFields))</div><div class="line">	<span class="keyword">for</span> i, cfField := <span class="keyword">range</span> cfFields &#123;</div><div class="line">		fields[i] = &amp;Field&#123;&#125;</div><div class="line">		fields[i].class = class</div><div class="line">		fields[i].copyMemberInfo(cfField)</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> fields</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 省略判断访问标识的方法，参照项目源码</span></div></pre></td></tr></table></figure></p>
+<h4 id="方法信息"><a href="#方法信息" class="headerlink" title="方法信息"></a>方法信息</h4><p>方法比字段稍微复杂一些，因为方法中有字节码，实现代码位于method.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> Method <span class="keyword">struct</span> &#123;</div><div class="line">	<span class="comment">// 字段和方法公用结构体</span></div><div class="line">	ClassMember</div><div class="line">	<span class="comment">// 操作数栈最大深度</span></div><div class="line">	maxStack  <span class="keyword">uint</span></div><div class="line">	<span class="comment">// 局部变量表大小</span></div><div class="line">	maxLocals <span class="keyword">uint</span></div><div class="line">	<span class="comment">// 字节码</span></div><div class="line">	code      []<span class="keyword">byte</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 初始化方法信息</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">newMethods</span><span class="params">(class *Class, cfMethods []*classfile.MemberInfo)</span> []*<span class="title">Method</span></span> &#123;</div><div class="line">	methods := <span class="built_in">make</span>([]*Method, <span class="built_in">len</span>(cfMethods))</div><div class="line">	<span class="keyword">for</span> i, cfMethod := <span class="keyword">range</span> cfMethods &#123;</div><div class="line">		methods[i] = &amp;Method&#123;&#125;</div><div class="line">		methods[i].class = class</div><div class="line">		methods[i].copyMemberInfo(cfMethod)</div><div class="line">		methods[i].copyAttributes(cfMethod)</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> methods</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 从方法的属性中读取maxStack、maxLocals和字节码</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Method)</span> <span class="title">copyAttributes</span><span class="params">(cfMethod *classfile.MemberInfo)</span></span> &#123;</div><div class="line">	<span class="keyword">if</span> codeAttr := cfMethod.CodeAttribute(); codeAttr != <span class="literal">nil</span> &#123;</div><div class="line">		self.maxStack = codeAttr.MaxStack()</div><div class="line">		self.maxLocals = codeAttr.MaxLocals()</div><div class="line">		self.code = codeAttr.Code()</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="运行时常量池"><a href="#运行时常量池" class="headerlink" title="运行时常量池"></a>运行时常量池</h3><p>运行时常量池主要存放两类信息：字面量和符号引用。字面量包括整数、浮点数和字符串字面量；符号引用包括类符号引用、字段符号引用、方法符号引用和接口方法符号引用。运行时常量池结构体位于constant_pool.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 常量接口</span></div><div class="line"><span class="keyword">type</span> Constant <span class="keyword">interface</span>&#123;&#125;</div><div class="line"></div><div class="line"><span class="comment">// 运行时常量池结构体</span></div><div class="line"><span class="keyword">type</span> ConstantPool <span class="keyword">struct</span> &#123;</div><div class="line">	class  *Class</div><div class="line">	consts []Constant</div><div class="line">&#125;</div><div class="line">ni</div><div class="line"><span class="comment">// 把class文件中的常量池转换成运行时常量池</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">newConstantPool</span><span class="params">(class *Class, cfCp classfile.ConstantPool)</span> *<span class="title">ConstantPool</span></span> &#123;</div><div class="line">	<span class="comment">// 获取常量池中常量数量</span></div><div class="line">	cpCount := <span class="built_in">len</span>(cfCp)</div><div class="line">	<span class="comment">// 构造运行时常量池结构体</span></div><div class="line">	consts := <span class="built_in">make</span>([]Constant, cpCount)</div><div class="line">	rtCp := &amp;ConstantPool&#123;class, consts&#125;</div><div class="line">	<span class="comment">// 遍历class文件常量池</span></div><div class="line">	<span class="keyword">for</span> i := <span class="number">1</span>; i &lt; cpCount; i++ &#123;</div><div class="line">		cpInfo := cfCp[i]</div><div class="line">		<span class="keyword">switch</span> cpInfo.(<span class="keyword">type</span>) &#123;</div><div class="line">		<span class="comment">// 根据常量类型不同，读取方式不一样</span></div><div class="line">		<span class="keyword">case</span> *classfile.ConstantIntegerInfo:</div><div class="line">			intInfo := cpInfo.(*classfile.ConstantIntegerInfo)</div><div class="line">			consts[i] = intInfo.Value()</div><div class="line">		<span class="comment">// 省略其他case，参照项目源代码</span></div><div class="line">        ...</div><div class="line">		<span class="keyword">default</span>:</div><div class="line">		<span class="comment">// todo</span></div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> rtCp</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 根据索引返回运行时常量</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ConstantPool)</span> <span class="title">GetConstant</span><span class="params">(index <span class="keyword">uint</span>)</span> <span class="title">Constant</span></span> &#123;</div><div class="line">	<span class="keyword">if</span> c := self.consts[index]; c != <span class="literal">nil</span> &#123;</div><div class="line">		<span class="keyword">return</span> c</div><div class="line">	&#125;</div><div class="line">	<span class="built_in">panic</span>(fmt.Sprintf(<span class="string">"No constants at index %d"</span>, index))</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>newConstantPool()函数的switch循环体要稍微注意下：int和float分支直接去除常量值即可；long和double也是直接取出常量，但是由于这两种类型的常量在常量池中占据2个位置，所以索引要特殊处理下；字符串常量直接取字符串；剩下类、字段、方法和接口方法的符号引用需要单独处理，下面就来实现。</p>
+<h4 id="类符号引用"><a href="#类符号引用" class="headerlink" title="类符号引用"></a>类符号引用</h4><p>因为4种类型的符号引用有一些共性，所以仍然使用继承来减少重复代码，公用结构体位于cp_symref.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 类、字段、方法和接口方法的符号引用公共结构体</span></div><div class="line"><span class="keyword">type</span> SymRef <span class="keyword">struct</span> &#123;</div><div class="line">	<span class="comment">// 运行时常量池指针，便于通过符号引用访问运行时常量池</span></div><div class="line">	cp        *ConstantPool</div><div class="line">	<span class="comment">// 类的完全限定名</span></div><div class="line">	className <span class="keyword">string</span></div><div class="line">	<span class="comment">// 缓存解析后的类结构体指针</span></div><div class="line">	class     *Class</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>类符号引用结构体位于cp_classref.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 类符号引用结构体</span></div><div class="line"><span class="keyword">type</span> ClassRef <span class="keyword">struct</span> &#123;</div><div class="line">	SymRef</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 初始化类符号引用结构体</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">newClassRef</span><span class="params">(cp *ConstantPool, classInfo *classfile.ConstantClassInfo)</span> *<span class="title">ClassRef</span></span> &#123;</div><div class="line">	ref := &amp;ClassRef&#123;&#125;</div><div class="line">	ref.cp = cp</div><div class="line">	ref.className = classInfo.Name()</div><div class="line">	<span class="keyword">return</span> ref</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="字段符号引用"><a href="#字段符号引用" class="headerlink" title="字段符号引用"></a>字段符号引用</h4><p>定义MemberRef结构体来存放字段和方法符号引用公用信息，实现代码位于cp_memberref.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 字段和方法符号引用共用结构体</span></div><div class="line"><span class="keyword">type</span> MemberRef <span class="keyword">struct</span> &#123;</div><div class="line">	SymRef</div><div class="line">	<span class="comment">// 字段或方法的名字</span></div><div class="line">	name       <span class="keyword">string</span></div><div class="line">	<span class="comment">// 字段或方法的描述符</span></div><div class="line">	descriptor <span class="keyword">string</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 从class文件中复制数据</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *MemberRef)</span> <span class="title">copyMemberRefInfo</span><span class="params">(refInfo *classfile.ConstantMemberrefInfo)</span></span> &#123;</div><div class="line">	<span class="comment">// 读取类名</span></div><div class="line">	self.className = refInfo.ClassName()</div><div class="line">	<span class="comment">// 读取字段或方法的名字和描述符</span></div><div class="line">	self.name, self.descriptor = refInfo.NameAndDescriptor()</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 省略Getter方法</span></div><div class="line">...</div></pre></td></tr></table></figure></p>
+<p>下面定义字段符号引用结构体，代码位于cp_fieldref.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 字段符号引用结构体</span></div><div class="line"><span class="keyword">type</span> FieldRef <span class="keyword">struct</span> &#123;</div><div class="line">	MemberRef</div><div class="line">	<span class="comment">// 字段信息结构体</span></div><div class="line">	field *Field</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 初始化字段符号引用</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">newFieldRef</span><span class="params">(cp *ConstantPool, refInfo *classfile.ConstantFieldrefInfo)</span> *<span class="title">FieldRef</span></span> &#123;</div><div class="line">	ref := &amp;FieldRef&#123;&#125;</div><div class="line">	ref.cp = cp</div><div class="line">	ref.copyMemberRefInfo(&amp;refInfo.ConstantMemberrefInfo)</div><div class="line">	<span class="keyword">return</span> ref</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="方法符号引用"><a href="#方法符号引用" class="headerlink" title="方法符号引用"></a>方法符号引用</h4><p>方法符号引用和字段符号引用类似，其实现代码位于cp_methodref.go文件中，比较简单，这里就不贴出来了。</p>
+<h4 id="接口方法符号引用"><a href="#接口方法符号引用" class="headerlink" title="接口方法符号引用"></a>接口方法符号引用</h4><p>接口方法符号引用和字段符号引用类似，其实现代码位于cp_interface_methodref.go文件中，比较简单，这里就不贴出来了。</p>
+<h3 id="完善类信息"><a href="#完善类信息" class="headerlink" title="完善类信息"></a>完善类信息</h3><p>现在可以来完善下Class结构体，添加把ClassFile结构体换成Class结构体的方法，编辑class.go文件：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 将ClassFile结构体转换成Class结构体</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">newClass</span><span class="params">(cf *classfile.ClassFile)</span> *<span class="title">Class</span></span> &#123;</div><div class="line">	class := &amp;Class&#123;&#125;</div><div class="line">	class.accessFlags = cf.AccessFlags()</div><div class="line">	class.name = cf.ClassName()</div><div class="line">	class.superClassName = cf.SuperClassName()</div><div class="line">	class.interfaceNames = cf.InterfaceNames()</div><div class="line">	class.constantPool = newConstantPool(class, cf.ConstantPool())</div><div class="line">	class.fields = newFields(class, cf.Fields())</div><div class="line">	class.methods = newMethods(class, cf.Methods())</div><div class="line">	<span class="keyword">return</span> class</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 另外添加8个判断访问标志符的方法和Getter方法，参照项目源码</span></div><div class="line">...</div></pre></td></tr></table></figure></p>
+<p>下节继续。。。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JVM/" rel="tag"># JVM</a>
+          
+            <a href="/tags/Go/" rel="tag"># Go</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/07/自己动手写JVM十七【指令集和解释器（五）】/" rel="next" title="自己动手写JVM十七【指令集和解释器（五）】">
+                <i class="fa fa-chevron-left"></i> 自己动手写JVM十七【指令集和解释器（五）】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/09/自己动手写JVM十九【类和对象（二）】/" rel="prev" title="自己动手写JVM十九【类和对象（二）】">
+                自己动手写JVM十九【类和对象（二）】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#方法区"><span class="nav-number">1.</span> <span class="nav-text">方法区</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#类信息"><span class="nav-number">1.1.</span> <span class="nav-text">类信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#字段信息"><span class="nav-number">1.2.</span> <span class="nav-text">字段信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#方法信息"><span class="nav-number">1.3.</span> <span class="nav-text">方法信息</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运行时常量池"><span class="nav-number">2.</span> <span class="nav-text">运行时常量池</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#类符号引用"><span class="nav-number">2.1.</span> <span class="nav-text">类符号引用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#字段符号引用"><span class="nav-number">2.2.</span> <span class="nav-text">字段符号引用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#方法符号引用"><span class="nav-number">2.3.</span> <span class="nav-text">方法符号引用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#接口方法符号引用"><span class="nav-number">2.4.</span> <span class="nav-text">接口方法符号引用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#完善类信息"><span class="nav-number">3.</span> <span class="nav-text">完善类信息</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

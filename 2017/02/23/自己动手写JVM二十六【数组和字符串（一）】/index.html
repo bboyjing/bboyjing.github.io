@@ -1,0 +1,723 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JVM,Go," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="在大部分编程语言中，数组和字符串都是最基本的数据类型。Java虚拟机直接支持数组，对字符串的支持则由java.lang.String和相关的类提供。本章就来学习数组和字符串相关指令。 数组概述数组在Java虚拟机中是个比较特殊的概念。为什么这么说呢，有下面几个原因：">
+<meta name="keywords" content="JVM,Go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自己动手写JVM二十六【数组和字符串（一）】">
+<meta property="og:url" content="http://yoursite.com/2017/02/23/自己动手写JVM二十六【数组和字符串（一）】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="在大部分编程语言中，数组和字符串都是最基本的数据类型。Java虚拟机直接支持数组，对字符串的支持则由java.lang.String和相关的类提供。本章就来学习数组和字符串相关指令。 数组概述数组在Java虚拟机中是个比较特殊的概念。为什么这么说呢，有下面几个原因：">
+<meta property="og:updated_time" content="2017-02-28T08:23:12.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="自己动手写JVM二十六【数组和字符串（一）】">
+<meta name="twitter:description" content="在大部分编程语言中，数组和字符串都是最基本的数据类型。Java虚拟机直接支持数组，对字符串的支持则由java.lang.String和相关的类提供。本章就来学习数组和字符串相关指令。 数组概述数组在Java虚拟机中是个比较特殊的概念。为什么这么说呢，有下面几个原因：">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/23/自己动手写JVM二十六【数组和字符串（一）】/"/>
+
+
+
+
+
+  <title> 自己动手写JVM二十六【数组和字符串（一）】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/23/自己动手写JVM二十六【数组和字符串（一）】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                自己动手写JVM二十六【数组和字符串（一）】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-23T12:06:48+08:00">
+                2017-02-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在大部分编程语言中，数组和字符串都是最基本的数据类型。Java虚拟机直接支持数组，对字符串的支持则由java.lang.String和相关的类提供。本章就来学习数组和字符串相关指令。</p>
+<h3 id="数组概述"><a href="#数组概述" class="headerlink" title="数组概述"></a>数组概述</h3><p>数组在Java虚拟机中是个比较特殊的概念。为什么这么说呢，有下面几个原因：</p>
+<a id="more"></a>
+<ol>
+<li>数组类和普通的类是不同的。普通的类从class文件中加载，但是数组类由Java虚拟机在运行时生成。数组的类名是左方括号([)+数组元素的类型描述符；数组类型描述符就是类名本身。例如int[]的类名是[I，int[][]的类名是[[I，Object[]的类名是[Ljava/lang/Object;，String[][]的类名是[[Ljava/lang/String;，等等。</li>
+<li>创建数组的方式和创建普通对象的方式不同。普通对象由new指令创建，然后由构造函数初始化。基本类型数组由newarray指令创建；引用类型数组由anewarray指令创建；另外还有一个专门的multianewarray指令用于创建多维数组。</li>
+<li>数组和普通对象存放的数据叶不同。普通对象中存放的是实例变量，通过putfield和各条field指令存取。数组对象中存放的则是数组元素，通过&lt;t&gt;aload和&lt;t&gt;astore系列指令按索引存取。其中&lt;t&gt;可以是a、b、c、d、f、i、l或者s。分别用于存取引用、byte、char、double、float、int、long或short类型的数组。</li>
+</ol>
+<h3 id="数组实现"><a href="#数组实现" class="headerlink" title="数组实现"></a>数组实现</h3><p>将在类和对象的基础上实现数组类和数组对象。</p>
+<h4 id="数组对象"><a href="#数组对象" class="headerlink" title="数组对象"></a>数组对象</h4><p>和普通对象一样，数组也是分配在堆中，通过引用来使用。所以需要改造Object结构体，让它既可以表示普通对象，也可以表示数组。修改/rtdata/heap/object.go文件：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Object结构体</span></div><div class="line"><span class="keyword">type</span> Object <span class="keyword">struct</span> &#123;</div><div class="line">	<span class="comment">// 对象的Class指针</span></div><div class="line">	class  *Class</div><div class="line">	<span class="comment">// 实例变量，可以容纳任何类型的值</span></div><div class="line">	data  <span class="keyword">interface</span>&#123;&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">newObject</span><span class="params">(class *Class)</span> *<span class="title">Object</span></span> &#123;</div><div class="line">	<span class="keyword">return</span> &amp;Object&#123;</div><div class="line">		class:  class,</div><div class="line">		data: newSlots(class.instanceSlotCount),</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// Fields()方法仍然只针对普通对象，转成Slots</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Object)</span> <span class="title">Fields</span><span class="params">()</span> <span class="title">Slots</span></span> &#123;</div><div class="line">	<span class="keyword">return</span> self.data.(Slots)</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>需要给Object结构体添加几个数组特有的方法，单独定义在/rtdata/heap/array_object.go文件：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 获取类型为byte的数组</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Object)</span> <span class="title">Bytes</span><span class="params">()</span> []<span class="title">int8</span></span> &#123;</div><div class="line">	<span class="keyword">return</span> self.data.([]<span class="keyword">int8</span>)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 省略获取其他类型的数组</span></div><div class="line">...</div><div class="line"></div><div class="line"><span class="comment">// 获取数组长度</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Object)</span> <span class="title">ArrayLength</span><span class="params">()</span> <span class="title">int32</span></span> &#123;</div><div class="line">	<span class="keyword">switch</span> self.data.(<span class="keyword">type</span>) &#123;</div><div class="line">	<span class="keyword">case</span> []<span class="keyword">int8</span>:</div><div class="line">		<span class="keyword">return</span> <span class="keyword">int32</span>(<span class="built_in">len</span>(self.data.([]<span class="keyword">int8</span>)))</div><div class="line">	<span class="comment">// 省略其他类型</span></div><div class="line">    ...</div><div class="line">	<span class="keyword">default</span>:</div><div class="line">		<span class="built_in">panic</span>(<span class="string">"Not array!"</span>)</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="数组类"><a href="#数组类" class="headerlink" title="数组类"></a>数组类</h4><p>不需要修改Class结构体，只要给它添加几个数组特有的方法即可。为了强调这些方法只是针对数组类，把这些方法定义到新的文件/rtdata/heap/array_class.go中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 判断是否是数组类</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Class)</span> <span class="title">IsArray</span><span class="params">()</span> <span class="title">bool</span></span> &#123;</div><div class="line">	<span class="keyword">return</span> self.name[<span class="number">0</span>] == <span class="string">'['</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 创建数组</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Class)</span> <span class="title">NewArray</span><span class="params">(count <span class="keyword">uint</span>)</span> *<span class="title">Object</span></span> &#123;</div><div class="line">	<span class="keyword">if</span> !self.IsArray() &#123;</div><div class="line">		<span class="built_in">panic</span>(<span class="string">"Not array class: "</span> + self.name)</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">switch</span> self.Name() &#123;</div><div class="line">	<span class="comment">// 省略其他类型</span></div><div class="line">    ...</div><div class="line">	<span class="keyword">default</span>:</div><div class="line">		<span class="keyword">return</span> &amp;Object&#123;self, <span class="built_in">make</span>([]*Object, count)&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>有一点要说明下，上面都没看到boolean类型的身影，因为使用的是[]int8来表示布尔数组。</p>
+<h4 id="加载数组类"><a href="#加载数组类" class="headerlink" title="加载数组类"></a>加载数组类</h4><p>修改/rtdata/heap/class_loader.go文件：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 把类数据加载到方法区</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ClassLoader)</span> <span class="title">LoadClass</span><span class="params">(name <span class="keyword">string</span>)</span> *<span class="title">Class</span></span> &#123;</div><div class="line">	...</div><div class="line">	<span class="comment">// 若类名的第一个字符是'['，表示该类是数组类</span></div><div class="line">	<span class="keyword">if</span> name[<span class="number">0</span>] == <span class="string">'['</span> &#123;</div><div class="line">		<span class="keyword">return</span> self.loadArrayClass(name)</div><div class="line">	&#125;</div><div class="line">    ...</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 加载数组类</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ClassLoader)</span> <span class="title">loadArrayClass</span><span class="params">(name <span class="keyword">string</span>)</span> *<span class="title">Class</span></span> &#123;</div><div class="line">	<span class="comment">/*</span></div><div class="line">		生成Class结构体，数组类由Java虚拟机在运行时生成</div><div class="line">		所以没有像loadNonArrayClass()那样读取class文件</div><div class="line">	 */</div><div class="line">	class := &amp;Class&#123;</div><div class="line">		<span class="comment">// 访问标识</span></div><div class="line">		accessFlags: ACC_PUBLIC, <span class="comment">// todo</span></div><div class="line">		<span class="comment">// 类名</span></div><div class="line">		name:        name,</div><div class="line">		<span class="comment">// 类加载器</span></div><div class="line">		loader:      self,</div><div class="line">		<span class="comment">// 数组类不需要初始化，所以设成true</span></div><div class="line">		initStarted: <span class="literal">true</span>,</div><div class="line">		<span class="comment">// 数组类的超类是java/lang/Object</span></div><div class="line">		superClass:  self.LoadClass(<span class="string">"java/lang/Object"</span>),</div><div class="line">		interfaces: []*Class&#123;</div><div class="line">			<span class="comment">// 数组类实现了java.lang.Cloneable接口</span></div><div class="line">			self.LoadClass(<span class="string">"java/lang/Cloneable"</span>),</div><div class="line">			<span class="comment">// 数组类实现了java.io.Serializable</span></div><div class="line">			self.LoadClass(<span class="string">"java/io/Serializable"</span>),</div><div class="line">		&#125;,</div><div class="line">	&#125;</div><div class="line">	<span class="comment">// 记录该数组类已加载</span></div><div class="line">	self.classMap[name] = class</div><div class="line">	<span class="keyword">return</span> class</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="数组相关指令"><a href="#数组相关指令" class="headerlink" title="数组相关指令"></a>数组相关指令</h3><p>下面将要实现20条指令，其中newarray、anewarray、multianewarray和arraylength指令属于引用类指令；&lt;t&gt;aload和&lt;t&gt;astore系列各有8条，分别属于加载类和存储类指令。下面在java项目中新建ArrayDamo.java，后面就拿该类做测试。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayDemo</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span>[] a1 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">10</span>];       <span class="comment">// newarray</span></div><div class="line">        String[] a2 = <span class="keyword">new</span> String[<span class="number">10</span>]; <span class="comment">// anewarray</span></div><div class="line">        <span class="keyword">int</span>[][] a3 = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">10</span>][<span class="number">10</span>]; <span class="comment">// multianewarray</span></div><div class="line">        <span class="keyword">int</span> x = a1.length;            <span class="comment">// arraylength</span></div><div class="line">        a1[<span class="number">0</span>] = <span class="number">100</span>;                  <span class="comment">// iastore</span></div><div class="line">        <span class="keyword">int</span> y = a1[<span class="number">0</span>];                <span class="comment">// iaload</span></div><div class="line">        a2[<span class="number">0</span>] = <span class="string">"abc"</span>;                <span class="comment">// aastore</span></div><div class="line">        String s = a2[<span class="number">0</span>];             <span class="comment">// aaload</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="newarray指令"><a href="#newarray指令" class="headerlink" title="newarray指令"></a>newarray指令</h4><p>newarray指令用来创建基本类型数组，包括boolean[]、byte[]、char[]、short[]、int[]、long[]、float[]、double[]8种。其实现代码位于/instructions/references/newarray.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// newarray指令结构体</span></div><div class="line"><span class="keyword">type</span> NEW_ARRAY <span class="keyword">struct</span> &#123;</div><div class="line">	atype <span class="keyword">uint8</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>newarray指令需要两个操作数。第一个操作数时一个uint8整数，在字节码中紧跟在指令操作码后面，表示要创建哪种类型的数组。Java虚拟机规范把这个操作数叫座atype，并且规定了它的有效值，在newarray.go文件中定义常量和读取第一个操作数的方法：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// atype常量，对应8种基本类型</span></div><div class="line"><span class="keyword">const</span> (</div><div class="line">	AT_BOOLEAN = <span class="number">4</span></div><div class="line">	AT_CHAR    = <span class="number">5</span></div><div class="line">	AT_FLOAT   = <span class="number">6</span></div><div class="line">	AT_DOUBLE  = <span class="number">7</span></div><div class="line">	AT_BYTE    = <span class="number">8</span></div><div class="line">	AT_SHORT   = <span class="number">9</span></div><div class="line">	AT_INT     = <span class="number">10</span></div><div class="line">	AT_LONG    = <span class="number">11</span></div><div class="line">)</div><div class="line"></div><div class="line"><span class="comment">// 读取第一个单字节操作数</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *NEW_ARRAY)</span> <span class="title">FetchOperands</span><span class="params">(reader *base.BytecodeReader)</span></span> &#123;</div><div class="line">	self.atype = reader.ReadUint8()</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>newarray指令的第二个操作数是count，从操作数栈中弹出，表示数组长度。在newarray.go文件中定义Execute()方法，在实现该方法之前要先修改下/rtdata/heap/class.go文件，添加获取当前class的ClassLoader，很简单，就一个普通的Getter方法，这里就不贴出来了。<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *NEW_ARRAY)</span> <span class="title">Execute</span><span class="params">(frame *rtdata.Frame)</span></span> &#123;</div><div class="line">	<span class="comment">// 获取当前帧的操作数栈</span></div><div class="line">	stack := frame.OperandStack()</div><div class="line">	<span class="comment">// 弹出栈顶元素，作为数组的长度</span></div><div class="line">	count := stack.PopInt()</div><div class="line">	<span class="keyword">if</span> count &lt; <span class="number">0</span> &#123;</div><div class="line">		<span class="built_in">panic</span>(<span class="string">"java.lang.NegativeArraySizeException"</span>)</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// 获取当前类的类加载器</span></div><div class="line">	classLoader := frame.Method().Class().Loader()</div><div class="line">	<span class="comment">// 加载数组类</span></div><div class="line">	arrClass := getPrimitiveArrayClass(classLoader, self.atype)</div><div class="line">	<span class="comment">// 创建数组</span></div><div class="line">	arr := arrClass.NewArray(<span class="keyword">uint</span>(count))</div><div class="line">	<span class="comment">// 将创建的数组指针推入操作数栈</span></div><div class="line">	stack.PushRef(arr)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 根据atype加载对应的Class</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">getPrimitiveArrayClass</span><span class="params">(loader *heap.ClassLoader, atype <span class="keyword">uint8</span>)</span> *<span class="title">heap</span>.<span class="title">Class</span></span> &#123;</div><div class="line">	<span class="keyword">switch</span> atype &#123;</div><div class="line">	<span class="keyword">case</span> AT_BOOLEAN:</div><div class="line">		<span class="keyword">return</span> loader.LoadClass(<span class="string">"[Z"</span>)</div><div class="line">	<span class="comment">// 省略其他类型的case</span></div><div class="line">    ...</div><div class="line">	<span class="keyword">default</span>:</div><div class="line">		<span class="built_in">panic</span>(<span class="string">"Invalid atype!"</span>)</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="anewarray指令"><a href="#anewarray指令" class="headerlink" title="anewarray指令"></a>anewarray指令</h4><p>anewarray指令用来创建引用类型数组，其实现代码位于/instructions/references/anewarray.go文件中。anewarray指令也需要两个操作数。第一个操作数时uint16索引，来自字节码。通过这个索引可以从当前类的运行时常量池中找到一个类符号索引，解析这个符号引用就可以得到数组元素的类。第二个操作数是数组的长度，从操作数栈中弹出。在实现该指令之前，也要做些准备工作，下面先来看下：</p>
+<ol>
+<li><p>将类型名转成类型描述符，新建/rtdata/heap/class_name_helper.go文件：</p>
+ <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">   <span class="comment">/*</span></div><div class="line">将类名转换成类型描述符</div><div class="line">XXX -&gt; [LXXX;</div><div class="line">int -&gt; [I</div><div class="line">[XXX -&gt; [[XXX</div><div class="line">    */</div><div class="line">   <span class="function"><span class="keyword">func</span> <span class="title">getArrayClassName</span><span class="params">(className <span class="keyword">string</span>)</span> <span class="title">string</span></span> &#123;</div><div class="line">       <span class="keyword">return</span> <span class="string">"["</span> + toDescriptor(className)</div><div class="line">   &#125;</div><div class="line"></div><div class="line">   <span class="comment">/*</span></div><div class="line">       将类名转成类型描述符</div><div class="line">       XXX  =&gt; LXXX;</div><div class="line">       int  =&gt; I</div><div class="line">       [XXX =&gt; [XXX</div><div class="line">    */</div><div class="line">   <span class="function"><span class="keyword">func</span> <span class="title">toDescriptor</span><span class="params">(className <span class="keyword">string</span>)</span> <span class="title">string</span></span> &#123;</div><div class="line">       <span class="comment">// 如果已经是数组类名，直接返回</span></div><div class="line">       <span class="keyword">if</span> className[<span class="number">0</span>] == <span class="string">'['</span> &#123;</div><div class="line">           <span class="comment">// array</span></div><div class="line">           <span class="keyword">return</span> className</div><div class="line">       &#125;</div><div class="line">       <span class="comment">// 如果是基本类型名，返回对应的类型描述符</span></div><div class="line">       <span class="keyword">if</span> d, ok := primitiveTypes[className]; ok &#123;</div><div class="line">           <span class="comment">// primitive</span></div><div class="line">           <span class="keyword">return</span> d</div><div class="line">       &#125;</div><div class="line">       <span class="comment">// 普通类名转成类型描述符L***;</span></div><div class="line">       <span class="keyword">return</span> <span class="string">"L"</span> + className + <span class="string">";"</span></div><div class="line">   &#125;</div><div class="line"></div><div class="line">   <span class="comment">// 基本类型和对应类型描述符map</span></div><div class="line">   <span class="keyword">var</span> primitiveTypes = <span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">string</span>&#123;</div><div class="line">       <span class="string">"void"</span>:    <span class="string">"V"</span>,</div><div class="line">       <span class="string">"boolean"</span>: <span class="string">"Z"</span>,</div><div class="line">       <span class="string">"byte"</span>:    <span class="string">"B"</span>,</div><div class="line">       <span class="string">"short"</span>:   <span class="string">"S"</span>,</div><div class="line">       <span class="string">"int"</span>:     <span class="string">"I"</span>,</div><div class="line">       <span class="string">"long"</span>:    <span class="string">"J"</span>,</div><div class="line">       <span class="string">"char"</span>:    <span class="string">"C"</span>,</div><div class="line">       <span class="string">"float"</span>:   <span class="string">"F"</span>,</div><div class="line">       <span class="string">"double"</span>:  <span class="string">"D"</span>,</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>修改/rtdata/heap/class.go文件，添加加载数组类的方法：</p>
+ <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Class)</span> <span class="title">ArrayClass</span><span class="params">()</span> *<span class="title">Class</span></span> &#123;</div><div class="line">    <span class="comment">// 获取数组类名</span></div><div class="line">    arrayClassName := getArrayClassName(self.name)</div><div class="line">    <span class="comment">// 通过数组类名加载该数组类</span></div><div class="line">    <span class="keyword">return</span> self.loader.LoadClass(arrayClassName)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>准备工作做好，我们来实现anewarray指令：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// anewarray指令结构体</span></div><div class="line"><span class="keyword">type</span> ANEW_ARRAY <span class="keyword">struct</span>&#123;</div><div class="line">	base.Index16Instruction</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ANEW_ARRAY)</span> <span class="title">Execute</span><span class="params">(frame *rtdata.Frame)</span></span> &#123;</div><div class="line">	<span class="comment">// 获取运行时常量池</span></div><div class="line">	cp := frame.Method().Class().ConstantPool()</div><div class="line">	<span class="comment">// 获取类符号引用</span></div><div class="line">	classRef := cp.GetConstant(self.Index).(*heap.ClassRef)</div><div class="line">	<span class="comment">// 解析类符号引用</span></div><div class="line">	componentClass := classRef.ResolvedClass()</div><div class="line"></div><div class="line">	stack := frame.OperandStack()</div><div class="line">	<span class="comment">// 从操作数栈中弹出元素，作为数组长度</span></div><div class="line">	count := stack.PopInt()</div><div class="line">	<span class="keyword">if</span> count &lt; <span class="number">0</span> &#123;</div><div class="line">		<span class="built_in">panic</span>(<span class="string">"java.lang.NegativeArraySizeException"</span>)</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// 加载数组类</span></div><div class="line">	arrClass := componentClass.ArrayClass()</div><div class="line">	<span class="comment">// 创建数组</span></div><div class="line">	arr := arrClass.NewArray(<span class="keyword">uint</span>(count))</div><div class="line">	<span class="comment">// 将数组指针推入操作数栈</span></div><div class="line">	stack.PushRef(arr)</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="arraylength指令"><a href="#arraylength指令" class="headerlink" title="arraylength指令"></a>arraylength指令</h4><p>arraylength指令用于获取数组长度，实现代码位于/instructions/references/arraylength.go文件中，该指令只需要一个操作数，即从操作数栈顶弹出的数组引用。<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// arraylength指令结构体</span></div><div class="line"><span class="keyword">type</span> ARRAY_LENGTH <span class="keyword">struct</span>&#123; base.NoOperandsInstruction &#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ARRAY_LENGTH)</span> <span class="title">Execute</span><span class="params">(frame *rtdata.Frame)</span></span> &#123;</div><div class="line">	<span class="comment">// 获取操作数栈，并且弹出栈顶引用</span></div><div class="line">	stack := frame.OperandStack()</div><div class="line">	arrRef := stack.PopRef()</div><div class="line">	<span class="comment">// 若引用为空，抛出NullPointerException异常</span></div><div class="line">	<span class="keyword">if</span> arrRef == <span class="literal">nil</span> &#123;</div><div class="line">		<span class="built_in">panic</span>(<span class="string">"java.lang.NullPointerException"</span>)</div><div class="line">	&#125;</div><div class="line">	<span class="comment">// 获取数组长度</span></div><div class="line">	arrLen := arrRef.ArrayLength()</div><div class="line">	<span class="comment">// 讲数组长度推入操作数栈顶</span></div><div class="line">	stack.PushInt(arrLen)</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JVM/" rel="tag"># JVM</a>
+          
+            <a href="/tags/Go/" rel="tag"># Go</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/22/自己动手写JVM二十五【方法调用和返回（三）】/" rel="next" title="自己动手写JVM二十五【方法调用和返回（三）】">
+                <i class="fa fa-chevron-left"></i> 自己动手写JVM二十五【方法调用和返回（三）】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/01/自己动手写JVM二十七【数组和字符串（二）】/" rel="prev" title="自己动手写JVM二十七【数组和字符串（二）】">
+                自己动手写JVM二十七【数组和字符串（二）】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#数组概述"><span class="nav-number">1.</span> <span class="nav-text">数组概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数组实现"><span class="nav-number">2.</span> <span class="nav-text">数组实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#数组对象"><span class="nav-number">2.1.</span> <span class="nav-text">数组对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数组类"><span class="nav-number">2.2.</span> <span class="nav-text">数组类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加载数组类"><span class="nav-number">2.3.</span> <span class="nav-text">加载数组类</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数组相关指令"><span class="nav-number">3.</span> <span class="nav-text">数组相关指令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#newarray指令"><span class="nav-number">3.1.</span> <span class="nav-text">newarray指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#anewarray指令"><span class="nav-number">3.2.</span> <span class="nav-text">anewarray指令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#arraylength指令"><span class="nav-number">3.3.</span> <span class="nav-text">arraylength指令</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

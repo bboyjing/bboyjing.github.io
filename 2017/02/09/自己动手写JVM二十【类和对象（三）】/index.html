@@ -1,0 +1,714 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JVM,Go," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="类和字段符号引用解析类符号引用解析先修改class.go文件，添加判断是否能访问其他类的函数：1234567891011121314151617// self class是否能被other class访问func (self *Class) isAccessibleTo(other *Class) bool &amp;#123;	/*		若self class访问标识为public或者两个类在同一个包下，">
+<meta name="keywords" content="JVM,Go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自己动手写JVM二十【类和对象（三）】">
+<meta property="og:url" content="http://yoursite.com/2017/02/09/自己动手写JVM二十【类和对象（三）】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="类和字段符号引用解析类符号引用解析先修改class.go文件，添加判断是否能访问其他类的函数：1234567891011121314151617// self class是否能被other class访问func (self *Class) isAccessibleTo(other *Class) bool &amp;#123;	/*		若self class访问标识为public或者两个类在同一个包下，">
+<meta property="og:updated_time" content="2017-02-16T01:57:20.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="自己动手写JVM二十【类和对象（三）】">
+<meta name="twitter:description" content="类和字段符号引用解析类符号引用解析先修改class.go文件，添加判断是否能访问其他类的函数：1234567891011121314151617// self class是否能被other class访问func (self *Class) isAccessibleTo(other *Class) bool &amp;#123;	/*		若self class访问标识为public或者两个类在同一个包下，">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/09/自己动手写JVM二十【类和对象（三）】/"/>
+
+
+
+
+
+  <title> 自己动手写JVM二十【类和对象（三）】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/09/自己动手写JVM二十【类和对象（三）】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                自己动手写JVM二十【类和对象（三）】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-09T16:50:41+08:00">
+                2017-02-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="类和字段符号引用解析"><a href="#类和字段符号引用解析" class="headerlink" title="类和字段符号引用解析"></a>类和字段符号引用解析</h3><h4 id="类符号引用解析"><a href="#类符号引用解析" class="headerlink" title="类符号引用解析"></a>类符号引用解析</h4><p>先修改class.go文件，添加判断是否能访问其他类的函数：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// self class是否能被other class访问</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Class)</span> <span class="title">isAccessibleTo</span><span class="params">(other *Class)</span> <span class="title">bool</span></span> &#123;</div><div class="line">	<span class="comment">/*</span></div><div class="line">		若self class访问标识为public或者两个类在同一个包下，则可以访问</div><div class="line">		暂时简单地按照包名来检查类是否属于同一个包</div><div class="line">	 */</div><div class="line">	<span class="keyword">return</span> self.IsPublic() ||</div><div class="line">		self.getPackageName() == other.getPackageName()</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 获取包名</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Class)</span> <span class="title">getPackageName</span><span class="params">()</span> <span class="title">string</span></span> &#123;</div><div class="line">	<span class="keyword">if</span> i := strings.LastIndex(self.name, <span class="string">"/"</span>); i &gt;= <span class="number">0</span> &#123;</div><div class="line">		<span class="keyword">return</span> self.name[:i]</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> <span class="string">""</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<p>修改cp_symref.go文件，添加类符号解析方法：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 解析类符号引用</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *SymRef)</span> <span class="title">ResolvedClass</span><span class="params">()</span> *<span class="title">Class</span></span> &#123;</div><div class="line">	<span class="comment">// 如果类符号引用已经解析，直接返回类指针</span></div><div class="line">	<span class="keyword">if</span> self.class == <span class="literal">nil</span> &#123;</div><div class="line">		<span class="comment">// 解析类符号</span></div><div class="line">		self.resolveClassRef()</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> self.class</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *SymRef)</span> <span class="title">resolveClassRef</span><span class="params">()</span></span> &#123;</div><div class="line">	<span class="comment">// 获取当前Class指针</span></div><div class="line">	d := self.cp.class</div><div class="line">	<span class="comment">// 通过需要引用的类的完全限定名加载类</span></div><div class="line">	c := d.loader.LoadClass(self.className)</div><div class="line">	<span class="comment">// 判断d是否能有权限调用引用类c</span></div><div class="line">	<span class="keyword">if</span> !c.isAccessibleTo(d) &#123;</div><div class="line">		<span class="built_in">panic</span>(<span class="string">"java.lang.IllegalAccessError"</span>)</div><div class="line">	&#125;</div><div class="line">	self.class = c</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h4 id="字段符号引用解析"><a href="#字段符号引用解析" class="headerlink" title="字段符号引用解析"></a>字段符号引用解析</h4><p>先修改class_member.go文件，添加判断是否能访问其他字段的函数：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 判断self字段是否能被d class访问</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ClassMember)</span> <span class="title">isAccessibleTo</span><span class="params">(d *Class)</span> <span class="title">bool</span></span> &#123;</div><div class="line">	<span class="comment">// 如果self字段是public，则任何类都可以访问</span></div><div class="line">	<span class="keyword">if</span> self.IsPublic() &#123;</div><div class="line">		<span class="keyword">return</span> <span class="literal">true</span></div><div class="line">	&#125;</div><div class="line">	<span class="comment">// 获取self字段所属的class</span></div><div class="line">	c := self.class</div><div class="line">	<span class="comment">// 如果self字段是protected，只有子类和同一包下的类可以访问(isSubClassOf()函数后面给出)</span></div><div class="line">	<span class="keyword">if</span> self.IsProtected() &#123;</div><div class="line">		<span class="keyword">return</span> d == c || d.isSubClassOf(c) ||</div><div class="line">			c.getPackageName() == d.getPackageName()</div><div class="line">	&#125;</div><div class="line">	<span class="comment">// 如果是默认访问权限，则只有同一包下的类可以访问</span></div><div class="line">	<span class="keyword">if</span> !self.IsPrivate() &#123;</div><div class="line">		<span class="keyword">return</span> c.getPackageName() == d.getPackageName()</div><div class="line">	&#125;</div><div class="line">	<span class="comment">// self字段是private，则只有本类才可以访问</span></div><div class="line">	<span class="keyword">return</span> d == c</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>修改cp_fieldref.go文件，添加解析方法：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 初始化字段符号引用</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">newFieldRef</span><span class="params">(cp *ConstantPool, refInfo *classfile.ConstantFieldrefInfo)</span> *<span class="title">FieldRef</span></span> &#123;</div><div class="line">	ref := &amp;FieldRef&#123;&#125;</div><div class="line">	ref.cp = cp</div><div class="line">	ref.copyMemberRefInfo(&amp;refInfo.ConstantMemberrefInfo)</div><div class="line">	<span class="keyword">return</span> ref</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 解析字段符号引用</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *FieldRef)</span> <span class="title">ResolvedField</span><span class="params">()</span> *<span class="title">Field</span></span> &#123;</div><div class="line">	<span class="keyword">if</span> self.field == <span class="literal">nil</span> &#123;</div><div class="line">		self.resolveFieldRef()</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> self.field</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *FieldRef)</span> <span class="title">resolveFieldRef</span><span class="params">()</span></span> &#123;</div><div class="line">	<span class="comment">// 获取当前Class指针</span></div><div class="line">	d := self.cp.class</div><div class="line">	<span class="comment">// 解析字段符号引用之前需要先解析字段所属的类</span></div><div class="line">	c := self.ResolvedClass()</div><div class="line">	<span class="comment">//根据字段名和描述符查找字段</span></div><div class="line">	field := lookupField(c, self.name, self.descriptor)</div><div class="line"></div><div class="line">	<span class="keyword">if</span> field == <span class="literal">nil</span> &#123;</div><div class="line">		<span class="comment">// 若没有找到字段，报出NoSuchFieldError异常</span></div><div class="line">		<span class="built_in">panic</span>(<span class="string">"java.lang.NoSuchFieldError"</span>)</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">if</span> !field.isAccessibleTo(d) &#123;</div><div class="line">		<span class="comment">// 若当前类没有该字段的访问权限，则报出IllegalAccessError异常</span></div><div class="line">		<span class="built_in">panic</span>(<span class="string">"java.lang.IllegalAccessError"</span>)</div><div class="line">	&#125;</div><div class="line">	</div><div class="line">	self.field = field</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 根据字段名和描述符查找字段</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">lookupField</span><span class="params">(c *Class, name, descriptor <span class="keyword">string</span>)</span> *<span class="title">Field</span></span> &#123;</div><div class="line">	<span class="comment">// 从Class结构体中遍历fields</span></div><div class="line">	<span class="keyword">for</span> _, field := <span class="keyword">range</span> c.fields &#123;</div><div class="line">		<span class="keyword">if</span> field.name == name &amp;&amp; field.descriptor == descriptor &#123;</div><div class="line">			<span class="keyword">return</span> field</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// 遍历接口</span></div><div class="line">	<span class="keyword">for</span> _, iface := <span class="keyword">range</span> c.interfaces &#123;</div><div class="line">		<span class="keyword">if</span> field := lookupField(iface, name, descriptor); field != <span class="literal">nil</span> &#123;</div><div class="line">			<span class="keyword">return</span> field</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// 遍历超类的fields</span></div><div class="line">	<span class="keyword">if</span> c.superClass != <span class="literal">nil</span> &#123;</div><div class="line">		<span class="keyword">return</span> lookupField(c.superClass, name, descriptor)</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">return</span> <span class="literal">nil</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="类和对象相关指令"><a href="#类和对象相关指令" class="headerlink" title="类和对象相关指令"></a>类和对象相关指令</h3><p>下面我们来实现10条类和对象相关指令。new指令用来创建类实例；putstatic和getstatic指令用于存取静态变量；putfield和getfield用于存取实例变量；instanceof和checkcast指令用于判断对象是否属于某种类型；ldc系列指令把运行时常量池中的常量推到操作数栈顶。本节部分实现代码位于/instructions/references包下，ldc系列的指令实现代码位于/instructions/constants包下。下面先建一个用于测试的java文件,在java项目中新建MyObject.java：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyObject</span> </span>&#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> staticVar;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> instanceVar;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        <span class="keyword">int</span> x = <span class="number">32768</span>; <span class="comment">// ldc</span></div><div class="line">        MyObject myObj = <span class="keyword">new</span> MyObject(); <span class="comment">// new</span></div><div class="line">        MyObject.staticVar = x; <span class="comment">// putstatic</span></div><div class="line">        x = MyObject.staticVar; <span class="comment">// getstatic</span></div><div class="line">        myObj.instanceVar = x; <span class="comment">// putfield</span></div><div class="line">        x = myObj.instanceVar; <span class="comment">// getfield</span></div><div class="line">        Object obj = myObj;</div><div class="line">        <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> MyObject) &#123; <span class="comment">// instanceof</span></div><div class="line">            myObj = (MyObject) obj; <span class="comment">// checkcast</span></div><div class="line">            System.out.println(myObj.instanceVar);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这里稍微补充下之前的iconst指令和ldc系列指令的区别：当int取值-1 ~ 5采用iconst指令，取值-128 ~ 127采用bipush指令，取值-32768 ~ 32767采用sipush指令，取值-2147483648 ~ 2147483647采用 ldc 指令。</p>
+<h4 id="new指令"><a href="#new指令" class="headerlink" title="new指令"></a>new指令</h4><p>new指令专门用来创建类实例，在实现new指令之前有两个地方需要完善：</p>
+<ol>
+<li><p>修改/rtdata/frame.go文件，给Frame结构体添加方法区的方法信息指针属性，并且修改newFrame()函数：</p>
+ <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> Frame <span class="keyword">struct</span> &#123;</div><div class="line">    ...</div><div class="line">    <span class="comment">// 方法区的方法信息指针</span></div><div class="line">    method       *heap.Method</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 实例化栈帧(此时有两个newFrame函数，并且编译有错，暂时先不管)</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">newFrame</span><span class="params">(thread *Thread, method *heap.Method)</span> *<span class="title">Frame</span></span> &#123;</div><div class="line">    <span class="keyword">return</span> &amp;Frame&#123;</div><div class="line">        thread:       thread,</div><div class="line">        method:       method,</div><div class="line">        localVars:    newLocalVars(method.MaxLocals()),</div><div class="line">        operandStack: newOperandStack(method.MaxStack()),</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 省略Getter方法</span></div><div class="line">...</div></pre></td></tr></table></figure>
+</li>
+<li><p>修改thread.go文件，修改NewFrame()函数：</p>
+ <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 为线程创建新的栈帧</span></div><div class="line">   <span class="function"><span class="keyword">func</span> <span class="params">(self *Thread)</span> <span class="title">NewFrame</span><span class="params">(method *heap.Method)</span> *<span class="title">Frame</span></span> &#123;</div><div class="line">       <span class="keyword">return</span> newFrame(self, method)</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>修改class.go文件，添加初始化类的方法：</p>
+ <figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 创建对象引用</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Class)</span> <span class="title">NewObject</span><span class="params">()</span> *<span class="title">Object</span></span> &#123;</div><div class="line">    <span class="comment">// 调用Object结构体</span></div><div class="line">    <span class="keyword">return</span> newObject(self)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>new指令实现代码位于new.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// new指令结构体(2个字节操作数)</span></div><div class="line"><span class="keyword">type</span> NEW <span class="keyword">struct</span>&#123; base.Index16Instruction &#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *NEW)</span> <span class="title">Execute</span><span class="params">(frame *rtdata.Frame)</span></span> &#123;</div><div class="line">	<span class="comment">// 获取运行时常量池</span></div><div class="line">	cp := frame.Method().Class().ConstantPool()</div><div class="line">	<span class="comment">// 通过索引从常量池中获取类符号引用</span></div><div class="line">	classRef := cp.GetConstant(self.Index).(*heap.ClassRef)</div><div class="line">	<span class="comment">// 解析类</span></div><div class="line">	class := classRef.ResolvedClass()</div><div class="line"></div><div class="line">	<span class="comment">// 接口和抽象类不能实例化，抛出InstantiationError异常</span></div><div class="line">	<span class="keyword">if</span> class.IsInterface() || class.IsAbstract() &#123;</div><div class="line">		<span class="built_in">panic</span>(<span class="string">"java.lang.InstantiationError"</span>)</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">// 创建对象引用</span></div><div class="line">	ref := class.NewObject()</div><div class="line">	<span class="comment">// 将对象引用入栈</span></div><div class="line">	frame.OperandStack().PushRef(ref)</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JVM/" rel="tag"># JVM</a>
+          
+            <a href="/tags/Go/" rel="tag"># Go</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/09/自己动手写JVM十九【类和对象（二）】/" rel="next" title="自己动手写JVM十九【类和对象（二）】">
+                <i class="fa fa-chevron-left"></i> 自己动手写JVM十九【类和对象（二）】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/16/自己动手写JVM二十一【类和对象（四）】/" rel="prev" title="自己动手写JVM二十一【类和对象（四）】">
+                自己动手写JVM二十一【类和对象（四）】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#类和字段符号引用解析"><span class="nav-number">1.</span> <span class="nav-text">类和字段符号引用解析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#类符号引用解析"><span class="nav-number">1.1.</span> <span class="nav-text">类符号引用解析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#字段符号引用解析"><span class="nav-number">1.2.</span> <span class="nav-text">字段符号引用解析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类和对象相关指令"><span class="nav-number">2.</span> <span class="nav-text">类和对象相关指令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#new指令"><span class="nav-number">2.1.</span> <span class="nav-text">new指令</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

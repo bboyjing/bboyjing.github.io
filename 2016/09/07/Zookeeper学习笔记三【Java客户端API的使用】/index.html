@@ -1,0 +1,710 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Zookeeper," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Zookeeper提供了源生Java Api，下面我们新建个项目来测试，之后所有的测试代码都放于该项目中，项目地址为zookeeper-sample。1234567891011121314151617&amp;lt;!-- Zookeeper --&amp;gt;&amp;lt;dependency&amp;gt;    &amp;lt;groupId&amp;gt;org.apache.zookeeper&amp;lt;/groupId&amp;gt;">
+<meta name="keywords" content="Java,Zookeeper">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zookeeper学习笔记三【Java客户端API的使用】">
+<meta property="og:url" content="http://yoursite.com/2016/09/07/Zookeeper学习笔记三【Java客户端API的使用】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="Zookeeper提供了源生Java Api，下面我们新建个项目来测试，之后所有的测试代码都放于该项目中，项目地址为zookeeper-sample。1234567891011121314151617&amp;lt;!-- Zookeeper --&amp;gt;&amp;lt;dependency&amp;gt;    &amp;lt;groupId&amp;gt;org.apache.zookeeper&amp;lt;/groupId&amp;gt;">
+<meta property="og:updated_time" content="2016-09-13T01:48:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Zookeeper学习笔记三【Java客户端API的使用】">
+<meta name="twitter:description" content="Zookeeper提供了源生Java Api，下面我们新建个项目来测试，之后所有的测试代码都放于该项目中，项目地址为zookeeper-sample。1234567891011121314151617&amp;lt;!-- Zookeeper --&amp;gt;&amp;lt;dependency&amp;gt;    &amp;lt;groupId&amp;gt;org.apache.zookeeper&amp;lt;/groupId&amp;gt;">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/09/07/Zookeeper学习笔记三【Java客户端API的使用】/"/>
+
+
+
+
+
+  <title> Zookeeper学习笔记三【Java客户端API的使用】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/09/07/Zookeeper学习笔记三【Java客户端API的使用】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Zookeeper学习笔记三【Java客户端API的使用】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-09-07T14:50:53+08:00">
+                2016-09-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Zookeeper/" itemprop="url" rel="index">
+                    <span itemprop="name">Zookeeper</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Zookeeper提供了源生Java Api，下面我们新建个项目来测试，之后所有的测试代码都放于该项目中，项目地址为<a href="https://github.com/bboyjing/zookeeper-sample" target="_blank" rel="external">zookeeper-sample</a>。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- Zookeeper --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.zookeeper<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>zookeeper<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.4.9<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">    <span class="comment">&lt;!-- Multiple SLF4J bindings error--&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">exclusions</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">exclusion</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.slf4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>slf4j-log4j12<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">exclusion</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">exclusions</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<h3 id="创建会话，连接服务端"><a href="#创建会话，连接服务端" class="headerlink" title="创建会话，连接服务端"></a>创建会话，连接服务端</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//Java API -&gt; 创建连接 -&gt; 创建一个最基本的ZooKeeper对象实例</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ZooKeeperConstructorUsageSimple</span> <span class="keyword">implements</span> <span class="title">Watcher</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> CountDownLatch connectedSemaphore = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception</span>&#123;</div><div class="line">        <span class="comment">/**</span></div><div class="line">         * Zookeeper客户端和服务端会话的建立是一个异步的过程</div><div class="line">         * 也就是说在程序中，构造方法会在处理完客户端初始化工作后立即返回</div><div class="line">         * 在大多数情况下此时并没有真正建立好一个可用的会话，此时在会话的生命周期中处于“CONNECTING”的状态</div><div class="line">         */</div><div class="line">        ZooKeeper zookeeper = <span class="keyword">new</span> ZooKeeper(<span class="string">"localhost:2181"</span>, <span class="number">5000</span>,</div><div class="line">                <span class="keyword">new</span> ZooKeeperConstructorUsageSimple());</div><div class="line">        System.out.println(zookeeper.getState());</div><div class="line"></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="comment">//等待Watcher通知SyncConnected</span></div><div class="line">            connectedSemaphore.await();</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;&#125;</div><div class="line">        System.out.println(<span class="string">"ZooKeeper session established."</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * ZooKeeper_Constructor_Usage_Simples实现了Watcher接口，重写了process方法</div><div class="line">     * 该方法负责处理来自Zookeeper服务端的Watcher通知，即服务端建立连接后会调用该方法</div><div class="line">     * <span class="doctag">@param</span> event</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(WatchedEvent event)</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"Receive watched event："</span> + event);</div><div class="line">        <span class="keyword">if</span> (Event.KeeperState.SyncConnected == event.getState()) &#123;</div><div class="line">            connectedSemaphore.countDown();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//Java API -&gt; 创建连接 -&gt; 创建一个最基本的ZooKeeper对象实例，复用sessionId和password</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ZooKeeperConstructorUsageWithSidPassword</span> <span class="keyword">implements</span> <span class="title">Watcher</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> CountDownLatch connectedSemaphore = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception</span>&#123;</div><div class="line">        ZooKeeper zookeeper = <span class="keyword">new</span> ZooKeeper(<span class="string">"localhost:2181"</span>, <span class="number">5000</span>,</div><div class="line">                <span class="keyword">new</span> ZooKeeperConstructorUsageWithSidPassword());</div><div class="line">        connectedSemaphore.await();</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 获取sessionId、password，目的是为了复用会话</div><div class="line">         */</div><div class="line">        <span class="keyword">long</span> sessionId = zookeeper.getSessionId();</div><div class="line">        <span class="keyword">byte</span>[] password  = zookeeper.getSessionPasswd();</div><div class="line"></div><div class="line">        <span class="comment">//使用错误的sessionId和password连接</span></div><div class="line">        zookeeperConnector wrong = <span class="keyword">new</span> zookeeperConnector(<span class="number">1</span>, <span class="string">"test"</span>.getBytes(), <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>));</div><div class="line">        wrong.connect();</div><div class="line"></div><div class="line">        <span class="comment">//使用正确的sessionId和password连接</span></div><div class="line">        zookeeperConnector correct = <span class="keyword">new</span> zookeeperConnector(sessionId, password, <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>));</div><div class="line">        correct.connect();</div><div class="line"></div><div class="line">    &#125;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(WatchedEvent event)</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"Receive watched event："</span> + event);</div><div class="line">        <span class="keyword">if</span> (KeeperState.SyncConnected == event.getState()) &#123;</div><div class="line">            connectedSemaphore.countDown();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">zookeeperConnector</span> <span class="keyword">implements</span> <span class="title">Watcher</span></span>&#123;</div><div class="line">        <span class="keyword">private</span> <span class="keyword">long</span> sessionId;</div><div class="line">        <span class="keyword">private</span> <span class="keyword">byte</span>[] password;</div><div class="line">        <span class="keyword">private</span> CountDownLatch connectedSemaphore;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="title">zookeeperConnector</span><span class="params">(<span class="keyword">long</span> sessionId, <span class="keyword">byte</span>[] password, CountDownLatch connectedSemaphore)</span></span>&#123;</div><div class="line">            <span class="keyword">this</span>.sessionId = sessionId;</div><div class="line">            <span class="keyword">this</span>.password = password;</div><div class="line">            <span class="keyword">this</span>.connectedSemaphore = connectedSemaphore;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">connect</span><span class="params">()</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</div><div class="line">            <span class="keyword">new</span> ZooKeeper(<span class="string">"localhost:2181"</span>, <span class="number">5000</span>, <span class="keyword">this</span>, sessionId, password);</div><div class="line">            <span class="keyword">this</span>.connectedSemaphore.await();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(WatchedEvent watchedEvent)</span> </span>&#123;</div><div class="line">            System.out.println(<span class="string">"Receive watched event："</span> + watchedEvent);</div><div class="line">            <span class="keyword">this</span>.connectedSemaphore.countDown();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="comment">//从输出中截取出三条能代表结果的信息如下：</span></div><div class="line">Receive watched event：WatchedEvent state:SyncConnected type:None path:<span class="keyword">null</span></div><div class="line">Receive watched event：WatchedEvent state:Expired type:None path:<span class="keyword">null</span></div><div class="line">Receive watched event：WatchedEvent state:SyncConnected type:None path:<span class="keyword">null</span></div></pre></td></tr></table></figure>
+<h3 id="创建节点"><a href="#创建节点" class="headerlink" title="创建节点"></a>创建节点</h3><p>创建节点的API分同步和异步两种方式，无论时同步还是异步接口，Zookeeper都不支持递归创建。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//ZooKeeper API创建节点，使用同步(sync)接口。</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ZooKeeperCreateAPISyncUsage</span> <span class="keyword">implements</span> <span class="title">Watcher</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> CountDownLatch connectedSemaphore = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception</span>&#123;</div><div class="line">        ZooKeeper zookeeper = <span class="keyword">new</span> ZooKeeper(<span class="string">"localhost:2181"</span>, <span class="number">5000</span>,</div><div class="line">				<span class="keyword">new</span> ZooKeeperCreateAPISyncUsage());</div><div class="line">        connectedSemaphore.await();</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 创建临时节点</div><div class="line">         */</div><div class="line">        String path1 = zookeeper.create(<span class="string">"/zk-test-ephemeral-"</span>, <span class="string">""</span>.getBytes(),</div><div class="line">        		Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);</div><div class="line">        System.out.println(<span class="string">"Success create znode: "</span> + path1);</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 创建临时顺序节点</div><div class="line">         * Zookeeper会自动在节点后缀加上一个数字</div><div class="line">         */</div><div class="line">        String path2 = zookeeper.create(<span class="string">"/zk-test-ephemeral-"</span>, <span class="string">""</span>.getBytes(),</div><div class="line">        		Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);</div><div class="line">        System.out.println(<span class="string">"Success create znode: "</span> + path2);</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 创建永久节点</div><div class="line">         */</div><div class="line">        String path3 = zookeeper.create(<span class="string">"/persistent-node"</span>,<span class="string">"bboyjing"</span>.getBytes(),</div><div class="line">                Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);</div><div class="line">        System.out.println(<span class="string">"Success create znode: "</span> + path3);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(WatchedEvent event)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (KeeperState.SyncConnected == event.getState()) &#123;</div><div class="line">            connectedSemaphore.countDown();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"><span class="comment">//在zookeeper客户端中查看结果</span></div><div class="line">[zk: localhost:<span class="number">2181</span>(CONNECTED) <span class="number">7</span>] ls /</div><div class="line">[zookeeper, persistent-node]</div><div class="line">[zk: localhost:<span class="number">2181</span>(CONNECTED) <span class="number">8</span>] get /persistent-node</div><div class="line">bboyjing</div><div class="line">...</div></pre></td></tr></table></figure></p>
+<p>异步方式就不写了，贴代码版面太多了，项目里面都有，直接clone下来就行了。</p>
+<h3 id="删除节点"><a href="#删除节点" class="headerlink" title="删除节点"></a>删除节点</h3><p>删除节点API分同步和异步两种方式，只允许删除叶子节点。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// ZooKeeper API 删除节点，使用同步(sync)接口。</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DeleteAPISyncUsage</span> <span class="keyword">implements</span> <span class="title">Watcher</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> CountDownLatch connectedSemaphore = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        ZooKeeper zk = <span class="keyword">new</span> ZooKeeper(<span class="string">"localhost:2181"</span>, <span class="number">5000</span>, <span class="keyword">new</span> DeleteAPISyncUsage());</div><div class="line">    	connectedSemaphore.await();</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 删除节点，需要注意的是至允许删除叶子节点</div><div class="line">         */</div><div class="line">        zk.delete(<span class="string">"/persistent-node"</span>, -<span class="number">1</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(WatchedEvent event)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (KeeperState.SyncConnected == event.getState()) &#123;</div><div class="line">            <span class="keyword">if</span> (EventType.None == event.getType() &amp;&amp; <span class="keyword">null</span> == event.getPath()) &#123;</div><div class="line">                connectedSemaphore.countDown();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>异步方式在项目代码示例中，不贴出来了。</p>
+<h3 id="读取节点数据"><a href="#读取节点数据" class="headerlink" title="读取节点数据"></a>读取节点数据</h3><p>读取的数据包括子节点列表和节点数据，Zookeeper提供了不同的API，而且还能注册Watcher来订阅节点相关信息的变化。</p>
+<h4 id="读取子节点-getChildren"><a href="#读取子节点-getChildren" class="headerlink" title="读取子节点(getChildren)"></a>读取子节点(getChildren)</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// ZooKeeper API 获取子节点列表，使用同步(sync)接口。</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ZooKeeperGetChildrenAPISyncUsage</span> <span class="keyword">implements</span> <span class="title">Watcher</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> CountDownLatch connectedSemaphore = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> CountDownLatch watcherSemaphore = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ZooKeeper zk = <span class="keyword">null</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception</span>&#123;</div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 声明node路径</div><div class="line">         * 实例化Zookeeper</div><div class="line">         */</div><div class="line">    	String path = <span class="string">"/zk-book"</span>;</div><div class="line">        zk = <span class="keyword">new</span> ZooKeeper(<span class="string">"localhost:2181"</span>, <span class="number">500000</span>, <span class="keyword">new</span> ZooKeeperGetChildrenAPISyncUsage());</div><div class="line">        connectedSemaphore.await();</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 创建永久节点/zk-book</div><div class="line">         * 创建临时节点/zk-book/c1</div><div class="line">         */</div><div class="line">        zk.create(path, <span class="string">""</span>.getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);</div><div class="line">        zk.create(path + <span class="string">"/c1"</span>, <span class="string">""</span>.getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 获取/zk-book下的子节点</div><div class="line">         * 此时注册了默认的watch，如果继续在/zk-book下增加节点的话，会调用process方法，通知客户端节点变化了</div><div class="line">         * 但是仅仅是发通知，客户端需要自己去再次查询</div><div class="line">         * 另外需要注意的是watcher是一次性的，即一旦触发一次通知后，该watcher就失效了，需要反复注册watcher，</div><div class="line">         * 即process方中的getChildren继续注册了watcher</div><div class="line">         */</div><div class="line">        List&lt;String&gt; childrenList = zk.getChildren(path, <span class="keyword">true</span>);</div><div class="line">        System.out.println(childrenList);</div><div class="line"></div><div class="line">        zk.create(path+<span class="string">"/c2"</span>, <span class="string">""</span>.getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);</div><div class="line">        watcherSemaphore.await();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(WatchedEvent event)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (KeeperState.SyncConnected == event.getState()) &#123;</div><div class="line">            <span class="keyword">if</span> (EventType.None == event.getType() &amp;&amp; <span class="keyword">null</span> == event.getPath()) &#123;</div><div class="line">                connectedSemaphore.countDown();</div><div class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (event.getType() == EventType.NodeChildrenChanged) &#123;</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    <span class="comment">//收到子节点变更通知，重新主动查询子节点信息</span></div><div class="line">                    System.out.println(<span class="string">"ReGet Child:"</span> + zk.getChildren(event.getPath(),<span class="keyword">true</span>));</div><div class="line">                    watcherSemaphore.countDown();</div><div class="line">                &#125; <span class="keyword">catch</span> (Exception e) &#123;&#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>异步方式在项目代码示例中，不贴出来了。</p>
+<h4 id="获取节点数据-getData"><a href="#获取节点数据-getData" class="headerlink" title="获取节点数据(getData)"></a>获取节点数据(getData)</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// ZooKeeper API 获取节点数据内容，使用同步(sync)接口。</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GetDataAPISyncUsage</span> <span class="keyword">implements</span> <span class="title">Watcher</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> CountDownLatch connectedSemaphore = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line">	<span class="keyword">private</span> <span class="keyword">static</span> CountDownLatch nodeDataChangedSemaphore = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ZooKeeper zk = <span class="keyword">null</span>;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Stat stat = <span class="keyword">new</span> Stat();</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line"></div><div class="line">    	String path = <span class="string">"/zk-book"</span>;</div><div class="line">    	zk = <span class="keyword">new</span> ZooKeeper(<span class="string">"localhost:2181"</span>, <span class="number">5000</span>, <span class="keyword">new</span> GetDataAPISyncUsage());</div><div class="line">        connectedSemaphore.await();</div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 新增节点并给节点赋值</div><div class="line">         */</div><div class="line">        zk.create( path, <span class="string">"123"</span>.getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL );</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 获取节点数据，传入旧的stat，会被服务端响应的新的stat替换</div><div class="line">         */</div><div class="line">        System.out.println(<span class="keyword">new</span> String(zk.getData( path, <span class="keyword">true</span>, stat )));</div><div class="line">        System.out.println(stat.getCzxid()+<span class="string">","</span>+stat.getMzxid()+<span class="string">","</span>+stat.getVersion());</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 虽然节点的值没有改版，但是版本号改变了，依然会触发process事件</div><div class="line">         */</div><div class="line">        zk.setData( path, <span class="string">"123"</span>.getBytes(), -<span class="number">1</span> );</div><div class="line">        nodeDataChangedSemaphore.await();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(WatchedEvent event)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (KeeperState.SyncConnected == event.getState()) &#123;</div><div class="line">            <span class="keyword">if</span> (EventType.None == event.getType() &amp;&amp; <span class="keyword">null</span> == event.getPath()) &#123;</div><div class="line">                connectedSemaphore.countDown();</div><div class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (event.getType() == EventType.NodeDataChanged) &#123;</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    System.out.println(<span class="keyword">new</span> String(zk.getData( event.getPath(), <span class="keyword">true</span>, stat)));</div><div class="line">                    System.out.println(stat.getCzxid()+<span class="string">","</span>+ stat.getMzxid()+<span class="string">","</span>+ stat.getVersion());</div><div class="line">                    nodeDataChangedSemaphore.countDown();</div><div class="line">                &#125; <span class="keyword">catch</span> (Exception e) &#123;&#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>异步方式在项目代码示例中，不贴出来了。</p>
+<h3 id="更新数据"><a href="#更新数据" class="headerlink" title="更新数据"></a>更新数据</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// ZooKeeper API 更新节点数据内容，使用同步(sync)接口。</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SetDataAPISyncUsage</span> <span class="keyword">implements</span> <span class="title">Watcher</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> CountDownLatch connectedSemaphore = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line"></div><div class="line">    	String path = <span class="string">"/zk-book"</span>;</div><div class="line">        ZooKeeper zk = <span class="keyword">new</span> ZooKeeper(<span class="string">"localhost:2181"</span>, <span class="number">5000</span>, <span class="keyword">new</span> SetDataAPISyncUsage());</div><div class="line">    	connectedSemaphore.await();</div><div class="line"></div><div class="line">        zk.create( path, <span class="string">"123"</span>.getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL );</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * version：-1，代表不需要根据版本号更新</div><div class="line">         */</div><div class="line">        Stat stat = zk.setData( path, <span class="string">"456"</span>.getBytes(), -<span class="number">1</span> );</div><div class="line">        System.out.println(stat.getCzxid()+<span class="string">","</span>+</div><div class="line">                           stat.getMzxid()+<span class="string">","</span>+</div><div class="line">                           stat.getVersion());</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 根据上一次更新的版本号更新，成功</div><div class="line">         */</div><div class="line">        Stat stat2 = zk.setData( path, <span class="string">"456"</span>.getBytes(), stat.getVersion());</div><div class="line">        System.out.println(stat2.getCzxid()+<span class="string">","</span>+</div><div class="line">                           stat2.getMzxid()+<span class="string">","</span>+</div><div class="line">                           stat2.getVersion());</div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 根据上上次旧的版本跟新，失败抛异常</div><div class="line">         */</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            zk.setData( path, <span class="string">"456"</span>.getBytes(), stat.getVersion() );</div><div class="line">        &#125; <span class="keyword">catch</span> ( KeeperException e ) &#123;</div><div class="line">            System.out.println(<span class="string">"Error: "</span> + e.code() + <span class="string">","</span> + e.getMessage());</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(WatchedEvent event)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (KeeperState.SyncConnected == event.getState()) &#123;</div><div class="line">            <span class="keyword">if</span> (EventType.None == event.getType() &amp;&amp; <span class="keyword">null</span> == event.getPath()) &#123;</div><div class="line">                connectedSemaphore.countDown();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">异步更新方式在项目代码示例中，不贴出来了。</div></pre></td></tr></table></figure>
+<h3 id="检测节点是否存在"><a href="#检测节点是否存在" class="headerlink" title="检测节点是否存在"></a>检测节点是否存在</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// ZooKeeper API 判断节点是否存在，使用同步(sync)接口。</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExistAPISyncUsage</span> <span class="keyword">implements</span> <span class="title">Watcher</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> CountDownLatch connectedSemaphore = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> CountDownLatch lastSemaphore = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ZooKeeper zk;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String path = <span class="string">"/zk-book"</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">    	zk = <span class="keyword">new</span> ZooKeeper(<span class="string">"localhost:2181"</span>, <span class="number">5000</span>, <span class="keyword">new</span> ExistAPISyncUsage());</div><div class="line">    	connectedSemaphore.await();</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 通过exists接口检测是否存在指定节点，同事注册一个Watcher</div><div class="line">         */</div><div class="line">    	zk.exists( path, <span class="keyword">true</span> );</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 创建节点/zk-book，服务器会向客户端发送事件通知：NodeCreated</div><div class="line">         * 客户端收到通知后，继续调用exists接口，注册Watcher</div><div class="line">         */</div><div class="line">    	zk.create( path, <span class="string">""</span>.getBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT );</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 更新节点数据，服务器会向客户端发送事件通知：NodeDataChanged</div><div class="line">         * 客户端收到通知后，继续调用exists接口，注册Watcher</div><div class="line">         */</div><div class="line">    	zk.setData( path, <span class="string">"123"</span>.getBytes(), -<span class="number">1</span> );</div><div class="line"></div><div class="line">        <span class="comment">/**</span></div><div class="line">         * 删除节点/zk-book</div><div class="line">         * 客户端会收到服务端的事件通知：NodeDeleted</div><div class="line">         */</div><div class="line">    	zk.delete( path, -<span class="number">1</span> );</div><div class="line"></div><div class="line">        lastSemaphore.await();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(WatchedEvent event)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">if</span> (KeeperState.SyncConnected == event.getState()) &#123;</div><div class="line">                <span class="keyword">if</span> (EventType.None == event.getType() &amp;&amp; <span class="keyword">null</span> == event.getPath()) &#123;</div><div class="line">                    connectedSemaphore.countDown();</div><div class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (EventType.NodeCreated == event.getType()) &#123;</div><div class="line">                    System.out.println(<span class="string">"Node("</span> + event.getPath() + <span class="string">")Created"</span>);</div><div class="line">                    zk.exists( event.getPath(), <span class="keyword">true</span> );</div><div class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (EventType.NodeDeleted == event.getType()) &#123;</div><div class="line">                    System.out.println(<span class="string">"Node("</span> + event.getPath() + <span class="string">")Deleted"</span>);</div><div class="line">                    zk.exists( event.getPath(), <span class="keyword">true</span> );</div><div class="line">                    System.out.println(<span class="string">"Last semaphore"</span>);</div><div class="line">                    lastSemaphore.countDown();</div><div class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (EventType.NodeDataChanged == event.getType()) &#123;</div><div class="line">                    System.out.println(<span class="string">"Node("</span> + event.getPath() + <span class="string">")DataChanged"</span>);</div><div class="line">                    zk.exists( event.getPath(), <span class="keyword">true</span> );</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">异步方式我没有再写出来，自行查看API吧。</div></pre></td></tr></table></figure>
+<p>有预感这个专题会贴好多代码，罪过～～</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Zookeeper/" rel="tag"># Zookeeper</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/06/Zookeeper学习笔记二【使用Zookeeper】/" rel="next" title="Zookeeper学习笔记二【使用Zookeeper】">
+                <i class="fa fa-chevron-left"></i> Zookeeper学习笔记二【使用Zookeeper】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/09/12/Zookeeper学习笔记四【Java客户端API之权限控制】/" rel="prev" title="Zookeeper学习笔记四【Java客户端API之权限控制】">
+                Zookeeper学习笔记四【Java客户端API之权限控制】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">94</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建会话，连接服务端"><span class="nav-number">1.</span> <span class="nav-text">创建会话，连接服务端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建节点"><span class="nav-number">2.</span> <span class="nav-text">创建节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除节点"><span class="nav-number">3.</span> <span class="nav-text">删除节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#读取节点数据"><span class="nav-number">4.</span> <span class="nav-text">读取节点数据</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#读取子节点-getChildren"><span class="nav-number">4.1.</span> <span class="nav-text">读取子节点(getChildren)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取节点数据-getData"><span class="nav-number">4.2.</span> <span class="nav-text">获取节点数据(getData)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新数据"><span class="nav-number">5.</span> <span class="nav-text">更新数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#检测节点是否存在"><span class="nav-number">6.</span> <span class="nav-text">检测节点是否存在</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
