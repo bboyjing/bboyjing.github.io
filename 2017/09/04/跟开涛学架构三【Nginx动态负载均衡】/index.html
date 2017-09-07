@@ -1,0 +1,742 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.proxy.ustclug.org/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Architecture,Nginx," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本系列第一章节我们就知道了如何配置upstream。下面要学习的是如何不写死服务列表，而是通过服务注册、发现的方式来实现upstream列表的动态变更。书中是使用Consul来实现的，它是一款开源的分布式服务注册与发现系统。简单来说，其核心思想就是，upstream服务向Consul注册服务，Nginx能监听到Consul上注册的服务变更，然后修改upstream列表，最后重启Nginx。本人也没">
+<meta name="keywords" content="Java,Architecture,Nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="跟开涛学架构三【Nginx动态负载均衡】">
+<meta property="og:url" content="http://yoursite.com/2017/09/04/跟开涛学架构三【Nginx动态负载均衡】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="本系列第一章节我们就知道了如何配置upstream。下面要学习的是如何不写死服务列表，而是通过服务注册、发现的方式来实现upstream列表的动态变更。书中是使用Consul来实现的，它是一款开源的分布式服务注册与发现系统。简单来说，其核心思想就是，upstream服务向Consul注册服务，Nginx能监听到Consul上注册的服务变更，然后修改upstream列表，最后重启Nginx。本人也没">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/hunger_4.png">
+<meta property="og:updated_time" content="2017-09-07T17:18:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="跟开涛学架构三【Nginx动态负载均衡】">
+<meta name="twitter:description" content="本系列第一章节我们就知道了如何配置upstream。下面要学习的是如何不写死服务列表，而是通过服务注册、发现的方式来实现upstream列表的动态变更。书中是使用Consul来实现的，它是一款开源的分布式服务注册与发现系统。简单来说，其核心思想就是，upstream服务向Consul注册服务，Nginx能监听到Consul上注册的服务变更，然后修改upstream列表，最后重启Nginx。本人也没">
+<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/hunger_4.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/09/04/跟开涛学架构三【Nginx动态负载均衡】/"/>
+
+
+
+
+
+  <title> 跟开涛学架构三【Nginx动态负载均衡】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/04/跟开涛学架构三【Nginx动态负载均衡】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                跟开涛学架构三【Nginx动态负载均衡】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-04T21:58:56+08:00">
+                2017-09-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Architecture/" itemprop="url" rel="index">
+                    <span itemprop="name">Architecture</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本系列第一章节我们就知道了如何配置upstream。下面要学习的是如何不写死服务列表，而是通过服务注册、发现的方式来实现upstream列表的动态变更。书中是使用Consul来实现的，它是一款开源的分布式服务注册与发现系统。简单来说，其核心思想就是，upstream服务向Consul注册服务，Nginx能监听到Consul上注册的服务变更，然后修改upstream列表，最后重启Nginx。本人也没有使用过该产品，就一起来学习下吧。</p>
+<a id="more"></a>
+<h3 id="了解Consul"><a href="#了解Consul" class="headerlink" title="了解Consul"></a>了解Consul</h3><p>首先得稍微了解下Consul，要不然玩儿不起来。</p>
+<ol>
+<li>安装。本人直接使用<code>brew install consul</code>，如果是其他系统，可以去<a href="https://www.consul.io/downloads.html" target="_blank" rel="external">官网</a>下载对应的安装包。</li>
+<li>启动。浏览了下官网，感觉跟Zookeeper有点像。通过命令<code>consul agent -dev</code>启动，如果能正常打印出日志，表示安装成功了。这里就不研究Consul，有兴趣的同学自行去官网看文档。</li>
+<li>Web UI。Consul自带Web UI，而且-dev模式下是默认启动的，访问<code>localhost:8500/ui</code>即可。</li>
+</ol>
+<h3 id="注册服务"><a href="#注册服务" class="headerlink" title="注册服务"></a>注册服务</h3><p>将服务注册到Consul。和Consul的交互可以使用HTTP协议，发送如下请求可以注册一个服务到Consul：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">curl -X PUT http://localhost:8500/v1/agent/service/register -d '</div><div class="line">&#123;</div><div class="line">  "ID": "real_server_1",</div><div class="line">  "Name": "real_server",</div><div class="line">  "Tags": ["dev"],</div><div class="line">  "Address": "127.0.0.1",</div><div class="line">  "Port": 8081</div><div class="line">&#125;</div><div class="line">'</div></pre></td></tr></table></figure></p>
+<p>成功之后登录控制台，会看到SERVICES下多出了一个real_server服务：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/hunger_4.png" alt="hunger_4"><br>书中注册服务是请求的catalog API，但是注册完之后过会儿会被自动deregister，查了下文档，换成上述API了。另外，有一点和zookeeper不太一样的是，停止Consul后，之前注册的服务就消失了。不知道和目前测试用的是单节点有没关系，如果线上准备使用该工具，还得详细地看完文档再说。解释下上述API的几个参数：</p>
+<ul>
+<li>ID：代表要注册的服务的唯一标识</li>
+<li>Name：表示一组服务的名称</li>
+<li>Tags：服务标签，可以用于区分开发、测试环境</li>
+<li>Address：服务的地址</li>
+<li>Port：服务的端口</li>
+</ul>
+<p>还有一个real_server_2也要注册上去，改下参数ID和Port就行了，就不贴出来了。</p>
+<h3 id="Consul-template"><a href="#Consul-template" class="headerlink" title="Consul-template"></a>Consul-template</h3><p>Consul-template的作用是生成upstream的配置模板。这个不包含在consul中，是单独的工具，先安装<code>brew install consul-template</code>。接下来在conf目录下新建real_server.ctmpl文件，内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">upstream real_server &#123;</div><div class="line">    &#123;&#123;range service &quot;dev.real_server@dc1&quot;&#125;&#125;</div><div class="line">        server &#123;&#123;.Address&#125;&#125;:&#123;&#123;.Port&#125;&#125;;</div><div class="line">    &#123;&#123;end&#125;&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>大概可以看出是遍历数据中心dc1中的Tags为dev，Name为real_server的服务。Consul启动的时候打印日志有一行<code>Datacenter: &#39;dc1&#39;</code>，这个就是数据中心。其余的占位符都对应注册服务发送的API请求参数。<br>还需要再新建一个Nginx重启脚本，同样再conf目录下新建restart.sh，并且给该文件执行权限：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">ps -ef | grep nginx | grep -v grep</div><div class="line">if [ $? -ne 0 ]</div><div class="line">then</div><div class="line">    sudo nginx -c ./nginx.conf</div><div class="line">    echo "nginx start"</div><div class="line">else</div><div class="line">    sudo nginx -s reload</div><div class="line">    echo "ngixn restart"</div><div class="line">fi</div></pre></td></tr></table></figure></p>
+<p>最后在修改ngxin.conf，删除原来的upstream配置，通过includ引入配置文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">http &#123;</div><div class="line">...</div><div class="line">include /Users/zhangjing/IdeaProjects/hunger/conf/real_server.conf</div><div class="line">...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>Consul-template配置完毕，先不启动，还差一步。对了，有一点先注意下，我们新建的模板是real_server.ctmpl，而nginx.conf中include的文件是real_server.conf。</p>
+<h3 id="Java服务"><a href="#Java服务" class="headerlink" title="Java服务"></a>Java服务</h3><p>在项目中引入Consul Java Client可以实现服务的注册与摘除，那上面直接通过HTTP的注册方式就当了解下了。下面贴出核心代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Configuration</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConsulConfiguration</span> </span>&#123;</div><div class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;server.port&#125;"</span>)</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> port;</div><div class="line"></div><div class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;spring.application.name&#125;"</span>)</div><div class="line">    <span class="keyword">private</span> String serviceId;</div><div class="line"></div><div class="line">    <span class="meta">@PostConstruct</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">// 参数完全对应HTTP API</span></div><div class="line">        ImmutableRegistration.Builder builder = ImmutableRegistration.builder()</div><div class="line">                .id(serviceId)</div><div class="line">                .name(<span class="string">"real_server"</span>)</div><div class="line">                .address(<span class="string">"127.0.0.1"</span>)</div><div class="line">                .port(port)</div><div class="line">                .addTags(<span class="string">"dev"</span>);</div><div class="line"></div><div class="line">        <span class="comment">// 向Consul注册服务</span></div><div class="line">        Consul consul = Consul.builder().withHostAndPort(HostAndPort.fromString(<span class="string">"127.0.0.1:8500"</span>)).build();</div><div class="line">        <span class="keyword">final</span> AgentClient agentClient = consul.agentClient();</div><div class="line">        agentClient.register(builder.build());</div><div class="line"></div><div class="line">        <span class="comment">//注册shutdown hook，停掉应用时从Consul摘除服务</span></div><div class="line">        Runtime.getRuntime().addShutdownHook(<span class="keyword">new</span> Thread(() -&gt; agentClient.deregister(serviceId)));</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>启动项目，然后登到Consul Web界面看一下，服务是否注册成功。另外，不要忘了把代码拷到real_server_2中，port和serviceId是取的配置文件中的值，所以不用改啥。另外，如果是真实环境的话serviceId可以取成ip地址+端口号，这样同一个应用的serviceId自然就不一样了。</p>
+<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>在整体测试之前，我们还不知道consul-template怎么用。下面就利用consul、real_server.ctmpl和Java服务，来先了测试下consul-template。</p>
+<ol>
+<li>启动Consul：<code>consul agent -dev</code></li>
+<li>real_server_1、real_server_2</li>
+<li>在terminal中执行如下命令：<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">consul-template -consul-addr 127.0.0.1:8500 -template \</div><div class="line">"/Users/zhangjing/IdeaProjects/hunger/conf/real_server.ctmpl:\</div><div class="line">/Users/zhangjing/IdeaProjects/hunger/conf/real_server.conf"</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>成功之后会发现多了一个文件real_server.conf，其内容为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">upstream real_server &#123;</div><div class="line">    server 127.0.0.1:8081;</div><div class="line">    server 127.0.0.1:8082;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>其过程就是consul-template会监听指定的consul(-consul-addr指定的地址)，监听的内容在real_server.ctmpl中定义。一旦相关内容有改动(此处指的是注册在consul上的服务)，就会把更改后的内容输出到指定文件(此处是real_server.conf)。这里-template参数的格式为”模板源文件:将要写入的目标文件”。如果停掉其中一个服务，real_server.conf的内容会即时更新。可见达到实时更改配置的效果了。<br>有一点需要说明一下，consul-template是触发执行的，也就说监听的内容有改动才会触发命令。所以，有可能当时执行consul-template命令的时候什么事都不会发生，会误以为命令没有生效。这一点困扰了我一会儿，所以就提一下。</p>
+<p>至此，相关知识点已经梳理完毕，下面整合起来测试下，列出测试步骤：</p>
+<ol>
+<li>启动Consul：<code>consul agent -dev</code></li>
+<li><p>启动consul-template</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">consul-template -consul-addr 127.0.0.1:8500 -template \</div><div class="line">"/Users/zhangjing/IdeaProjects/hunger/conf/real_server.ctmpl:\</div><div class="line">/Users/zhangjing/IdeaProjects/hunger/conf/real_server.conf:\</div><div class="line">sh /Users/zhangjing/IdeaProjects/hunger/conf/restart.sh"</div></pre></td></tr></table></figure>
+<p> 这里的命令稍有不同，在-template参数中加入了执行脚本</p>
+</li>
+<li><p>启动real_server_1、real_server_2，从输出可以看出nginx先被启动，然后又重启了：</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">nginx start</div><div class="line">0 52600     1   0  5:36下午 ??         0:00.00 nginx: master ...</div><div class="line">-2 52601 52600   0  5:36下午 ??         0:00.00 nginx: worker process</div><div class="line">ngixn restart</div></pre></td></tr></table></figure>
+</li>
+<li><p>请求Nginx：</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">   &gt;</span> curl localhost</div><div class="line">from real server 1%</div><div class="line"><span class="meta">   &gt;</span>curl localhost</div><div class="line">from real server 2%</div><div class="line">   ...</div><div class="line"><span class="meta">   #</span> 可以自行停止、启动real_server进行测试</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>这种实现方式会导致每次发现配置有变更，都需要reload nginx。书中还有另外一种方式，通过lua脚本的配合来实现无reload动态负载均衡，有兴趣的同学可以自行去看，本章节内容就到这里了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Architecture/" rel="tag"># Architecture</a>
+          
+            <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/01/跟开涛学架构二【Nginx长连接】/" rel="next" title="跟开涛学架构二【Nginx长连接】">
+                <i class="fa fa-chevron-left"></i> 跟开涛学架构二【Nginx长连接】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">95</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#了解Consul"><span class="nav-number">1.</span> <span class="nav-text">了解Consul</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注册服务"><span class="nav-number">2.</span> <span class="nav-text">注册服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Consul-template"><span class="nav-number">3.</span> <span class="nav-text">Consul-template</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java服务"><span class="nav-number">4.</span> <span class="nav-text">Java服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试"><span class="nav-number">5.</span> <span class="nav-text">测试</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
