@@ -1,0 +1,717 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.proxy.ustclug.org/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Architecture,Nginx," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Hystrix是Netflix开源的一款针对分布式系统的延迟和容错库，目的是用来隔离分布式服务故障。它是通过线程池和信号量来是实现的，现在没有概念没关系，先来看怎么用吧。 Hystrix简单使用我们在real_server_1项目上做测试，如下两步即可完成：">
+<meta name="keywords" content="Java,Architecture,Nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="跟开涛学架构四【Hystrix的使用】">
+<meta property="og:url" content="http://yoursite.com/2017/09/13/跟开涛学架构四【Hystrix的使用】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="Hystrix是Netflix开源的一款针对分布式系统的延迟和容错库，目的是用来隔离分布式服务故障。它是通过线程池和信号量来是实现的，现在没有概念没关系，先来看怎么用吧。 Hystrix简单使用我们在real_server_1项目上做测试，如下两步即可完成：">
+<meta property="og:updated_time" content="2017-09-14T18:12:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="跟开涛学架构四【Hystrix的使用】">
+<meta name="twitter:description" content="Hystrix是Netflix开源的一款针对分布式系统的延迟和容错库，目的是用来隔离分布式服务故障。它是通过线程池和信号量来是实现的，现在没有概念没关系，先来看怎么用吧。 Hystrix简单使用我们在real_server_1项目上做测试，如下两步即可完成：">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/09/13/跟开涛学架构四【Hystrix的使用】/"/>
+
+
+
+
+
+  <title> 跟开涛学架构四【Hystrix的使用】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/13/跟开涛学架构四【Hystrix的使用】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                跟开涛学架构四【Hystrix的使用】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-13T18:21:16+08:00">
+                2017-09-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Architecture/" itemprop="url" rel="index">
+                    <span itemprop="name">Architecture</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Hystrix是Netflix开源的一款针对分布式系统的延迟和容错库，目的是用来隔离分布式服务故障。它是通过线程池和信号量来是实现的，现在没有概念没关系，先来看怎么用吧。</p>
+<h3 id="Hystrix简单使用"><a href="#Hystrix简单使用" class="headerlink" title="Hystrix简单使用"></a>Hystrix简单使用</h3><p>我们在real_server_1项目上做测试，如下两步即可完成：</p>
+<a id="more"></a>
+<ol>
+<li><p>添加hystrix依赖：</p>
+ <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"> <span class="tag">&lt;<span class="name">repositories</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">repository</span>&gt;</span></div><div class="line">         <span class="tag">&lt;<span class="name">id</span>&gt;</span>netflix<span class="tag">&lt;/<span class="name">id</span>&gt;</span></div><div class="line">         <span class="tag">&lt;<span class="name">name</span>&gt;</span>netflix oss<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">         <span class="tag">&lt;<span class="name">url</span>&gt;</span>https://dl.bintray.com/netflixoss/maven/<span class="tag">&lt;/<span class="name">url</span>&gt;</span></div><div class="line">     <span class="tag">&lt;/<span class="name">repository</span>&gt;</span></div><div class="line"> <span class="tag">&lt;/<span class="name">repositories</span>&gt;</span></div><div class="line"> </div><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.netflix.hystrix<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hystrix-core<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.5.13<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"> <span class="tag">&lt;/<span class="name">dependency</span></span></div></pre></td></tr></table></figure>
+</li>
+<li><p>新建类测试类：</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloWorldCommand</span> <span class="keyword">extends</span> <span class="title">HystrixCommand</span>&lt;<span class="title">String</span>&gt; </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String name;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">HelloWorldCommand</span><span class="params">(String name)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(HystrixCommandGroupKey.Factory.asKey(<span class="string">"ExampleGroup"</span>));</div><div class="line">        <span class="keyword">this</span>.name = name;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> String <span class="title">run</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Hello "</span> + name +<span class="string">" thread:"</span> + Thread.currentThread().getName();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        <span class="comment">/**</span></div><div class="line">         * Command对象的使用有如下三种方式</div><div class="line">         * 注：每个Command对象不是单例的，不能重用</div><div class="line">         */</div><div class="line"></div><div class="line">        <span class="comment">// 同步调用</span></div><div class="line">        HelloWorldCommand helloWorldCommand = <span class="keyword">new</span> HelloWorldCommand(<span class="string">"Synchronous-hystrix"</span>);</div><div class="line">        System.out.println(<span class="string">"result="</span> + helloWorldCommand.execute());</div><div class="line"></div><div class="line">        <span class="comment">// Future方式的异步调用</span></div><div class="line">        helloWorldCommand = <span class="keyword">new</span> HelloWorldCommand(<span class="string">"Asynchronous-hystrix"</span>);</div><div class="line">        Future&lt;String&gt; future = helloWorldCommand.queue();</div><div class="line">        System.out.println(<span class="string">"result="</span> + future.get());</div><div class="line"></div><div class="line">        <span class="comment">// RxJava响应式</span></div><div class="line">        helloWorldCommand = <span class="keyword">new</span> HelloWorldCommand(<span class="string">"RxJava-hystrix"</span>);</div><div class="line">        Observable&lt;String&gt; observable = helloWorldCommand.observe();</div><div class="line">        observable.asObservable().subscribe(result -&gt; System.out.println(<span class="string">"result="</span> + result));</div><div class="line"></div><div class="line">        System.out.println(<span class="string">"mainThread="</span> + Thread.currentThread().getName());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>看下HelloWorldCommand类的输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">result=Hello Synchronous-hystrix thread:hystrix-ExampleGroup-1</div><div class="line">result=Hello Asynchronous-hystrix thread:hystrix-ExampleGroup-2</div><div class="line">result=Hello RxJava-hystrix thread:hystrix-ExampleGroup-3</div><div class="line">mainThread=main</div></pre></td></tr></table></figure></p>
+<p>从输出可以看出，线程池的概念已经很明显了。HelloWorldCommand类可以理解为hystrix的执行单元，<br>继承自HystrixCommand，具体的处理逻辑在run方法中。该Command的执行(run方法的调用)是在单独的线程中，由hystrix管理。还有核心的降级、熔断等处理，这里就不演示了，推荐个<a href="http://www.jianshu.com/p/b9af028efebb" target="_blank" rel="external">博客</a>给各位吧。</p>
+<h3 id="引入Hystrix到项目中"><a href="#引入Hystrix到项目中" class="headerlink" title="引入Hystrix到项目中"></a>引入Hystrix到项目中</h3><p>用过Sping Cloud的同学知道，它已经集成了Netflix的一套服务化治理的工具，这里我们不准备采用其starter，而是通过自己配置来熟悉。下面以real_server_1为例：</p>
+<ol>
+<li>注释掉ConsulConfiguration.java的@Configuration，因为这里用不上。</li>
+<li><p>添加处理类：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">@Component</div><div class="line">@Scope(&quot;prototype&quot;)</div><div class="line">public class RealServiceCommand extends HystrixCommand&lt;String&gt; &#123;</div><div class="line"></div><div class="line">    protected RealServiceCommand() &#123;</div><div class="line">        super(HystrixCommandGroupKey.Factory.asKey(&quot;RealServiceGroup&quot;));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    protected String run() throws Exception &#123;</div><div class="line">        return &quot;Thread:&quot; + Thread.currentThread().getName() + &quot; is handling...&quot;;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Scope(&quot;prototype&quot;)</div><div class="line">public class RealServerController &#123;</div><div class="line">    @Autowired</div><div class="line">    private RealServiceCommand realServiceCommand;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p> 这样就配置好了，有一点要注意的是，RealServiceCommand类和RealServerController类都要配成prototype，这样感觉有点恶心，回头看看springboot是如何优雅地解决的。</p>
+</li>
+</ol>
+<p>上面配置了最基本的实现方式，下面来试着处理下降级和熔断。降级是通过重写getFallback()方法实现的，简单点来说就是当run()方法执行出现某些错误时，将跳转到getFallback()相关逻辑。熔断机制相当于电路的跳闸功能，意思就是当调用该Command类请求错误比例达到指定阈值时，直接调用getFallback()方法。先来配置下降级处理：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Component</span></div><div class="line"><span class="meta">@Scope</span>(<span class="string">"prototype"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RealServiceCommand</span> <span class="keyword">extends</span> <span class="title">HystrixCommand</span>&lt;<span class="title">String</span>&gt; </span>&#123;</div><div class="line">    ...</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> String <span class="title">run</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        System.out.println(<span class="string">"Thread:"</span> + Thread.currentThread().getName() + <span class="string">" is handling..."</span>);</div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException();</div><div class="line">        <span class="comment">//return "Thread:" + Thread.currentThread().getName() + " is handling...";</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> String <span class="title">getFallback</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Thread:"</span> + Thread.currentThread().getName() + <span class="string">" fallback."</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>来发个请求测试下：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> curl localhost:8081</div><div class="line">from real server 1.Thread:hystrix-RealServiceGroup-2 fallback.%</div><div class="line"><span class="meta">#</span> 同时服务端打印出Thread:hystrix-RealServiceGroup-1 is handling...</div></pre></td></tr></table></figure></p>
+<p>从返回的数据也可以看出降级的意思，当请求的服务(run())不可用时，选择另一个替代方案(getFallback())。再来看下熔断的配置：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RealServiceCommand</span> <span class="keyword">extends</span> <span class="title">HystrixCommand</span>&lt;<span class="title">String</span>&gt; </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="title">RealServiceCommand</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(HystrixCommand.Setter</div><div class="line">                .withGroupKey(HystrixCommandGroupKey.Factory.asKey(<span class="string">"RealServiceGroup"</span>))</div><div class="line">                .andCommandPropertiesDefaults(</div><div class="line">                        <span class="comment">// 10s内失败请求数超过1个时熔断器开始生效</span></div><div class="line">                        HystrixCommandProperties.Setter().withCircuitBreakerRequestVolumeThreshold(<span class="number">1</span>)</div><div class="line">                )</div><div class="line">        );</div><div class="line">    &#125;</div><div class="line">    ...</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>自行测试下，当连续发两个请求时，第二个请求将直接进入到getFallback()方法，起到了熔断的效果。<br>本章节我们学习了Hystrix的皮毛，路还很长啊，再接再厉吧。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Architecture/" rel="tag"># Architecture</a>
+          
+            <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/04/跟开涛学架构三【Nginx动态负载均衡】/" rel="next" title="跟开涛学架构三【Nginx动态负载均衡】">
+                <i class="fa fa-chevron-left"></i> 跟开涛学架构三【Nginx动态负载均衡】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">96</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hystrix简单使用"><span class="nav-number">1.</span> <span class="nav-text">Hystrix简单使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#引入Hystrix到项目中"><span class="nav-number">2.</span> <span class="nav-text">引入Hystrix到项目中</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
