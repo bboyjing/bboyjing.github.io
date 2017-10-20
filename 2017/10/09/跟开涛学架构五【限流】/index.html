@@ -1,0 +1,735 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.proxy.ustclug.org/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Architecture,Nginx," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="限流就是通过一系列手段来控制并发请求量，以保证整个系统可用。下面就先来看常见的限流算法，然后再看如何具体应用。 限流算法常见的限流算法有令牌桶和漏桶。">
+<meta name="keywords" content="Java,Architecture,Nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="跟开涛学架构五【限流】">
+<meta property="og:url" content="http://yoursite.com/2017/10/09/跟开涛学架构五【限流】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="限流就是通过一系列手段来控制并发请求量，以保证整个系统可用。下面就先来看常见的限流算法，然后再看如何具体应用。 限流算法常见的限流算法有令牌桶和漏桶。">
+<meta property="og:updated_time" content="2017-10-20T06:49:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="跟开涛学架构五【限流】">
+<meta name="twitter:description" content="限流就是通过一系列手段来控制并发请求量，以保证整个系统可用。下面就先来看常见的限流算法，然后再看如何具体应用。 限流算法常见的限流算法有令牌桶和漏桶。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/10/09/跟开涛学架构五【限流】/"/>
+
+
+
+
+
+  <title> 跟开涛学架构五【限流】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/09/跟开涛学架构五【限流】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                跟开涛学架构五【限流】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-09T11:03:37+08:00">
+                2017-10-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Architecture/" itemprop="url" rel="index">
+                    <span itemprop="name">Architecture</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>限流就是通过一系列手段来控制并发请求量，以保证整个系统可用。下面就先来看常见的限流算法，然后再看如何具体应用。</p>
+<h3 id="限流算法"><a href="#限流算法" class="headerlink" title="限流算法"></a>限流算法</h3><p>常见的限流算法有令牌桶和漏桶。</p>
+<a id="more"></a>
+<h4 id="令牌桶算法"><a href="#令牌桶算法" class="headerlink" title="令牌桶算法"></a>令牌桶算法</h4><p>令牌桶算法是一个存放固定容量令牌的桶，按照固定速率往桶里添加令牌。令牌桶算法的描述如下：(该描述完全拷贝书上内容)</p>
+<ul>
+<li>假设限制r/s，表示每秒会有r个令牌放入桶中，或者说每过1/r秒桶中增加一个令牌</li>
+<li>桶中最多存放b个令牌，当桶满时，新添加的令牌被丢弃或拒绝</li>
+<li>当一个n个字节大小的数据包到达，将从桶中删除n个令牌，接着数据包被发送到网络上</li>
+<li>如果桶中的令牌不足n个，则不会删除令牌，且该数据包将被限流(要么丢弃，要么在缓冲区等待)</li>
+</ul>
+<h4 id="漏桶算法"><a href="#漏桶算法" class="headerlink" title="漏桶算法"></a>漏桶算法</h4><p>漏桶算法的描述如下：</p>
+<ul>
+<li>一个固定容量的漏桶，按照常量固定速率流出水滴</li>
+<li>如果桶是空的，则不需要流出水滴</li>
+<li>可以以任意速率流入水滴盗漏桶</li>
+<li>如果流入水滴超出了桶的容量，则流入的水滴溢出了(被丢弃)，而漏桶容量是不变的</li>
+</ul>
+<p>令牌桶是限制平均流入速度，并且允许一定程度的突发流量，只要桶中有令牌就可以处理请求；而漏桶算法限制的是常量流出速度，可以平滑地处理流入速度。乍一看，两者好像并没有本质区别，用的时候再细细体会吧。</p>
+<h3 id="限流算法的使用"><a href="#限流算法的使用" class="headerlink" title="限流算法的使用"></a>限流算法的使用</h3><p>Guava提供了令牌桶算法实现，可以直接拿来使用。其RateLimiter提供的的令牌桶算法可用于平滑突发限流(SmoothBursty)和平滑预热限流(SmoothWarmingUp)实现。下面在real_server_1项目中简单测试下，首先添加guava依赖：<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;com.google.guava&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;guava&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;23.0&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure></p>
+<h4 id="SmoothBursty"><a href="#SmoothBursty" class="headerlink" title="SmoothBursty"></a>SmoothBursty</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 表示桶容量为5，且每秒新增5个令牌，即每格200毫秒新增一个令牌</span></div><div class="line">RateLimiter limiter = RateLimiter.create(<span class="number">5</span>);</div><div class="line"><span class="comment">/**</span></div><div class="line"> * acquire()表示消费一个令牌</div><div class="line"> * 如果当前桶中有足够令牌，则成功(返回0)</div><div class="line"> * 如果桶中没有令牌，则等待一段时间再去消费令牌</div><div class="line"> */</div><div class="line">System.out.println(limiter.acquire());</div><div class="line">System.out.println(limiter.acquire());</div><div class="line">System.out.println(limiter.acquire());</div><div class="line">System.out.println(limiter.acquire());</div><div class="line">System.out.println(limiter.acquire());</div><div class="line">System.out.println(limiter.acquire());</div><div class="line"></div><div class="line">输出如下：</div><div class="line"><span class="number">0.0</span></div><div class="line"><span class="number">0.197007</span></div><div class="line"><span class="number">0.196617</span></div><div class="line"><span class="number">0.199382</span></div><div class="line"><span class="number">0.198855</span></div><div class="line"><span class="number">0.196794</span></div></pre></td></tr></table></figure>
+<p>从输出结果可以看出，第一个acquire()成功获取到令牌，接下来差不多每隔200毫秒(结果的输出单位为秒)左右才能消费到令牌。这种实现将突发请求速率平均为固定请求速率。<br>再看一个突发的例子：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">RateLimiter limiter = RateLimiter.create(<span class="number">5</span>);</div><div class="line">System.out.println(limiter.acquire(<span class="number">5</span>));</div><div class="line">System.out.println(limiter.acquire(<span class="number">1</span>));</div><div class="line">System.out.println(limiter.acquire(<span class="number">1</span>));</div><div class="line"></div><div class="line">输出如下：</div><div class="line"><span class="number">0.0</span></div><div class="line"><span class="number">0.996835</span></div><div class="line"><span class="number">0.193916</span></div></pre></td></tr></table></figure></p>
+<p>令牌桶算法允许一定程度的突发，所以可以一次性消费5个令牌，但是接下来的差不多需要等待1秒，桶中才有令牌可消费。可以理解为预消费了未来的令牌，但是不会影响生产速度。接着，后面的请求被整形为固定速度了。<br>再看一个突发例子：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">RateLimiter limiter = RateLimiter.create(<span class="number">2</span>);</div><div class="line">System.out.println(limiter.acquire());</div><div class="line">Thread.sleep(<span class="number">2000l</span>);</div><div class="line">System.out.println(limiter.acquire());</div><div class="line">System.out.println(limiter.acquire());</div><div class="line">System.out.println(limiter.acquire());</div><div class="line"></div><div class="line">System.out.println(limiter.acquire());</div><div class="line">System.out.println(limiter.acquire());</div><div class="line"></div><div class="line">输出如下：</div><div class="line"><span class="number">0.0</span></div><div class="line"><span class="number">0.0</span></div><div class="line"><span class="number">0.0</span></div><div class="line"><span class="number">0.0</span></div><div class="line"><span class="number">0.499701</span></div><div class="line"><span class="number">0.491598</span></div></pre></td></tr></table></figure></p>
+<p>第二、三个acquire()消费的是桶中积攒的令牌，从第四个acquire()开始正常计算了。<br>SmoothBursty允许一定程度的突发，如果担心瞬时流量可能会击垮整个系统，那么有一种平滑速率的限流方式，可以再系统冷启动后慢慢趋于平均固定速率。Guava提供了SmoothWarmingUp来实现这种需求，也可以认为是漏桶算法。</p>
+<h4 id="SmoothWarmingUp"><a href="#SmoothWarmingUp" class="headerlink" title="SmoothWarmingUp"></a>SmoothWarmingUp</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">RateLimiter limiter = RateLimiter.create(<span class="number">5</span>, <span class="number">1000</span>, TimeUnit.MILLISECONDS);</div><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</div><div class="line">    System.out.println(limiter.acquire());</div><div class="line">&#125;</div><div class="line">Thread.sleep(<span class="number">1000l</span>);</div><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</div><div class="line">    System.out.println(limiter.acquire());</div><div class="line">&#125;</div><div class="line"></div><div class="line">输出如下：</div><div class="line"><span class="number">0.0</span></div><div class="line"><span class="number">0.516515</span></div><div class="line"><span class="number">0.352645</span></div><div class="line"><span class="number">0.217478</span></div><div class="line"><span class="number">0.199864</span></div><div class="line"><span class="number">0.0</span></div><div class="line"><span class="number">0.364917</span></div><div class="line"><span class="number">0.220114</span></div><div class="line"><span class="number">0.195786</span></div><div class="line"><span class="number">0.196516</span></div></pre></td></tr></table></figure>
+<p>可以看出速率呈梯形上升，也就是说冷启动时会以一个比较打的速率慢慢达到平均速率，然后趋于平均速率。<br>这里的限流的使用方式是应用级别的，假设部署到多台机器，应用级限流方式只是单应用内的请求限流，不能进行全局限流。因此，需要用分布式限流或者介入层限流来解决这个问题。</p>
+<h3 id="分布式限流"><a href="#分布式限流" class="headerlink" title="分布式限流"></a>分布式限流</h3><p>分布式限流可以使用Redis+Lua或者Nginx+Lua来实现，这两种都比较简单，就不演示了，有兴趣的话可以去看下作者的书。</p>
+<h3 id="接入层限流"><a href="#接入层限流" class="headerlink" title="接入层限流"></a>接入层限流</h3><p>接入层通常指请求流量入口，这里我们用了OpenResty，就直接使用它提供的Lua限流模块lua-resty-limit-traffic。假设一个场景，需要将平均请求速率限制在500毫秒一个，下面就一步步来实现：</p>
+<ol>
+<li><p>在conf/lua目录下新建limit_req.lua文件，内容如下：</p>
+ <figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">local</span> limit_req = <span class="built_in">require</span>(<span class="string">"resty.limit.req"</span>)</div><div class="line"><span class="comment">-- 固定平均速率为2r/s，也就是500毫秒一个请求</span></div><div class="line"><span class="keyword">local</span> rate = <span class="number">2</span></div><div class="line"><span class="comment">-- 桶容量</span></div><div class="line"><span class="keyword">local</span> burst = <span class="number">3</span></div><div class="line"><span class="keyword">local</span> error_status = <span class="number">503</span></div><div class="line"><span class="comment">-- 是否需要不延迟处理</span></div><div class="line"><span class="keyword">local</span> nodelay = <span class="literal">false</span></div><div class="line"><span class="comment">-- 共享字典</span></div><div class="line"><span class="keyword">local</span> lim, err = limit_req.new(<span class="string">"limit_req_store"</span>, rate, burst)</div><div class="line"><span class="keyword">if</span> <span class="keyword">not</span> lim <span class="keyword">then</span></div><div class="line">    ngx.<span class="built_in">exit</span>(error_status)</div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="comment">-- IP维度的限流</span></div><div class="line"><span class="keyword">local</span> key = ngx.var.binary_remote_addr</div><div class="line"><span class="keyword">local</span> delay, err = lim:incoming(key, <span class="literal">true</span>)</div><div class="line"></div><div class="line"><span class="comment">-- 超出桶大小</span></div><div class="line"><span class="keyword">if</span> <span class="keyword">not</span> delay <span class="keyword">and</span> err == <span class="string">"rejected"</span> <span class="keyword">then</span></div><div class="line">    ngx.<span class="built_in">exit</span>(error_status)</div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="keyword">if</span> delay &gt; <span class="number">0</span> <span class="keyword">then</span></div><div class="line">    <span class="keyword">if</span> <span class="keyword">not</span> nodelay <span class="keyword">then</span></div><div class="line">        <span class="comment">-- 直接突发处理</span></div><div class="line">    <span class="keyword">else</span></div><div class="line">        <span class="comment">-- 延迟处理</span></div><div class="line">        ngx.sleep(delay)</div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>修改conf/nginx.conf配置：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">http &#123;</div><div class="line">    # 共享全局变量，在所有worker间共享</div><div class="line">    lua_shared_dict limit_req_store 100m;</div><div class="line"></div><div class="line">    server &#123;</div><div class="line">        listen 80;</div><div class="line">        </div><div class="line">        location = /limit &#123;</div><div class="line">            access_by_lua_file /Users/zhangjing/IdeaProjects/hunger/conf/lua/limit_req.lua;  </div><div class="line">            echo &quot;access&quot;;  </div><div class="line">            lua_code_cache off;</div><div class="line">            access_log logs/access.log;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>启动nginx，利用AB测试工具简单的测试下：</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> -n 表示总的请求次数 -c 表示并发数</div><div class="line">ab -c 6 -n 6 http://127.0.0.1/limit</div><div class="line"><span class="meta"></span></div><div class="line"># nginx的access log输出如下：</div><div class="line">127.0.0.1 - - [10/Oct/2017:23:21:30 +0800] "GET /limit HTTP/1.0" 200 7 "-" "ApacheBench/2.3"</div><div class="line">127.0.0.1 - - [10/Oct/2017:23:21:30 +0800] "GET /limit HTTP/1.0" 200 7 "-" "ApacheBench/2.3"</div><div class="line">127.0.0.1 - - [10/Oct/2017:23:21:30 +0800] "GET /limit HTTP/1.0" 200 7 "-" "ApacheBench/2.3"</div><div class="line">127.0.0.1 - - [10/Oct/2017:23:21:30 +0800] "GET /limit HTTP/1.0" 200 7 "-" "ApacheBench/2.3"</div><div class="line">127.0.0.1 - - [10/Oct/2017:23:21:30 +0800] "GET /limit HTTP/1.0" 503 219 "-" "ApacheBench/2.3"</div><div class="line">127.0.0.1 - - [10/Oct/2017:23:21:30 +0800] "GET /limit HTTP/1.0" 503 219 "-" "ApacheBench/2.3"</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>从输出可以看出，有请求被限流了。这里只是做了个简单的测试，lua-resty-limit-traffic模块还有更丰富的功能，可以去查阅其文档。</p>
+<h3 id="节流"><a href="#节流" class="headerlink" title="节流"></a>节流</h3><p>有时候我们想在特定时间窗口内对重复的相同事件最多只处理一次，或者想限制多个连续相同事件最小执行间隔事件，那么可以使用节流(Throttle)实现，这个概念本人还没接触过，一起来学下吧。节流主要有如下集中方法：throttleFirst、throttleLast、throttleWithTimeout。</p>
+<h4 id="throttleFirst-throttleLast"><a href="#throttleFirst-throttleLast" class="headerlink" title="throttleFirst/throttleLast"></a>throttleFirst/throttleLast</h4><p>throttleFirst/throttleLast是指一个窗口内，如果有重复的多个相同事件要处理，则指处理第一个或最后一个，从而提升性能。一个场景是网页中的一些操作事件，比如resize、scroll等，当快速连续执行这些操作时，可能会造成UI反应慢，甚至卡顿。节流这时候就可以派上用场了，比如同类事件可以只响应最后一次操作。</p>
+<h4 id="throttleWithTimeout"><a href="#throttleWithTimeout" class="headerlink" title="throttleWithTimeout"></a>throttleWithTimeout</h4><p>throttleWithTimeout也叫做debounce(去抖)，限制两个连续事件的先后执行时间不得小于某个事件窗口。处理方式是，当两个连续事件的间隔事件小于最小间隔时间窗口，就会丢弃上一个事件，而如果最后一个事件等待了最小事件间隔后还没有新的事件到来，那么会处理最后一个事件。比如搜索关键词自动补全，如果用户每录入一个字就发送一个请求，而先输入的字的自动补全很快会被到来的下一个字符覆盖，那么会导致先期的自动补全是无用的。throttleWithTimeout正好可以来解决这个问题，通过它来减少频繁的网络请求。</p>
+<p>这一章节就了解到这里了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Architecture/" rel="tag"># Architecture</a>
+          
+            <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/13/跟开涛学架构四【Hystrix的使用】/" rel="next" title="跟开涛学架构四【Hystrix的使用】">
+                <i class="fa fa-chevron-left"></i> 跟开涛学架构四【Hystrix的使用】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">97</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#限流算法"><span class="nav-number">1.</span> <span class="nav-text">限流算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#令牌桶算法"><span class="nav-number">1.1.</span> <span class="nav-text">令牌桶算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#漏桶算法"><span class="nav-number">1.2.</span> <span class="nav-text">漏桶算法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#限流算法的使用"><span class="nav-number">2.</span> <span class="nav-text">限流算法的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SmoothBursty"><span class="nav-number">2.1.</span> <span class="nav-text">SmoothBursty</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SmoothWarmingUp"><span class="nav-number">2.2.</span> <span class="nav-text">SmoothWarmingUp</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分布式限流"><span class="nav-number">3.</span> <span class="nav-text">分布式限流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#接入层限流"><span class="nav-number">4.</span> <span class="nav-text">接入层限流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#节流"><span class="nav-number">5.</span> <span class="nav-text">节流</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#throttleFirst-throttleLast"><span class="nav-number">5.1.</span> <span class="nav-text">throttleFirst/throttleLast</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#throttleWithTimeout"><span class="nav-number">5.2.</span> <span class="nav-text">throttleWithTimeout</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
