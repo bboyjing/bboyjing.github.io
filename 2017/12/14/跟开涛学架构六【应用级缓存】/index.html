@@ -1,0 +1,729 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.proxy.ustclug.org/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Architecture,Nginx," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="缓存的重要性不用多说了，这一章我们来了解下以Java为例的应用级缓存。 缓存回收策略 基于空间：指缓存设置了存储空间，如果设置为10MB，当达到存储空间上限时，按照一定的策略移除数据。 基于容量：指缓存设置了最大大小，当缓存的条目超过最大大小时，按照一定的策略移除旧数据。 基于时间 TTL(Time To Live)：存活期，即缓存数据从创建开始直到到期的一个时间段。 TTI(Time To Id">
+<meta name="keywords" content="Java,Architecture,Nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="跟开涛学架构六【应用级缓存】">
+<meta property="og:url" content="http://yoursite.com/2017/12/14/跟开涛学架构六【应用级缓存】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="缓存的重要性不用多说了，这一章我们来了解下以Java为例的应用级缓存。 缓存回收策略 基于空间：指缓存设置了存储空间，如果设置为10MB，当达到存储空间上限时，按照一定的策略移除数据。 基于容量：指缓存设置了最大大小，当缓存的条目超过最大大小时，按照一定的策略移除旧数据。 基于时间 TTL(Time To Live)：存活期，即缓存数据从创建开始直到到期的一个时间段。 TTI(Time To Id">
+<meta property="og:updated_time" content="2018-01-22T06:48:12.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="跟开涛学架构六【应用级缓存】">
+<meta name="twitter:description" content="缓存的重要性不用多说了，这一章我们来了解下以Java为例的应用级缓存。 缓存回收策略 基于空间：指缓存设置了存储空间，如果设置为10MB，当达到存储空间上限时，按照一定的策略移除数据。 基于容量：指缓存设置了最大大小，当缓存的条目超过最大大小时，按照一定的策略移除旧数据。 基于时间 TTL(Time To Live)：存活期，即缓存数据从创建开始直到到期的一个时间段。 TTI(Time To Id">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/14/跟开涛学架构六【应用级缓存】/"/>
+
+
+
+
+
+  <title> 跟开涛学架构六【应用级缓存】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/14/跟开涛学架构六【应用级缓存】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                跟开涛学架构六【应用级缓存】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-14T11:31:03+08:00">
+                2017-12-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Architecture/" itemprop="url" rel="index">
+                    <span itemprop="name">Architecture</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>缓存的重要性不用多说了，这一章我们来了解下以Java为例的应用级缓存。</p>
+<h3 id="缓存回收策略"><a href="#缓存回收策略" class="headerlink" title="缓存回收策略"></a>缓存回收策略</h3><ol>
+<li>基于空间：指缓存设置了存储空间，如果设置为10MB，当达到存储空间上限时，按照一定的策略移除数据。</li>
+<li>基于容量：指缓存设置了最大大小，当缓存的条目超过最大大小时，按照一定的策略移除旧数据。</li>
+<li>基于时间<br> TTL(Time To Live)：存活期，即缓存数据从创建开始直到到期的一个时间段。<br> TTI(Time To Idle)：空闲期，即缓存数据多久没有被访问后移除缓存的时间。<a id="more"></a></li>
+<li>基于Java对象引用<br> 软引用：如果一个对象是软引用，那么当JVM堆内存不足时，垃圾回收器可以回收这些对象。<br> 弱引用：当垃圾回收器回收内存时，如果发现弱引用，则将它立即回收。相对于软引用，弱引用有更短的生命周期。<br> 注意：只有在没有其他强引用对象引用软引用/弱引用对象时，垃圾回收时才会回收该引用。</li>
+<li>回收算法<br> 使用基于空间和基于容量的缓存会使用一定的策略移除旧数据，常见如下：<br> FIFO(First In First Out)：先进先出算法，即先放入的缓存先被删除。<br> LRU(Least Recently Used)：最近最少使用算法，使用时间距离现在最久的被移除。<br> LFU(Lease Frequently Used)：最不常用算法，一定时间段内使用频率最少的呗移除。</li>
+</ol>
+<h3 id="Java缓存类型"><a href="#Java缓存类型" class="headerlink" title="Java缓存类型"></a>Java缓存类型</h3><ul>
+<li>堆缓存：使用java堆内存来存储对象，好处是不需要序列化/反序列化，速度快，缺点是受GC影响。可以使用Guava Cache、Ehcache 3.x、MapDB实现。</li>
+<li>堆外缓存：缓存数据存储在堆外，突破了JVM的枷锁，读取数据时需要序列化/反序列化，比对堆内缓存慢很多。可以使用Ehcache 3.x、MapDB实现。</li>
+<li>磁盘缓存：在JVM重启时数据还在，而堆缓存/堆外缓存数据会丢失，需要重新加载。可以使用Ehcache 3.x、MapDB实现。</li>
+<li>分布式缓存：没啥好说的了，Redis…</li>
+</ul>
+<p>对于上述缓存类型的使用，可以采用存储最热的数据到堆缓存，相对热的数据到堆外缓存，全量数据到分布式缓存。下面就来看下每一种类型怎么使用，示例写在real_server_1项目中。</p>
+<h4 id="堆缓存"><a href="#堆缓存" class="headerlink" title="堆缓存"></a>堆缓存</h4><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">&lt;!-- guava版本 --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;com.google.guava&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;guava&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;23.0&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line"></div><div class="line">private static void guavaHeap() throws InterruptedException &#123;</div><div class="line">    Cache&lt;String, String&gt; myCache = CacheBuilder.newBuilder()</div><div class="line">            .concurrencyLevel(4) // 并发级别，即ConcurrentHashMap segment数量，越大并发能力越强</div><div class="line">            .expireAfterWrite(10, TimeUnit.SECONDS) // 设置过期TTL</div><div class="line">            .maximumSize(10000) // 设置缓存的容量，当超出时，按照LRU进行回收</div><div class="line">            .build();</div><div class="line">    myCache.put("guava", "heap_guava");</div><div class="line"></div><div class="line">    while (true) &#123;</div><div class="line">        String value = myCache.getIfPresent("guava");</div><div class="line">        if (value == null) &#123;</div><div class="line">            System.out.println("Cache expired");</div><div class="line">            return;</div><div class="line">        &#125; else &#123;</div><div class="line">            System.out.println(value);</div><div class="line">        &#125;</div><div class="line">        Thread.sleep(1000);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="堆外缓存"><a href="#堆外缓存" class="headerlink" title="堆外缓存"></a>堆外缓存</h4><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">&lt;!-- mapdb --&gt;</div><div class="line">&lt;dependency&gt;</div><div class="line">    &lt;groupId&gt;org.mapdb&lt;/groupId&gt;</div><div class="line">    &lt;artifactId&gt;mapdb&lt;/artifactId&gt;</div><div class="line">    &lt;version&gt;3.0.5&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div><div class="line">        </div><div class="line">private static void mapdbDirect() throws InterruptedException &#123;</div><div class="line">   HTreeMap myCache = DBMaker.memoryDirectDB()</div><div class="line">           .concurrencyScale(16)</div><div class="line">           .make().hashMap("myCache")</div><div class="line">           .expireStoreSize(64 * 1024 * 1024)</div><div class="line">           .expireMaxSize(10000)</div><div class="line">           .expireAfterCreate(10, TimeUnit.SECONDS)</div><div class="line">           .expireAfterUpdate(10, TimeUnit.SECONDS)</div><div class="line">           .expireAfterGet(10, TimeUnit.SECONDS)</div><div class="line">           .create();</div><div class="line"></div><div class="line">    myCache.put("mapdb", "direct_mapdb");</div><div class="line">    System.out.println(myCache.get("mapdb"));</div><div class="line">    Thread.sleep(15000);</div><div class="line">    System.out.println(myCache.get("mapdb"));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="磁盘缓存"><a href="#磁盘缓存" class="headerlink" title="磁盘缓存"></a>磁盘缓存</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">mapdbDisk</span><span class="params">()</span> </span>&#123;</div><div class="line">    DB db = DBMaker.fileDB(<span class="string">"/Users/zhangjing/mpdb.data"</span>)</div><div class="line">            .fileMmapEnable() <span class="comment">// 启用mmap</span></div><div class="line">            .fileMmapEnableIfSupported() <span class="comment">// 在支持的平台上启用mmap</span></div><div class="line">            .fileMmapPreclearDisable() <span class="comment">// 让mmap更快</span></div><div class="line">            .cleanerHackEnable() <span class="comment">// 一些BUG处理</span></div><div class="line">            .transactionEnable() <span class="comment">// 启用事务</span></div><div class="line">            .closeOnJvmShutdown()</div><div class="line">            .concurrencyScale(<span class="number">16</span>).make();</div><div class="line"></div><div class="line">    HTreeMap myCache = db.hashMap(<span class="string">"myCache"</span>)</div><div class="line">            .expireMaxSize(<span class="number">10000</span>)</div><div class="line">            .expireAfterCreate(<span class="number">10</span>, TimeUnit.SECONDS)</div><div class="line">            .expireAfterUpdate(<span class="number">10</span>, TimeUnit.SECONDS)</div><div class="line">            .expireAfterGet(<span class="number">10</span>, TimeUnit.SECONDS)</div><div class="line">            .createOrOpen();</div><div class="line"></div><div class="line">    myCache.put(<span class="string">"mapdb"</span>, <span class="string">"disk_mapdb"</span>);</div><div class="line">    db.commit();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="分布式缓存"><a href="#分布式缓存" class="headerlink" title="分布式缓存"></a>分布式缓存</h4><p><a href="http://bboyjing.github.io/2016/10/18/Redis%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B8%80%E3%80%90%E5%88%9D%E8%AF%86Redis%E3%80%91/" target="_blank" rel="external">参考Redis</a></p>
+<p>上面简单地过下集中缓存的皮毛，在具体使用过程中还得逐个深入研究。</p>
+<h3 id="缓存使用模式实践"><a href="#缓存使用模式实践" class="headerlink" title="缓存使用模式实践"></a>缓存使用模式实践</h3><p>已经有前人给我们总结了模式的使用场景，主要分为两大类：Cache-Aside和Cache-As-SoR(Read-through、Write-through、Write-behind)。首先介绍三个名词：</p>
+<ul>
+<li>SoR(system-of-record)：记录系统，或者可以叫做数据源，即实际存储原始数据的系统。</li>
+<li>Cache：缓存，是SoR快照数据，Cache的访问速度比SoR要快，放入Cache的目的是提升访问速度，减少回源到SoR的次数。</li>
+<li>回源：即回到数据源头获取数据，Cache没有命中时，需要从SoR读取数据，这叫做回源。</li>
+</ul>
+<h4 id="Cache-Aside"><a href="#Cache-Aside" class="headerlink" title="Cache-Aside"></a>Cache-Aside</h4><p>Cache-Aside即业务代码围绕着Cache写，是由业务代码直接维护缓存：</p>
+<ul>
+<li>读场景：先从缓存获取数据，如果没有命中，则回源到SoR并将源数据放入缓存供下次读取使用。</li>
+<li>写场景：先将数据写入SoR，写入成功后立即将数据同步写入缓存；或者先将数据写入SoR，写入成功后将缓存数据过期，下次读取时再加载缓存。</li>
+</ul>
+<p>Cache-Aside可以用AOP模式去实现。</p>
+<h4 id="Cache-As-SoR"><a href="#Cache-As-SoR" class="headerlink" title="Cache-As-SoR"></a>Cache-As-SoR</h4><p>Cache-As-SoR即把Cache看做SoR，所有操作都是对Cache进行，然后Cache再委托给SoR进行真是的读/写。即业务代码中只看到Cache的操作，看不到关于SoR的相关代码。有三种实现：Read-Through、Write-Through、Write-Behind。</p>
+<h5 id="Read-Through"><a href="#Read-Through" class="headerlink" title="Read-Through"></a>Read-Through</h5><p>Read-through，业务代码首先调用Cache，如果Cache不命中由Cache回源到SoR，而不是业务代码（即由Cache读SoR）。使用Read-through模式，需要配置一个CacheLoader组件用来回源SoR加载源数据。</p>
+<h5 id="Write-Through"><a href="#Write-Through" class="headerlink" title="Write-Through"></a>Write-Through</h5><p>Write-Through被称为穿透写模式/直写模式，业务代码首先调用Cache写(新增/修改)数据，然后由Cache负责写缓存和写SoR,而不是由业务代码。使用Write-Through模式需要配置一个CacheWriter组件来回写SoR。</p>
+<h5 id="Write-Behind"><a href="#Write-Behind" class="headerlink" title="Write-Behind"></a>Write-Behind</h5><p>Write-Behind也叫做 Write-Back，我们称之为回写模式。不同于Write-Through是同步写SoR和Cache，Write-Behind是异步写。异步之后可以实现批量写、合并写、延时写和限流。</p>
+<p>这部分代码就不贴出来了，可以选择适合自己的缓存方式再深入研究。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Architecture/" rel="tag"># Architecture</a>
+          
+            <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/09/跟开涛学架构五【限流】/" rel="next" title="跟开涛学架构五【限流】">
+                <i class="fa fa-chevron-left"></i> 跟开涛学架构五【限流】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">98</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存回收策略"><span class="nav-number">1.</span> <span class="nav-text">缓存回收策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java缓存类型"><span class="nav-number">2.</span> <span class="nav-text">Java缓存类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#堆缓存"><span class="nav-number">2.1.</span> <span class="nav-text">堆缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#堆外缓存"><span class="nav-number">2.2.</span> <span class="nav-text">堆外缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#磁盘缓存"><span class="nav-number">2.3.</span> <span class="nav-text">磁盘缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分布式缓存"><span class="nav-number">2.4.</span> <span class="nav-text">分布式缓存</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存使用模式实践"><span class="nav-number">3.</span> <span class="nav-text">缓存使用模式实践</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Cache-Aside"><span class="nav-number">3.1.</span> <span class="nav-text">Cache-Aside</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Cache-As-SoR"><span class="nav-number">3.2.</span> <span class="nav-text">Cache-As-SoR</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Read-Through"><span class="nav-number">3.2.1.</span> <span class="nav-text">Read-Through</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Write-Through"><span class="nav-number">3.2.2.</span> <span class="nav-text">Write-Through</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Write-Behind"><span class="nav-number">3.2.3.</span> <span class="nav-text">Write-Behind</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

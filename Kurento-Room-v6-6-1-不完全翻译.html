@@ -1,0 +1,689 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.proxy.ustclug.org/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content=",,," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="介绍Kurento致力于为Web和智能手机平台的高级视频应用开发人员提供服务。发现一个常用的场景是：需要媒体服务器进行高级媒体处理的多人通话。这个项目介绍了Rooms API，专门用于开发以Kurento媒体服务器为核心的会议应用程序。会议组（会议室）将使用API进行管理，同时还提供了通过Kurento Media Server实例互连最终用户的方法。API的核心模块Room SDK是用于服务器端">
+<meta name="keywords" content="Kurento,WebRTC,Java">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kurento Room v6.6.1 不完全翻译">
+<meta property="og:url" content="http://yoursite.com/Kurento-Room-v6-6-1-不完全翻译.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="介绍Kurento致力于为Web和智能手机平台的高级视频应用开发人员提供服务。发现一个常用的场景是：需要媒体服务器进行高级媒体处理的多人通话。这个项目介绍了Rooms API，专门用于开发以Kurento媒体服务器为核心的会议应用程序。会议组（会议室）将使用API进行管理，同时还提供了通过Kurento Media Server实例互连最终用户的方法。API的核心模块Room SDK是用于服务器端">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/room-top-arch.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/room-components-integration.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/room-manager.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/room-manager-notifications.png">
+<meta property="og:updated_time" content="2017-11-17T16:07:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kurento Room v6.6.1 不完全翻译">
+<meta name="twitter:description" content="介绍Kurento致力于为Web和智能手机平台的高级视频应用开发人员提供服务。发现一个常用的场景是：需要媒体服务器进行高级媒体处理的多人通话。这个项目介绍了Rooms API，专门用于开发以Kurento媒体服务器为核心的会议应用程序。会议组（会议室）将使用API进行管理，同时还提供了通过Kurento Media Server实例互连最终用户的方法。API的核心模块Room SDK是用于服务器端">
+<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/room-top-arch.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/Kurento-Room-v6-6-1-不完全翻译.html"/>
+
+
+
+
+
+  <title>
+  
+
+  
+    Kurento Room v6.6.1 不完全翻译 | bboyjing's blog
+  
+</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left  ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+  <header class="post-header">
+
+	<h2 class="post-title" itemprop="name headline">Kurento Room v6.6.1 不完全翻译</h2>
+
+
+
+</header>
+
+    
+    
+      <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>Kurento致力于为Web和智能手机平台的高级视频应用开发人员提供服务。发现一个常用的场景是：需要媒体服务器进行高级媒体处理的多人通话。<br>这个项目介绍了Rooms API，专门用于开发以Kurento媒体服务器为核心的会议应用程序。会议组（会议室）将使用API进行管理，同时还提供了通过Kurento Media Server实例互连最终用户的方法。<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/room-top-arch.png" alt="room-top-arch"><br>API的核心模块Room SDK是用于服务器端的Java库，具有管理多会议会话的主要功能。<br>此外，还提供额外的组件，可用于开发遵循上述架构的应用程序：</p>
+<ul>
+<li>Room Serve：基于容器实现的服务器，通过WebSockets使用JSON-RPC与客户进行通信</li>
+<li>Room JavaScript Client：为Web应用程序实现一个Room间客户端的模块（仅与Room Server一起使用）</li>
+<li>Room Client：用于Java Web应用程序或Android客户端的客户端库（仅与Room Server一起使用）</li>
+</ul>
+<p><img src="http://7xvxof.com1.z0.glb.clouddn.com/room-components-integration.png" alt="room-components-integration"></p>
+<h4 id="Core-API"><a href="#Core-API" class="headerlink" title="Core API"></a>Core API</h4><p>核心模块为使用Java语言开发的应用程序定义了一个编程模型。使用这个库的一些好处：</p>
+<ul>
+<li>控制多媒体会议（room）的生命周期</li>
+<li>管理参与者所需的典型操作（加入，退出，发布或接收媒体流等）</li>
+<li>简单的媒体信令，应用仅需要提供从客户端接收的媒体初始化和协商参数</li>
+<li>多媒体分支或服务拓扑默认是隐藏的（像图像过滤器这样的媒体元素仍然可以应用于参与者的流）</li>
+</ul>
+<p>该组件需要访问至少一个Kurento媒体服务器实例以进行WebRTC媒体处理。<br>开发人员可以将这个API直接集成到他们的应用程序中，但是有一点需要认识到，这个库本身不具备与客户端通信的能力。更多细节可以在核心API部分找到。</p>
+<h4 id="其它组件"><a href="#其它组件" class="headerlink" title="其它组件"></a>其它组件</h4><p>服务器实现，即房间服务器，使用Springboot、基于WebSockets协议的JSON-RPC打包了Room SDK的功能。因此，它结合了客户端通信组件和核心Room API，提供了一个完整Rooms server应用程序。它可以很容易地集成到使用Spring Boot框架的其他应用程序中。这两个客户端库都被设计为与Room Server结合使用，因为它们使用服务器组件公开的JSON-RPC API。<br>Java客户端不处理媒体操作，而只是通过Room Server支持的JSON-RPC协议来定义Java API。<br>另一方面，JavaScript客户端还控制浏览器的媒体初始化和协商细节，使开发人员可以专注于应用程序功能。<br>目前，还没有可用的IOS客户端。<br>请注意服务器的WebSocket API对用户名称有一个限制，它不能包含下划线（_）。</p>
+<h4 id="整合例子"><a href="#整合例子" class="headerlink" title="整合例子"></a>整合例子</h4><p>Room演示模块是基于Room Server和Room JavaScript客户端的单页面应用程序。它使用户能够同时建立到连接到相同会话或房间的其他用户的多个连接。<br>需要注意的是，尽管核心模块是Room SDK，开发人员可以自由选择他们需要的任何组件来构建他们的应用程序。但是，有些可能需要在客户端进行一些小的修改，而另外一些则希望将其逻辑注入到服务器端，甚至不得不修改SDK。例如：demo演示了如何将一些提供的组件与客户端技术AngularJS以及对服务器的一些小修改（为视频流和自定义消息类型添加图像过滤器）集成在一起。<br>下面提供了demo的安装和运行的快速入门指南。</p>
+<h3 id="Quick-start"><a href="#Quick-start" class="headerlink" title="Quick start"></a>Quick start</h3><p>为了快速地了解框架，建议运行演示应用程序并观察客户端与服务器之间的WebSocket消息交换。<br>目前，该演示仅支持Ubuntu 14.04 LTS 64bits。</p>
+<h4 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h4><p>这个名为kurento-room-demo的项目包含了Rooms API的客户端实现（HTML，JavaScript，图形资源），并嵌入了Room服务器以提供群组通信所需的功能（所谓的房间）。<br>在启动并运行SpringBoot框架后，它启动模块kurento-room-server的主应用程序，通过一个WebSocket接口公开房间API。<br>客户端部分已经使用AngularJS和lumX实现，它使用客户端的JavaScript库（KurentoRoom.js）<br>这个应用程序允许Web客户端有如下行为：</p>
+<ul>
+<li>进入一个房间(如果房间不存在的话，创建)</li>
+<li>离开房间</li>
+<li>发布视频流</li>
+<li>关闭音频或视频</li>
+<li>进入全屏模式</li>
+<li>自动订阅在房间内发布的任何流，并在屏幕上播放（视频），并通过系统扬声器播放播放（音频）</li>
+<li>取消订阅流</li>
+<li>取消发布媒体</li>
+<li>发消息给其它同伴</li>
+<li>在其发布的视频流上应用或移除媒体过滤器（使用在识别的人脸上添加帽子的脸部覆盖过滤器）</li>
+<li>从可用缩略图中选择要在浏览器较大区域显示哪个视频源</li>
+</ul>
+<h4 id="运行demo"><a href="#运行demo" class="headerlink" title="运行demo"></a>运行demo</h4><p>克隆完教程后，可以使用Maven exec插件直接从终端执行。为了确保可以正确构建和执行演示，在继续构建之前检查稳定版本（或标记）（防止缺少依赖关系，因为Kurento master是开发分支）：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> git clone https://github.com/Kurento/kurento-room.git</div><div class="line"><span class="meta">$</span> cd kurento-room</div><div class="line"><span class="meta">#</span> checkout the latest tag</div><div class="line"><span class="meta">$</span> git checkout $(git describe --abbrev=0 --tags)</div><div class="line"><span class="meta">$</span> cd kurento-room-demo</div><div class="line"><span class="meta">$</span> mvn compile exec:java -Dkms.uris=[\"ws://kms_host:kms_port/kurento\"]</div></pre></td></tr></table></figure></p>
+<p>现在，在兼容WebRTC的浏览器中打开以下<a href="https://localhost:8443，并通过提供所需的用户名和房间名来连接到新房间。" target="_blank" rel="external">https://localhost:8443，并通过提供所需的用户名和房间名来连接到新房间。</a></p>
+<h4 id="配置demo"><a href="#配置demo" class="headerlink" title="配置demo"></a>配置demo</h4><p>有几个选项或属性可能需要修改才能使演示正常运行。演示执行过程中使用的属性文件kurento-room-demo.conf.json位于文件夹src/main/resources中。</p>
+<h3 id="Rooms核心API"><a href="#Rooms核心API" class="headerlink" title="Rooms核心API"></a>Rooms核心API</h3><p>Rooms API基于Room Manager抽象。Room Manager可以借助Kurento技术来组织和控制多方的群组通话。<br>我们将此库理解为任何想要实现Room服务端应用程序的开发人员的SDK。<br>Room Manager的Java API负责处理Room和媒体特定的细节，使程序员从低级或重复性任务（每个多重会议应用程序固有的）中解放出来，让他们更专注于应用程序的功能或业务逻辑。</p>
+<h4 id="理解API"><a href="#理解API" class="headerlink" title="理解API"></a>理解API</h4><p>Manager处理了两个主要概念：</p>
+<ul>
+<li>rooms：虚拟的同伴组，限制了用户一次只能加入一个组。为了识别用户，使用他们的名字。</li>
+<li>participants：虚拟的终端用户。应用程序将提供用户级别的字符串表示形式，以便唯一标识此参与者</li>
+</ul>
+<p>鉴于使用了我们API的应用程序的性质，期望终端用户能够尝试连接到现有房间（或创建新的房间），并发布或接收来自其他对等体的媒体流。<br>在使用这个SDK时，应用程序的工作是从终端用户那里接收消息并将其转换向Room Manager实例的请求。<br>API的一些方法不仅要处理房间管理，而且要处理参与者所需的媒体功能。底层媒体处理是通过一个名为Kurento Client的库来执行的，当一些由管理器创建的媒体对象满足某些条件时，可以出发事件。反过来，处理这些事件所收集的信息有时需要通知终端用户。Manager通过Room Handler接口来通知应用程序最重要的事件，应用程序必须提供一个实现。<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/room-manager.png" alt="room-manager"><br>提供了两种类型的Room Manager，它们暴露了相同的接口（相同的方法名称，但具有不同的签名）：</p>
+<ul>
+<li>org.kurento.room.RoomManager：默认实现</li>
+<li>org.kurento.room.NotificationRoomManager：定义了发送通知或响应客户端的模型的实现</li>
+</ul>
+<h4 id="RoomManager"><a href="#RoomManager" class="headerlink" title="RoomManager"></a>RoomManager</h4><p>创建新的Room Manager(普通)有两个要求，需要提供如下实现：</p>
+<ul>
+<li>Room Handler责由内部媒体对象触发的事件</li>
+<li>Kurento Client Manager用于获取Kurento客户端示例</li>
+</ul>
+<p>对于来自客户端的请求，应用程序需要通知远程参与者执行请求的结果，例如当其中一个请求发布她的媒体时通知房间中的所有参与者。<br>还有另外一种类型的方法来处理由应用程序发起的请求（或业务逻辑），在这种情况下，应用程序可以自由解释结果并对其执行操作。</p>
+<h4 id="Events-RoomHandler"><a href="#Events-RoomHandler" class="headerlink" title="Events - RoomHandler"></a>Events - RoomHandler</h4><p>为了向一个媒体对象发出的事件，如收集新的ICE候选人或媒体错误，应用程序必须提供一个事件处理机制。一般来说，这些都是面向用户的事件，所以应用程序应该通知相应的用户。</p>
+<h5 id="Room和RoomHandler的关系"><a href="#Room和RoomHandler的关系" class="headerlink" title="Room和RoomHandler的关系"></a>Room和RoomHandler的关系</h5><p>下面是一个事件到事件处理的对照表：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Events</th>
+<th style="text-align:center">RoomHandler</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">gathered ICE candidate</td>
+<td style="text-align:center">onSendIceCandidate</td>
+</tr>
+<tr>
+<td style="text-align:center">pipeline error</td>
+<td style="text-align:center">onPipelineError</td>
+</tr>
+<tr>
+<td style="text-align:center">media element error</td>
+<td style="text-align:center">onMediaElementError</td>
+</tr>
+</tbody>
+</table>
+<h4 id="NotificationRoomManager"><a href="#NotificationRoomManager" class="headerlink" title="NotificationRoomManager"></a>NotificationRoomManager</h4><p>实例化NotificationRoomManager时有两个要求，需要提供如下实现：</p>
+<ul>
+<li>能够发送消息或通知连接到应用程序的终端用户的接口或者控制通知的生命周期的房间处理通知</li>
+<li>Kurento Client Manager用于获取Kurento客户端示例</li>
+</ul>
+<p>房间事件处理程序的设计旨在向应用程序提供处理用户请求结果的反馈。<br>通知管理API考虑了两种不同类型的方法：</p>
+<ul>
+<li>server domain - 包括用于实现应用程序逻辑层的方法以及与Room SDK的集成。这些方法将以同步的形式执行。它们可以被视为帮助或管理方法，并直接控制Rooms。</li>
+<li>client domain - 由于传入的用户请求而调用，它们实现了客户端的房间规范。它们可以异步执行，调用方不应期望得到结果，但是如果需要进一步分析和处理客户端的请求，可以使用response handler。</li>
+</ul>
+<p>图描述了在使用notifications room manager时的系统组成组件：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/room-manager-notifications.png" alt="room-manager-notifications"></p>
+<h4 id="Notifications-design-UserNotificationService"><a href="#Notifications-design-UserNotificationService" class="headerlink" title="Notifications design - UserNotificationService"></a>Notifications design - UserNotificationService</h4><p>这个规范是设计好的，这样房间管理员可以将通知或响应发送回远程对等点，同时保持与传输层或通信层的隔离。通知API被NotificationRoomHandler的实现类(DefaultNotificationRoomHandler类)使用。<br>API的方法是基于协议json - rpc及其消息格式定义的。希望客户端和服务器通信使用此协议，但不是必需的。<br>开发人员需要为这个API提供一个实现。<br>如果开发人员选择另一种机制与客户端进行通信，那么他们将不得不使用他们自己的NotificationRoomHandler的实现，它将和来自Room API的通信细节解耦。</p>
+<h4 id="Notifications-design-NotificationRoomHandler"><a href="#Notifications-design-NotificationRoomHandler" class="headerlink" title="Notifications design - NotificationRoomHandler"></a>Notifications design - NotificationRoomHandler</h4><p>通过这个接口，Room API将客户端原语的执行结果传递给应用程序，并从那里传递给客户端。遵守这样的协议是应用程序的职责。这些方法都返回void。<br>在用户请求范围之外发生的事情会调用一些方法:房间关闭、用户被逐出，以及从RoomHandler接口继承的那些。</p>
+<h5 id="NotificationRoomManager-and-NotificationRoomHandler-relations"><a href="#NotificationRoomManager-and-NotificationRoomHandler-relations" class="headerlink" title="NotificationRoomManager and NotificationRoomHandler relations"></a>NotificationRoomManager and NotificationRoomHandler relations</h5><p>下面一张表详细描述了NotificationRoomManager的方法，它将使用NotificationRoomHandler(包括继承的方法)的方法。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">NotificationRoomManager</th>
+<th style="text-align:center">NotificationRoomHandler</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">joinRoom</td>
+<td style="text-align:center">onParticipantJoined</td>
+</tr>
+<tr>
+<td style="text-align:center">leaveRoom</td>
+<td style="text-align:center">onParticipantLeft</td>
+</tr>
+<tr>
+<td style="text-align:center">publishMedia</td>
+<td style="text-align:center">onPublishMedia</td>
+</tr>
+<tr>
+<td style="text-align:center">unpublishMedia</td>
+<td style="text-align:center">onUnpublishMedia</td>
+</tr>
+<tr>
+<td style="text-align:center">subscribe</td>
+<td style="text-align:center">onSubscribe</td>
+</tr>
+<tr>
+<td style="text-align:center">unsubscribe</td>
+<td style="text-align:center">onUnsubscribe</td>
+</tr>
+<tr>
+<td style="text-align:center">sendMessage</td>
+<td style="text-align:center">onSendMessage</td>
+</tr>
+<tr>
+<td style="text-align:center">onIceCandidate</td>
+<td style="text-align:center">onRecvIceCandidate</td>
+</tr>
+<tr>
+<td style="text-align:center">close room (Server action)</td>
+<td style="text-align:center">onRoomClosed</td>
+</tr>
+<tr>
+<td style="text-align:center">evict participant (Server action)</td>
+<td style="text-align:center">onParticipantEvicted</td>
+</tr>
+<tr>
+<td style="text-align:center">gathered ICE candidate (Server event)</td>
+<td style="text-align:center">onSendIceCandidate</td>
+</tr>
+<tr>
+<td style="text-align:center">pipeline error (Server event)</td>
+<td style="text-align:center">onPipelineError</td>
+</tr>
+<tr>
+<td style="text-align:center">media element error (Server event)</td>
+<td style="text-align:center">onParticipantMediaError</td>
+</tr>
+</tbody>
+</table>
+<h4 id="KurentoClientProvider"><a href="#KurentoClientProvider" class="headerlink" title="KurentoClientProvider"></a>KurentoClientProvider</h4><p>设计该服务的目的是房间管理员可以随时获取一个Kurento客户端实例，而不需要了解KMS实例的位置。<br>开发人员需要为这个接口提供一个实现。</p>
+<h4 id="POJOs"><a href="#POJOs" class="headerlink" title="POJOs"></a>POJOs</h4><p>在房间API定义的请求和响应中使用了以下类：</p>
+<ul>
+<li>UserParticipant - 将参与者的标识符与用户名联系起来，并标记该用户是否是当前流媒体。</li>
+<li>ParticipantRequest - 将参与者的标识符与请求ID(通信级别的可选请求标识符，包含客户端响应；是可以为null的，并且将被复制)联系起来。在Room Manager的通知变体中使用。</li>
+<li>RoomException - 运行时异常包装，包括：<ul>
+<li>code - 表示发生的错误类型的数字</li>
+<li>message - 对错误的简短字符串描述</li>
+</ul>
+</li>
+</ul>
+
+    
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">98</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
