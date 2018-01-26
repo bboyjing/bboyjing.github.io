@@ -1,0 +1,724 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.proxy.ustclug.org/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Architecture,Nginx," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本章节来学习下Http缓存相关内容，这也是容易被忽略的一部分。我们利用Chrome和real_server_1项目进行测试。我们下面就来看下如何在Java应用层控制浏览器缓存。 HTTP缓存Last-Modified直接看real_server_1上实现的代码：">
+<meta name="keywords" content="Java,Architecture,Nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="跟开涛学架构七【HTTP缓存】">
+<meta property="og:url" content="http://yoursite.com/2018/01/22/跟开涛学架构七【HTTP缓存】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="本章节来学习下Http缓存相关内容，这也是容易被忽略的一部分。我们利用Chrome和real_server_1项目进行测试。我们下面就来看下如何在Java应用层控制浏览器缓存。 HTTP缓存Last-Modified直接看real_server_1上实现的代码：">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/hunger_6.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/hunger_7.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/hunger_8.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/hunger_9.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/hunger_10.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/hunger_11.png">
+<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/hunger_12.png">
+<meta property="og:updated_time" content="2018-01-26T16:27:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="跟开涛学架构七【HTTP缓存】">
+<meta name="twitter:description" content="本章节来学习下Http缓存相关内容，这也是容易被忽略的一部分。我们利用Chrome和real_server_1项目进行测试。我们下面就来看下如何在Java应用层控制浏览器缓存。 HTTP缓存Last-Modified直接看real_server_1上实现的代码：">
+<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/hunger_6.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/01/22/跟开涛学架构七【HTTP缓存】/"/>
+
+
+
+
+
+  <title> 跟开涛学架构七【HTTP缓存】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/22/跟开涛学架构七【HTTP缓存】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                跟开涛学架构七【HTTP缓存】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-22T15:16:34+08:00">
+                2018-01-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Architecture/" itemprop="url" rel="index">
+                    <span itemprop="name">Architecture</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章节来学习下Http缓存相关内容，这也是容易被忽略的一部分。我们利用Chrome和real_server_1项目进行测试。我们下面就来看下如何在Java应用层控制浏览器缓存。</p>
+<h3 id="HTTP缓存"><a href="#HTTP缓存" class="headerlink" title="HTTP缓存"></a>HTTP缓存</h3><h4 id="Last-Modified"><a href="#Last-Modified" class="headerlink" title="Last-Modified"></a>Last-Modified</h4><p>直接看real_server_1上实现的代码：<br><a id="more"></a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RestController</span></div><div class="line"><span class="meta">@RequestMapping</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HttpCacheController</span> </span>&#123;</div><div class="line">    Cache&lt;String, Long&gt; lastModifiedCache = CacheBuilder.newBuilder()</div><div class="line">            .expireAfterWrite(<span class="number">10</span>, TimeUnit.SECONDS).build();</div><div class="line"></div><div class="line">    <span class="meta">@RequestMapping</span>(path = <span class="string">"/last-modified"</span>, method = RequestMethod.GET)</div><div class="line">    <span class="function"><span class="keyword">public</span> ResponseEntity&lt;String&gt; <span class="title">lastModified</span><span class="params">(@RequestHeader(value = <span class="string">"If-Modified-Since"</span>, required = <span class="keyword">false</span>)</span> Date ifModifiedSince) <span class="keyword">throws</span> ExecutionException </span>&#123;</div><div class="line">        DateFormat gmtDateFormat = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"EEE, d MMM yyyy HH:mm:ss 'GMT'"</span>, Locale.US);</div><div class="line"></div><div class="line">        <span class="comment">// 文档最后修改时间，去掉毫秒值</span></div><div class="line">        <span class="keyword">long</span> lastModifiedMillis = getLastModified() / <span class="number">1000</span> * <span class="number">1000</span>;</div><div class="line"></div><div class="line">        <span class="comment">// 当前系统时间，去掉毫秒值</span></div><div class="line">        <span class="keyword">long</span> now = System.currentTimeMillis() / <span class="number">1000</span> * <span class="number">1000</span>;</div><div class="line"></div><div class="line">        <span class="comment">// 文档可以被缓存多久，单位秒</span></div><div class="line">        <span class="keyword">long</span> maxAge = <span class="number">20</span>;</div><div class="line"></div><div class="line">        MultiValueMap&lt;String, String&gt; headers = <span class="keyword">new</span> HttpHeaders();</div><div class="line">        <span class="comment">// 当前时间</span></div><div class="line">        headers.add(<span class="string">"Date"</span>, gmtDateFormat.format(<span class="keyword">new</span> Date(now)));</div><div class="line">        <span class="comment">// 过期时间 http1.0支持</span></div><div class="line">        headers.add(<span class="string">"Expires"</span>, gmtDateFormat.format(<span class="keyword">new</span> Date(now + maxAge * <span class="number">1000</span>)));</div><div class="line">        <span class="comment">// 文档生存时间 http1.1支持</span></div><div class="line">        headers.add(<span class="string">"Cache-Control"</span>, <span class="string">"max-age="</span> + maxAge);</div><div class="line"></div><div class="line">        <span class="comment">// 判断内容是否修改了</span></div><div class="line">        <span class="keyword">if</span> (ifModifiedSince != <span class="keyword">null</span> &amp;&amp; ifModifiedSince.getTime() == lastModifiedMillis) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ResponseEntity(headers, HttpStatus.NOT_MODIFIED);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="comment">// 文档修改时间</span></div><div class="line">            headers.add(<span class="string">"Last-Modified"</span>, gmtDateFormat.format(lastModifiedMillis));</div><div class="line">            String body = <span class="string">"&lt;a href = ''&gt;点击跳转当前链接&lt;/a&gt;"</span>;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ResponseEntity(body, headers, HttpStatus.OK);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getLastModified</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException </span>&#123;</div><div class="line">        <span class="keyword">return</span> lastModifiedCache.get(<span class="string">"lastModified"</span>, () -&gt; System.currentTimeMillis());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>为了方便测试，文档的修改时间为每十秒钟更新一次。下面就来测试下：</p>
+<h5 id="首次访问"><a href="#首次访问" class="headerlink" title="首次访问"></a>首次访问</h5><p>首次访问<code>http://localhost:8081/last-modified</code>，将得到如下响应头：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/hunger_6.png" alt="hunger_6"><br>响应状态吗200表示请求成功，另外，有如下几个缓存控制参数。</p>
+<ul>
+<li>Last-Modified：表示文档的最后修改时间，当去服务器验证时会用到这个时间</li>
+<li>Expires：http/1.0规范定义，表示文档在浏览器中的过期时间，当缓存内容时间超过这个时间，则需要重新去服务器获取最新的内容。</li>
+<li>Cache-Control：http/1.1规范定义，表示浏览器缓存控制，max-age=20表示文档可以在浏览器中缓存20秒</li>
+</ul>
+<p>根据规范定义，Cache-Control优先级高于Expires。实际使用时可以两个都用，或仅使用Cache-Control就可以了。</p>
+<h5 id="F5刷新"><a href="#F5刷新" class="headerlink" title="F5刷新"></a>F5刷新</h5><p>接着按F5刷新当前页面(拒首次访问10秒内)，将看到浏览器发送如下请求头：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/hunger_7.png" alt="hunger_7"><br>此处发送时有一个If-Modified-Since请求头，其值是上次请求响应中的Last-Modified，即浏览器会用这个时间去服务端验证内容是否发生了变更，接着收到如下响应信息：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/hunger_8.png" alt="hunger_8"><br>状态码为304，表示服务端通知浏览器”你缓存的内容没有变化，直接使用缓存内容展示吧”。</p>
+<h5 id="Ctrl-F5强制刷新"><a href="#Ctrl-F5强制刷新" class="headerlink" title="Ctrl+F5强制刷新"></a>Ctrl+F5强制刷新</h5><p>如果想强制从服务端获取最新的内容，可以按”Ctrl + F5”(“command + shift + R”)组合键。浏览器在请求时不会带上If-Modified-Since，但是会带上Cache-Control:no-cache和Pragma:no-cache，这是为了通知服务器提供一份最新的内容。</p>
+<h4 id="ETag"><a href="#ETag" class="headerlink" title="ETag"></a>ETag</h4><p>先直接看下etag实现：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RequestMapping</span>(path = <span class="string">"/etag"</span>, method = RequestMethod.GET)</div><div class="line"><span class="function"><span class="keyword">public</span> ResponseEntity&lt;String&gt; <span class="title">etag</span><span class="params">(@RequestHeader(value = <span class="string">"If-None-Match"</span>, required = <span class="keyword">false</span>)</span> String ifNoneMatch) <span class="keyword">throws</span> ExecutionException </span>&#123;</div><div class="line">    <span class="comment">// 当前系统时间</span></div><div class="line">    <span class="keyword">long</span> now = System.currentTimeMillis();</div><div class="line"></div><div class="line">    <span class="comment">// 文档可以在浏览器上缓存多久</span></div><div class="line">    <span class="keyword">long</span> maxAge = <span class="number">10</span>;</div><div class="line"></div><div class="line">    String body = <span class="string">"&lt;a href = ''&gt;点击跳转当前链接&lt;/a&gt;"</span>;</div><div class="line">    String etag = <span class="string">"W/\""</span> + MD5Util.MD5(body) + <span class="string">"\""</span>;</div><div class="line">    <span class="keyword">if</span> (StringUtils.equals(ifNoneMatch, etag)) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ResponseEntity(HttpStatus.NOT_MODIFIED);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    DateFormat gmtDateFormat = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"EEE, d MMM yyyy HH:mm:ss 'GMT'"</span>, Locale.US);</div><div class="line">    MultiValueMap&lt;String, String&gt; headers = <span class="keyword">new</span> HttpHeaders();</div><div class="line">    <span class="comment">// Etag http 1.1支持</span></div><div class="line">    headers.add(<span class="string">"Etag"</span>, etag);</div><div class="line">    <span class="comment">// 当前时间</span></div><div class="line">    headers.add(<span class="string">"Date"</span>, gmtDateFormat.format(<span class="keyword">new</span> Date(now)));</div><div class="line">    <span class="comment">// 文档生存时间 http 1.1支持</span></div><div class="line">    headers.add(<span class="string">"Cache-Control"</span>, <span class="string">"max-age="</span> + maxAge);</div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ResponseEntity(body, headers, HttpStatus.OK);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>其中Etag用于发送到服务器进行内容变更验证的，而Cache-Control用于控制缓存时间。此处使用了W\”343sda”，弱实体只要内容语义没变即可。Nginx在生成Etag时使用的算法是Last-Modified + Content-Length。经过测试，可以看出请求头带上了If-None-Match，其值为第一次访问<code>http://localhost:8081/etag</code>时返回的Response Headers的Etag的值。</p>
+<p>到目前为止我们一直没有看出Cache-Control的max-age或者Expires是如何起作用的。之前测试都是在浏览器地址栏刷新或者强制刷新当前请求，都会去服务端验证内容是否发生变更，跟max-age完全没关系。也就是说max-age起作用的点不在于当前请求，而是可以被别人缓存多久。典型的场景比如js、css、图片等外部资源的引用，或者页面跳转等。我们拿页面跳转来做个测试，修改下/etag请求的body部分：<code>String body = &quot;&lt;a href = &#39;http://localhost:8081/last-modified&#39;&gt;点击跳转到/last-modified&lt;/a&gt;&quot;;</code>，目的是为了看出max-age到底是对谁生效。理一下测试的场景，我们当前主页面为<code>http://localhost:8081/etag</code>，其内容就是跳转到<code>http://localhost:8081/last-modified</code>，当前页面的max-age为10秒，/last-modified页面的max-age为20秒。下面列出测试步骤</p>
+<ol>
+<li>强制刷新<code>http://localhost:8081/etag</code>，然后立刻点击超链接，此时会跳转到<code>http://localhost:8081/last-modified</code>，看下请求头：<br> <img src="http://7xvxof.com1.z0.glb.clouddn.com/hunger_9.png" alt="hunger_9"></li>
+<li>点击浏览器后退按钮回到<code>http://localhost:8081/etag</code>，然后再点击超链接，请求到/last-modified的请求头：<br> <img src="http://7xvxof.com1.z0.glb.clouddn.com/hunger_10.png" alt="hunger_10"><br>可以看出Request Headers和之前大不相同，再结合服务端的debug来看，浏览器其实走的是本地cache，没有向服务端发出请求。当距离第一步20秒左右之后，再次执行本步奏，会发现点击超链接时，会发送/last-modified请求到服务端。综上看来这是max-age起的作用，其意思是/last-modified链接的内容可以被/etag缓存20秒。</li>
+</ol>
+<h3 id="Nginx-HTTP缓存设置"><a href="#Nginx-HTTP缓存设置" class="headerlink" title="Nginx HTTP缓存设置"></a>Nginx HTTP缓存设置</h3><h4 id="Nginx托管的静态资源"><a href="#Nginx托管的静态资源" class="headerlink" title="Nginx托管的静态资源"></a>Nginx托管的静态资源</h4><p>Nginx 提供了expires、etag、if-modified-since指令来实现浏览器缓存控制。<br>我们下面来测试下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"># 1、修改conf/nginx.conf</div><div class="line">location /img/ &#123;</div><div class="line">    alias /usr/local/Cellar/openresty/1.11.2.5/nginx/html/;</div><div class="line">    expires 1d;</div><div class="line">&#125;</div><div class="line"></div><div class="line"># 2、在/usr/local/Cellar/openresty/1.11.2.5/nginx/html/目录下新增一张图片1.jpg</div></pre></td></tr></table></figure></p>
+<p>访问<code>http://localhost/img/1.jpg</code>，返回的Response Headers如下:<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/hunger_11.png" alt="hunger_11"><br>可见缓存所需要的请求都基本都有了，其中对于静态资源Nginx会自动添加Etag，可以通过etag off指令禁止生成Etag。</p>
+<h4 id="proxy-pass"><a href="#proxy-pass" class="headerlink" title="proxy_pass"></a>proxy_pass</h4><p>在real_server_1项目中写一个新的请求，来看看nginx对proxy_pass的默认行为：<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">@RequestMapping(path = "/cache_nginx", method = RequestMethod.GET)</div><div class="line">public String cache_nginx() &#123;</div><div class="line">    return "from real server 1.";</div><div class="line">&#125;</div><div class="line"></div><div class="line"># Nginx location配置，和上面一样，加了expires</div><div class="line">location / &#123;</div><div class="line">    proxy_http_version 1.1;</div><div class="line">    proxy_set_header Connection "";</div><div class="line">    proxy_pass http://real_server;</div><div class="line">    expires 1d;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>来看下访问<code>http://localhost/cache_nginx</code>，返回的Response Headers如下:<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/hunger_12.png" alt="hunger_12"><br>可以看出expires 1d的设置是成功的，但是和Nginx对静态资源的处理有所不同。proxy_pass的Response Headers没有了ETag和Last-Modified，交由真正业务服务器自行处理。</p>
+<p>Http缓存就学到这里，在实际使用中，index页面和其加载的外部资源该如何缓存，需要自行斟酌。同时别忘了还要结合是通过浏览器直接访问还是APP的webview访问，这两种方式对于index页面的访问行为有时候是不一样的，区别就在于max-age是否介入。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Architecture/" rel="tag"># Architecture</a>
+          
+            <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/14/跟开涛学架构六【应用级缓存】/" rel="next" title="跟开涛学架构六【应用级缓存】">
+                <i class="fa fa-chevron-left"></i> 跟开涛学架构六【应用级缓存】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP缓存"><span class="nav-number">1.</span> <span class="nav-text">HTTP缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Last-Modified"><span class="nav-number">1.1.</span> <span class="nav-text">Last-Modified</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#首次访问"><span class="nav-number">1.1.1.</span> <span class="nav-text">首次访问</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#F5刷新"><span class="nav-number">1.1.2.</span> <span class="nav-text">F5刷新</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Ctrl-F5强制刷新"><span class="nav-number">1.1.3.</span> <span class="nav-text">Ctrl+F5强制刷新</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ETag"><span class="nav-number">1.2.</span> <span class="nav-text">ETag</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx-HTTP缓存设置"><span class="nav-number">2.</span> <span class="nav-text">Nginx HTTP缓存设置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Nginx托管的静态资源"><span class="nav-number">2.1.</span> <span class="nav-text">Nginx托管的静态资源</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#proxy-pass"><span class="nav-number">2.2.</span> <span class="nav-text">proxy_pass</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
