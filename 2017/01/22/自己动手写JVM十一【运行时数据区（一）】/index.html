@@ -91,12 +91,12 @@
 <meta property="og:url" content="http://yoursite.com/2017/01/22/自己动手写JVM十一【运行时数据区（一）】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="到目前为止，已经实现了搜索、解析class文件，本章节就来讨论下如何初步实现运行时数据区。 运行时数据区概述在运行Java程序时，Java虚拟机需要使用内存在存放各式各样的数据。Java虚拟机规范把这些内存区域叫作运行时数据区。运行时数据区可以分成两类：一类是多线程共享的，另一类则是线程私有的。多线程共享的运行时数据去需要在Java虚拟机启动时创建浩，在Java虚拟机退出时销毁。线程私有的运行时数">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_28.png">
-<meta property="og:updated_time" content="2017-02-05T23:15:56.000Z">
+<meta property="og:image" content="http://qiniu.didadu.cn/jvmgo_28.png">
+<meta property="og:updated_time" content="2019-02-05T17:14:21.383Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="自己动手写JVM十一【运行时数据区（一）】">
 <meta name="twitter:description" content="到目前为止，已经实现了搜索、解析class文件，本章节就来讨论下如何初步实现运行时数据区。 运行时数据区概述在运行Java程序时，Java虚拟机需要使用内存在存放各式各样的数据。Java虚拟机规范把这些内存区域叫作运行时数据区。运行时数据区可以分成两类：一类是多线程共享的，另一类则是线程私有的。多线程共享的运行时数据去需要在Java虚拟机启动时创建浩，在Java虚拟机退出时销毁。线程私有的运行时数">
-<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_28.png">
+<meta name="twitter:image" content="http://qiniu.didadu.cn/jvmgo_28.png">
 
 
 
@@ -276,7 +276,7 @@
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -372,7 +372,7 @@
 <h4 id="Java虚拟机栈"><a href="#Java虚拟机栈" class="headerlink" title="Java虚拟机栈"></a>Java虚拟机栈</h4><p>Java虚拟机规范对Java虚拟机栈的约束相当宽松，Java虚拟机栈可以是连续的空间，也可以时不连续的；可以时固定大小的，也可以是运行时动态扩展的。如果Java虚拟机栈有大小限制，且执行线程所需要的栈空间超出了这个限制，会导致StackOverflowError异常抛出。如果Java虚拟机栈可以动态扩展，但是内存已经耗尽，会导致OutOfMemoryError异常抛出。我们用经典的链表数据结构来实现Java虚拟机栈，这样栈就可以按需使用内存空间，而且弹出的帧也可以及时被GO的垃圾收集器回收。下面定义Stack结构体，相关代码位于jvm_stack.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 虚拟机栈结构体</span></div><div class="line"><span class="keyword">type</span> Stack <span class="keyword">struct</span> &#123;</div><div class="line">	<span class="comment">// 栈的容量(最多可以容纳多少帧)</span></div><div class="line">	maxSize <span class="keyword">uint</span></div><div class="line">	<span class="comment">// 当前栈的大小</span></div><div class="line">	size    <span class="keyword">uint</span></div><div class="line">	<span class="comment">// 栈顶指针</span></div><div class="line">	_top    *Frame</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 初始化虚拟机栈</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">newStack</span><span class="params">(maxSize <span class="keyword">uint</span>)</span> *<span class="title">Stack</span></span> &#123;</div><div class="line">	<span class="keyword">return</span> &amp;Stack&#123;maxSize:maxSize&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>完善thread.go文件，添加初始化线程的方法，newStack()函数创建Stack结构体实例，参数表明Stack最多可以容纳多少栈帧。<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 初始化线程</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewThread</span><span class="params">()</span> *<span class="title">Thread</span></span> &#123;</div><div class="line">	<span class="keyword">return</span> &amp;Thread&#123;</div><div class="line">		stack: newStack(<span class="number">1024</span>),</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <h4 id="栈帧"><a href="#栈帧" class="headerlink" title="栈帧"></a>栈帧</h4><p>栈帧结构体位于frame.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> Frame <span class="keyword">struct</span> &#123;</div><div class="line">	<span class="comment">// 实现链表数据结构</span></div><div class="line">	lower        *Frame</div><div class="line">	<span class="comment">// 局部变量</span></div><div class="line">	localVars    LocalVars</div><div class="line">	<span class="comment">// 操作数栈指针</span></div><div class="line">	operandStack *OperandStack</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// localVars和operandStackGet方法</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Frame)</span> <span class="title">LocalVars</span><span class="params">()</span> <span class="title">LocalVars</span></span> &#123;</div><div class="line">	<span class="keyword">return</span> self.localVars</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Frame)</span> <span class="title">OperandStack</span><span class="params">()</span> *<span class="title">OperandStack</span></span> &#123;</div><div class="line">	<span class="keyword">return</span> self.operandStack</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>由Thread、Stack和Frame的结构可以看出，Java虚拟机栈的链表结构如下图所示：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_28.png" alt="jvmgo_28"></p>
+<p>由Thread、Stack和Frame的结构可以看出，Java虚拟机栈的链表结构如下图所示：<br><img src="http://qiniu.didadu.cn/jvmgo_28.png" alt="jvmgo_28"></p>
 <h4 id="局部变量表"><a href="#局部变量表" class="headerlink" title="局部变量表"></a>局部变量表</h4><p>局部变量表时按索引访问的，所以很自然，可以把它想象成一个数组。根据Java虚拟机规范，这个数组的每个元素至少可以容纳一个int或引用之，两个连续的元素可以容纳一个long或double值。这里采用定义一个结构体来存放局部变量表，其结构体位于slot.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> Slot <span class="keyword">struct</span> &#123;</div><div class="line">	<span class="comment">// 整数</span></div><div class="line">	num <span class="keyword">int32</span></div><div class="line">	<span class="comment">// 引用</span></div><div class="line">	ref *Object</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>num字段存放整数，ref字段存放引用，刚好满足需求。其中Object位于object.go文件中，暂时结构体中没有内容，其结构如下：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> Object <span class="keyword">struct</span> &#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>下面就可以新建局部变量表结构体了，位于local_vars.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="comment">// 局部变量表结构体</span></div><div class="line"><span class="keyword">type</span> LocalVars []Slot</div><div class="line"></div><div class="line"><span class="comment">// 创建LocalVars实例</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">newLocalVars</span><span class="params">(maxLocals <span class="keyword">uint</span>)</span> <span class="title">LocalVars</span></span> &#123;</div><div class="line">	<span class="keyword">if</span> maxLocals &gt; <span class="number">0</span> &#123;</div><div class="line">		<span class="keyword">return</span> <span class="built_in">make</span>([]Slot, maxLocals)</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> <span class="literal">nil</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
@@ -498,7 +498,7 @@
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -506,7 +506,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -514,7 +514,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -523,7 +523,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -601,7 +601,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

@@ -91,14 +91,14 @@
 <meta property="og:url" content="http://yoursite.com/2017/01/08/自己动手写JVM五【解析class文件（三）】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="本章节继续学习ClassFile中各项所代表的含义。 接口索引表类和超类索引后面时接口索引表，表中存放的也是常量池索引。ClassFile.class没有实现接口，所以接口表是空的：在class_file.go文件中添加读取接口索引表的方法：1234func (self *ClassFile) readInterface(reader *ClassReader) &amp;#123;	//接口是u2类型的">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_10.png">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_11.png">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_12.png">
-<meta property="og:updated_time" content="2017-01-15T23:15:40.000Z">
+<meta property="og:image" content="http://qiniu.didadu.cn/jvmgo_10.png">
+<meta property="og:image" content="http://qiniu.didadu.cn/jvmgo_11.png">
+<meta property="og:image" content="http://qiniu.didadu.cn/jvmgo_12.png">
+<meta property="og:updated_time" content="2019-02-05T17:14:21.358Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="自己动手写JVM五【解析class文件（三）】">
 <meta name="twitter:description" content="本章节继续学习ClassFile中各项所代表的含义。 接口索引表类和超类索引后面时接口索引表，表中存放的也是常量池索引。ClassFile.class没有实现接口，所以接口表是空的：在class_file.go文件中添加读取接口索引表的方法：1234func (self *ClassFile) readInterface(reader *ClassReader) &amp;#123;	//接口是u2类型的">
-<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_10.png">
+<meta name="twitter:image" content="http://qiniu.didadu.cn/jvmgo_10.png">
 
 
 
@@ -278,7 +278,7 @@
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -365,7 +365,7 @@
 
       
         <p>本章节继续学习ClassFile中各项所代表的含义。</p>
-<h3 id="接口索引表"><a href="#接口索引表" class="headerlink" title="接口索引表"></a>接口索引表</h3><p>类和超类索引后面时接口索引表，表中存放的也是常量池索引。ClassFile.class没有实现接口，所以接口表是空的：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_10.png" alt="jvmgo_10"><br>在class_file.go文件中添加读取接口索引表的方法：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ClassFile)</span> <span class="title">readInterface</span><span class="params">(reader *ClassReader)</span></span> &#123;</div><div class="line">	<span class="comment">//接口是u2类型的表结构，所以用的readUint16s方法读取</span></div><div class="line">	self.interfaces = reader.readUint16s()</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="接口索引表"><a href="#接口索引表" class="headerlink" title="接口索引表"></a>接口索引表</h3><p>类和超类索引后面时接口索引表，表中存放的也是常量池索引。ClassFile.class没有实现接口，所以接口表是空的：<br><img src="http://qiniu.didadu.cn/jvmgo_10.png" alt="jvmgo_10"><br>在class_file.go文件中添加读取接口索引表的方法：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ClassFile)</span> <span class="title">readInterface</span><span class="params">(reader *ClassReader)</span></span> &#123;</div><div class="line">	<span class="comment">//接口是u2类型的表结构，所以用的readUint16s方法读取</span></div><div class="line">	self.interfaces = reader.readUint16s()</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <a id="more"></a>
 <h3 id="字段表-field-info-和方法表-method-info"><a href="#字段表-field-info-和方法表-method-info" class="headerlink" title="字段表(field_info)和方法表(method_info)"></a>字段表(field_info)和方法表(method_info)</h3><p>接口索引表之后是字段表和方法表，分别存储字段和方法信息。field_info和method_info的基本结构大致相同，差别仅在于属性表，下面时Java虚拟机规范给出的field_info结构定义：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">field_info &#123;</div><div class="line">    u2             access_flags;</div><div class="line">    u2             name_index;</div><div class="line">    u2             descriptor_index;</div><div class="line">    u2             attributes_count;</div><div class="line">    attribute_info attributes[attributes_count];</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>method_info的结构上述一样，仅在access_flags和attribute_info的可选项中有所区别。为了避免重复代码，所以用一个结构体同一表示字段表和方法表，位于member_info.go文件中，结构体名为MemberInfo：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> MemberInfo <span class="keyword">struct</span> &#123;</div><div class="line">	cp              ConstantPool</div><div class="line">	accessFlags     <span class="keyword">uint16</span></div><div class="line">	nameIndex       <span class="keyword">uint16</span></div><div class="line">	descriptorIndex <span class="keyword">uint16</span></div><div class="line">	attributes      []AttributeInfo</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
@@ -541,7 +541,7 @@
 </tr>
 </tbody>
 </table>
-<p>ClassFile.class的字段表和方法表如下：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_11.png" alt="jvmgo_11"><br><img src="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_12.png" alt="jvmgo_12"></p>
+<p>ClassFile.class的字段表和方法表如下：<br><img src="http://qiniu.didadu.cn/jvmgo_11.png" alt="jvmgo_11"><br><img src="http://qiniu.didadu.cn/jvmgo_12.png" alt="jvmgo_12"></p>
 <p>在member_info.go文件中添加读取方法：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">readMembers</span><span class="params">(reader *ClassReader, cp ConstantPool)</span> []*<span class="title">MemberInfo</span></span> &#123;</div><div class="line">	<span class="comment">// 获取fields_count或者methods_count</span></div><div class="line">	memberCount := reader.readUint16()</div><div class="line">	members := <span class="built_in">make</span>([]*MemberInfo, memberCount)</div><div class="line">	<span class="comment">// 读取每一个field或者method</span></div><div class="line">	<span class="keyword">for</span> i := <span class="keyword">range</span> members &#123;</div><div class="line">		members[i] = readMember(reader, cp)</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> members</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="title">readMember</span><span class="params">(reader *ClassReader, cp ConstantPool)</span> *<span class="title">MemberInfo</span></span> &#123;</div><div class="line">	<span class="comment">// 读取class文件中对应的字节</span></div><div class="line">	<span class="keyword">return</span> &amp;MemberInfo&#123;</div><div class="line">		cp:              cp,</div><div class="line">		accessFlags:     reader.readUint16(),</div><div class="line">		nameIndex:       reader.readUint16(),</div><div class="line">		descriptorIndex: reader.readUint16(),</div><div class="line">		<span class="comment">// 读取属性表后面再讲</span></div><div class="line">		<span class="comment">//attributes:      readAttributes(reader, cp),</span></div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>在class_file.go中添加读取字段表和方法表的方法：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ClassFile)</span> <span class="title">readFields</span><span class="params">(reader *ClassReader)</span></span> &#123;</div><div class="line">	self.fields = readMembers(reader, self.constantPool)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ClassFile)</span> <span class="title">readMethods</span><span class="params">(reader *ClassReader)</span></span> &#123;</div><div class="line">	self.methods = readMembers(reader, self.constantPool)</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>下节继续…</p>
@@ -651,7 +651,7 @@
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -659,7 +659,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -667,7 +667,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -676,7 +676,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -754,7 +754,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

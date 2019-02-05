@@ -91,14 +91,14 @@
 <meta property="og:url" content="http://yoursite.com/2017/03/28/Java-NIO之【缓冲区】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="平时写业务代码不一定会直接涉及到底层IO的使用，但是作为一个有点思想的码农，就算用不到，至少也应该知道。所以准备系统地学习下Java NIO，为日后看框架源码打下点基础。本系列博客学习的依据是前人翻译的《Java NIO》中文版，网友对该书褒贬不一，可能各个人群的需求不一样，确实重口难调。但是，没有经历过，怎么知道对自己是否合适。废话不多说了，摆好姿势，开始学习了。先建个项目，用于存放测试用力，本">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/nio_1.png">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/nio_2.png">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/nio_3.png">
-<meta property="og:updated_time" content="2017-03-27T18:52:06.000Z">
+<meta property="og:image" content="http://qiniu.didadu.cn/nio_1.png">
+<meta property="og:image" content="http://qiniu.didadu.cn/nio_2.png">
+<meta property="og:image" content="http://qiniu.didadu.cn/nio_3.png">
+<meta property="og:updated_time" content="2019-02-05T17:14:21.149Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java NIO之【缓冲区】">
 <meta name="twitter:description" content="平时写业务代码不一定会直接涉及到底层IO的使用，但是作为一个有点思想的码农，就算用不到，至少也应该知道。所以准备系统地学习下Java NIO，为日后看框架源码打下点基础。本系列博客学习的依据是前人翻译的《Java NIO》中文版，网友对该书褒贬不一，可能各个人群的需求不一样，确实重口难调。但是，没有经历过，怎么知道对自己是否合适。废话不多说了，摆好姿势，开始学习了。先建个项目，用于存放测试用力，本">
-<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/nio_1.png">
+<meta name="twitter:image" content="http://qiniu.didadu.cn/nio_1.png">
 
 
 
@@ -278,7 +278,7 @@
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -366,7 +366,7 @@
       
         <p>平时写业务代码不一定会直接涉及到底层IO的使用，但是作为一个有点思想的码农，就算用不到，至少也应该知道。所以准备系统地学习下Java NIO，为日后看框架源码打下点基础。本系列博客学习的依据是前人翻译的《Java NIO》中文版，网友对该书褒贬不一，可能各个人群的需求不一样，确实重口难调。但是，没有经历过，怎么知道对自己是否合适。废话不多说了，摆好姿势，开始学习了。先建个项目，用于存放测试用力，本人的项目位于<a href="https://github.com/bboyjing/nio_learn" target="_blank" rel="external">Github</a>。</p>
 <a id="more"></a>
-<p>Buffer类是java.nio的构造基础，简单来说，Buffer对象就是用来存放数据的。先看下，Buffer的直接继承关系：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/nio_1.png" alt="nio_1"><br>从图中可以看出，Byffer的子类基本上是跟Java基本数据类型密切相关的。打开IntBuffer.java看下源码，其中有一个成员变量<code>final int[] hb;</code>，这就是存放数据的数组。所以Buffer类的底层实现可以认为就是数组，但是同时做了一些扩展。</p>
+<p>Buffer类是java.nio的构造基础，简单来说，Buffer对象就是用来存放数据的。先看下，Buffer的直接继承关系：<br><img src="http://qiniu.didadu.cn/nio_1.png" alt="nio_1"><br>从图中可以看出，Byffer的子类基本上是跟Java基本数据类型密切相关的。打开IntBuffer.java看下源码，其中有一个成员变量<code>final int[] hb;</code>，这就是存放数据的数组。所以Buffer类的底层实现可以认为就是数组，但是同时做了一些扩展。</p>
 <h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><p>所有的缓冲区都包含四个重要的属性。</p>
 <ul>
 <li>容量(capacity)：缓冲区能够容纳的数据元素的最大数量，这一容量在缓冲区创建时被设定,并且永远不能被改变</li>
@@ -374,7 +374,7 @@
 <li>位置(position)：下一个要被读或写的元素的索引，初始值为0</li>
 <li>标记(mark)：备忘位置，初始值为-1，表示未定义。通过调用某些方法给该标记设值</li>
 </ul>
-<p>这四个属性之间的关系是：mark &lt;= position &lt;= limit &lt;= capacity，下面展示一个新创建的容量为10的ByteBuffer：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/nio_2.png" alt="nio_2"><br>从图中可以看出，初始时mark未被定义，position被设成0，limit和capacity被设为10，由于数组下标从0开始，所以该buffer可访问的地址为0~9，limit和capacity指向的10号位是不可访问的。</p>
+<p>这四个属性之间的关系是：mark &lt;= position &lt;= limit &lt;= capacity，下面展示一个新创建的容量为10的ByteBuffer：<br><img src="http://qiniu.didadu.cn/nio_2.png" alt="nio_2"><br>从图中可以看出，初始时mark未被定义，position被设成0，limit和capacity被设为10，由于数组下标从0开始，所以该buffer可访问的地址为0~9，limit和capacity指向的10号位是不可访问的。</p>
 <h3 id="缓冲区API"><a href="#缓冲区API" class="headerlink" title="缓冲区API"></a>缓冲区API</h3><p>Buffer类定义了一些公共的API，看了下源码，这些API基本上都是对属性的设值。可想而知，对位置的操作是使用Buffer类的关键，下面挑一个来看下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 清空缓冲区</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Buffer <span class="title">clear</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="comment">// 将起始位置设置成0</span></div><div class="line">    position = <span class="number">0</span>;</div><div class="line">    <span class="comment">// 将上限设置成容量最大值</span></div><div class="line">    limit = capacity;</div><div class="line">    <span class="comment">// 将mark设置成未定义</span></div><div class="line">    mark = -<span class="number">1</span>;</div><div class="line">    <span class="comment">// 返回当前Buffer实例</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>从上述API可以看出两个特点：</p>
 <ol>
@@ -389,7 +389,7 @@
 <li>上例中每个字符都必须强转成byte</li>
 <li>该缓冲区存的单位是字节，而char在java中占2个字节，这里强转会丢掉前八位，仅做测试用。</li>
 </ol>
-<p>5次调用put()之后缓冲区的状态如下图：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/nio_3.png" alt="nio_3"><br>这类图以后就不画了，太烦了。通过如下代码可以修改buffer中的值：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 将位置0的值替换为M，不会影响当前position</span></div><div class="line">buffer.put(<span class="number">0</span>, (<span class="keyword">byte</span>)<span class="string">'M'</span>);</div><div class="line"><span class="comment">// 继续操作buffer</span></div><div class="line">buffer.put((<span class="keyword">byte</span>)<span class="string">'w'</span>);</div></pre></td></tr></table></figure></p>
+<p>5次调用put()之后缓冲区的状态如下图：<br><img src="http://qiniu.didadu.cn/nio_3.png" alt="nio_3"><br>这类图以后就不画了，太烦了。通过如下代码可以修改buffer中的值：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 将位置0的值替换为M，不会影响当前position</span></div><div class="line">buffer.put(<span class="number">0</span>, (<span class="keyword">byte</span>)<span class="string">'M'</span>);</div><div class="line"><span class="comment">// 继续操作buffer</span></div><div class="line">buffer.put((<span class="keyword">byte</span>)<span class="string">'w'</span>);</div></pre></td></tr></table></figure></p>
 <h4 id="翻转"><a href="#翻转" class="headerlink" title="翻转"></a>翻转</h4><p>要读取写完的buffer，需要先对buffer进行翻转动作，Buffer类提供flip()函数正是提供该功能，我们先来看下该函数实现代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Buffer <span class="title">flip</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="comment">// 将limit设置成当前position所在的位置，也就是缓冲区的第一个不能被读或写的元素</span></div><div class="line">    limit = position;</div><div class="line">    <span class="comment">// 将position指向第0位</span></div><div class="line">    position = <span class="number">0</span>;</div><div class="line">    <span class="comment">// 将mark设置成未定义</span></div><div class="line">    mark = -<span class="number">1</span>;</div><div class="line">    <span class="comment">// 返回buffer引用</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>经过翻转之后，表示该缓冲区从0~limit-1是可读的。</p>
 <h4 id="释放"><a href="#释放" class="headerlink" title="释放"></a>释放</h4><p>Buffer类提供hasRemaining()函数，用于查看缓冲区是否已达上限，该函数实现很简单，只是判断下position是否小于上限：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">hasRemaining</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> position &lt; limit;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
@@ -529,7 +529,7 @@
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -537,7 +537,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -545,7 +545,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -554,7 +554,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -632,7 +632,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

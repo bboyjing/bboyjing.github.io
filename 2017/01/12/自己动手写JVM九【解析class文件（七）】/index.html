@@ -91,14 +91,14 @@
 <meta property="og:url" content="http://yoursite.com/2017/01/12/自己动手写JVM九【解析class文件（七）】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="本章节开始学习属性表相关信息，上一节找到的main()方法的字节码就出现在属性表中，属性表可谓是个大杂烩，里面存储了各式各样的信息。下面我们就来详细讨论讨论。 解析属性表AttributeInfo接口和常量池类似，各种属性表达的信息也各不相同，因此无法用同一的结构来定义。不同之处在于，常量是由Java虚拟机规范严格定义的，共有14种。但是属性是可以扩展的，不同的虚拟机实现可以定义自己的属性类型，所">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_24.png">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_25.png">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_26.png">
-<meta property="og:updated_time" content="2017-01-23T22:23:26.000Z">
+<meta property="og:image" content="http://qiniu.didadu.cn/jvmgo_24.png">
+<meta property="og:image" content="http://qiniu.didadu.cn/jvmgo_25.png">
+<meta property="og:image" content="http://qiniu.didadu.cn/jvmgo_26.png">
+<meta property="og:updated_time" content="2019-02-05T17:14:21.327Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="自己动手写JVM九【解析class文件（七）】">
 <meta name="twitter:description" content="本章节开始学习属性表相关信息，上一节找到的main()方法的字节码就出现在属性表中，属性表可谓是个大杂烩，里面存储了各式各样的信息。下面我们就来详细讨论讨论。 解析属性表AttributeInfo接口和常量池类似，各种属性表达的信息也各不相同，因此无法用同一的结构来定义。不同之处在于，常量是由Java虚拟机规范严格定义的，共有14种。但是属性是可以扩展的，不同的虚拟机实现可以定义自己的属性类型，所">
-<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_24.png">
+<meta name="twitter:image" content="http://qiniu.didadu.cn/jvmgo_24.png">
 
 
 
@@ -278,7 +278,7 @@
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -461,7 +461,7 @@
 <p>由于不包含任何数据，所以attribute_length的值必须为0。Deprecated属性用于指出类、接口、字段或方法已经不建议使用。Synthetic属性用来标记源文件中不存在、有编译器生成的类成员，引入Synthetic属性主要是为了支持嵌套类和嵌套接口。相关代码位于attr_marker.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 统一的结构体</span></div><div class="line"><span class="keyword">type</span> MarkerAttribute <span class="keyword">struct</span>&#123;&#125;</div><div class="line"></div><div class="line"><span class="keyword">type</span> DeprecatedAttribute <span class="keyword">struct</span> &#123;</div><div class="line">	MarkerAttribute</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">type</span> SyntheticAttribute <span class="keyword">struct</span> &#123;</div><div class="line">	MarkerAttribute</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// attribute_length值为0，所以方法中什么都不做</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *MarkerAttribute)</span> <span class="title">readInfo</span><span class="params">(reader *ClassReader)</span></span> &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <h4 id="SourceFile属性"><a href="#SourceFile属性" class="headerlink" title="SourceFile属性"></a>SourceFile属性</h4><p>SourceFile是可选定长属性，只会出现在ClassFile结构中，用于指出源文件名。其结构定义如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">SourceFile_attribute &#123;</div><div class="line">    u2 attribute_name_index;</div><div class="line">    u4 attribute_length;</div><div class="line">    u2 sourcefile_index;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>attribute_length的值必须是2，attribute_name_index和sourcefile_index都是常量池索引。相关代码位于attr_source_file.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> SourceFileAttribute <span class="keyword">struct</span> &#123;</div><div class="line">	cp              ConstantPool</div><div class="line">	sourceFileIndex <span class="keyword">uint16</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *SourceFileAttribute)</span> <span class="title">readInfo</span><span class="params">(reader *ClassReader)</span></span> &#123;</div><div class="line">	<span class="comment">// attribute_length的值为2，所以固定读取2个字节</span></div><div class="line">	self.sourceFileIndex = reader.readUint16()</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 通过索引读取常量池中utf8字面值</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *SourceFileAttribute)</span> <span class="title">FileName</span><span class="params">()</span> <span class="title">string</span></span> &#123;</div><div class="line">	<span class="keyword">return</span> self.cp.getUtf8(self.sourceFileIndex)</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>下面来看看class文件：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_24.png" alt="jvmgo_24"><br>前两个字节attribute_name_index为0x002F，转换成十进制为47。查看常量池，第47个是CONSTANT_Utf8_info常量结构体，字面值正是SourceFile。虽然attribute_length占4个字节，但是SourceFile属性中该值固定为2，所以直接看最后2个字节0x0030，转换成十进制为48。查看常量池第48个：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_25.png" alt="jvmgo_25"><br>图中可以看出是CONSTANT_Utf8_info常量结构体，字面值为ClassFile.java，正是源文件名。</p>
+<p>下面来看看class文件：<br><img src="http://qiniu.didadu.cn/jvmgo_24.png" alt="jvmgo_24"><br>前两个字节attribute_name_index为0x002F，转换成十进制为47。查看常量池，第47个是CONSTANT_Utf8_info常量结构体，字面值正是SourceFile。虽然attribute_length占4个字节，但是SourceFile属性中该值固定为2，所以直接看最后2个字节0x0030，转换成十进制为48。查看常量池第48个：<br><img src="http://qiniu.didadu.cn/jvmgo_25.png" alt="jvmgo_25"><br>图中可以看出是CONSTANT_Utf8_info常量结构体，字面值为ClassFile.java，正是源文件名。</p>
 <h4 id="ConstantValue"><a href="#ConstantValue" class="headerlink" title="ConstantValue"></a>ConstantValue</h4><p>ConstantValue是定长属性，只会出现在field_info结构中，用于表示常量表达wenjian式的值，其结构如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">ConstantValue_attribute &#123;</div><div class="line">    u2 attribute_name_index;</div><div class="line">    u4 attribute_length;</div><div class="line">    u2 constantvalue_index;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>attribute_length的值必须为2，attribute_name_index和constantvalue_index都是常量池索引，但constantvalue_index具体指向哪种常量因字段类型而异。下表给出字段类型和常量类型的对应关系：</p>
 <table>
@@ -495,7 +495,7 @@
 </tbody>
 </table>
 <p>相关代码位于attr_constant_value.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> ConstantValueAttribute <span class="keyword">struct</span> &#123;</div><div class="line">	constantValueIndex <span class="keyword">uint16</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 读取ConstantValue_attribute</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ConstantValueAttribute)</span> <span class="title">readInfo</span><span class="params">(reader *ClassReader)</span></span> &#123;</div><div class="line">	<span class="comment">// 读取读取2个字节的constantValueIndex</span></div><div class="line">	self.constantValueIndex = reader.readUint16()</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 读取constantValueIndex</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ConstantValueAttribute)</span> <span class="title">ConstantValueIndex</span><span class="params">()</span> <span class="title">uint16</span></span> &#123;</div><div class="line">	<span class="keyword">return</span> self.constantValueIndex</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>下面看下FLAG字段的class文件：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_26.png" alt="jvmgo_26"><br>可以清楚地看出，FLAG中有一个attribute，attribute_name_index为0x0009，常量池第9个正是ConstantValue。attribute_length值固定为2，那直接看最后两个字节0x000A，指向常量池第10个CONSTANT_Integer_info常量。</p>
+<p>下面看下FLAG字段的class文件：<br><img src="http://qiniu.didadu.cn/jvmgo_26.png" alt="jvmgo_26"><br>可以清楚地看出，FLAG中有一个attribute，attribute_name_index为0x0009，常量池第9个正是ConstantValue。attribute_length值固定为2，那直接看最后两个字节0x000A，指向常量池第10个CONSTANT_Integer_info常量。</p>
 <p>下节继续学习属性相关信息。。。</p>
 
       
@@ -603,7 +603,7 @@
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -611,7 +611,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -619,7 +619,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -628,7 +628,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -706,7 +706,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

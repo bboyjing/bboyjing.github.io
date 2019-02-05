@@ -266,12 +266,12 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/22/Redis学习笔记十五【使用Redis构建应用程序组件-任务队列】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/09/自己动手写JVM六【解析class文件（四）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/12/22/Redis学习笔记十五【使用Redis构建应用程序组件-任务队列】/" itemprop="url">
-                  Redis学习笔记十五【使用Redis构建应用程序组件-任务队列】
+                <a class="post-title-link" href="/2017/01/09/自己动手写JVM六【解析class文件（四）】/" itemprop="url">
+                  自己动手写JVM六【解析class文件（四）】
                 </a>
               
             
@@ -306,159 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-22T16:45:16+08:00">
-                2016-12-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis/" itemprop="url" rel="index">
-                    <span itemprop="name">Redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>本章节将学习如何使用Redis来构建任务队列，实现类似RabbitMQ之类的消息队列的功能。</p>
-<h3 id="先进先出队列"><a href="#先进先出队列" class="headerlink" title="先进先出队列"></a>先进先出队列</h3><p>依然使用之前虚构的例子，现在来实现通过电子邮件来订阅商品交易市场中已售出的商品的相关信息。因为对外发电子邮件可能会有非常高的延迟，甚至可能会出现发送失败的情况，所以将使用任务队列来记录邮件的收信人以及发送邮件的原因，并构建一个可以在邮件发送服务器运行变得缓慢的时候，以并行方式一次发送多封邮件的工作进程。我们要编写的队列将以“先到先服务”的方式发送邮件，并且无论发送是否成功，程序都会把结果记录到日志中。<br>邮件队列采用List构成，存储JSON格式的字符串，数据结构如下：</p>
-<ul>
-<li>key<ul>
-<li>queue:email</li>
-</ul>
-</li>
-<li>list value<ul>
-<li>“{“seller_id”:1,”item_id”:”Item_M”,”price”:97,”buyer_id”:27,”time”:1482399576744}”</li>
-<li>××××××</li>
-</ul>
-</li>
-</ul>
-          <!--noindex-->
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/12/22/Redis学习笔记十五【使用Redis构建应用程序组件-任务队列】/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/19/自己动手写JVM一【准备环境】/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="bboyjing">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="bboyjing's blog">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/12/19/自己动手写JVM一【准备环境】/" itemprop="url">
-                  自己动手写JVM一【准备环境】
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-19T17:20:17+08:00">
-                2016-12-19
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-09T23:24:00+08:00">
+                2017-01-09
               </time>
             
 
@@ -512,12 +361,12 @@
 
       
         
-          <p>之前看过两遍《深入理解java虚拟机》，能吸收点知识，但是远远没有能够深入理解。最近购入张秀宏著的《自己动手写Java虚拟机》一书，抱着想要更深地理解JVM的目的去学习，并记录下学习笔记。第一章节还是先来准备环境。</p>
-<h3 id="Java"><a href="#Java" class="headerlink" title="Java"></a>Java</h3><p>关于Java环境的准备步骤就不赘述了，本人使用的版本是1.8.0_91</p>
-<h3 id="Go"><a href="#Go" class="headerlink" title="Go"></a>Go</h3><p>这本书的JVM实现是用Go写的，之前没有接触过，在这一学习过程中顺带就把Go也简单地学习下了。Go的安装参照<a href="https://golang.org/dl/" target="_blank" rel="external">golang</a>，选择的是目前最新版是1.7.4。Go的参考资料选择<a href="http://docs.ruanjiadeng.com/gopl-zh/" target="_blank" rel="external">Go语言圣经</a>和<a href="https://go-tour-zh.appspot.com/welcome/1" target="_blank" rel="external">Go语言指南</a>。</p>
+          <p>本章节继续学习ClassFile中各项所代表的含义。</p>
+<h3 id="常量池"><a href="#常量池" class="headerlink" title="常量池"></a>常量池</h3><p>常量池占据了class文件很大一部分数据，里面存储着各式各样的常量信息，包括数字和字符串常量、类和接口名，字段和方法等等，下面我们就来详细了解常量池和各种常量。</p>
+<h4 id="ConstantPool结构体"><a href="#ConstantPool结构体" class="headerlink" title="ConstantPool结构体"></a>ConstantPool结构体</h4><p>constant_pool.go文件中定义了ConstantPool类型，常量池实际上也是一个表，所以ConstantPool被定义成ConstantInfo的数组。所以，要理解常量池，得先去看ConstantInfo是什么，然后再回过来，此处未完待续，接着往下看。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/12/19/自己动手写JVM一【准备环境】/#more" rel="contents">
+            <a class="btn" href="/2017/01/09/自己动手写JVM六【解析class文件（四）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -558,12 +407,12 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/16/Redis学习笔记十四【使用Redis构建应用程序组件-计数信号量】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/08/自己动手写JVM五【解析class文件（三）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -583,8 +432,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/12/16/Redis学习笔记十四【使用Redis构建应用程序组件-计数信号量】/" itemprop="url">
-                  Redis学习笔记十四【使用Redis构建应用程序组件-计数信号量】
+                <a class="post-title-link" href="/2017/01/08/自己动手写JVM五【解析class文件（三）】/" itemprop="url">
+                  自己动手写JVM五【解析class文件（三）】
                 </a>
               
             
@@ -598,8 +447,428 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-16T10:49:51+08:00">
-                2016-12-16
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-08T15:36:29+08:00">
+                2017-01-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>本章节继续学习ClassFile中各项所代表的含义。</p>
+<h3 id="接口索引表"><a href="#接口索引表" class="headerlink" title="接口索引表"></a>接口索引表</h3><p>类和超类索引后面时接口索引表，表中存放的也是常量池索引。ClassFile.class没有实现接口，所以接口表是空的：<br><img src="http://qiniu.didadu.cn/jvmgo_10.png" alt="jvmgo_10"><br>在class_file.go文件中添加读取接口索引表的方法：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ClassFile)</span> <span class="title">readInterface</span><span class="params">(reader *ClassReader)</span></span> &#123;</div><div class="line">	<span class="comment">//接口是u2类型的表结构，所以用的readUint16s方法读取</span></div><div class="line">	self.interfaces = reader.readUint16s()</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+          <!--noindex-->
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/01/08/自己动手写JVM五【解析class文件（三）】/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/05/自己动手写JVM四【解析class文件（二）】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/01/05/自己动手写JVM四【解析class文件（二）】/" itemprop="url">
+                  自己动手写JVM四【解析class文件（二）】
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-05T14:44:52+08:00">
+                2017-01-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>本章节开始重点学习ClassFile中各项所代表的含义，这部分可能会比较枯燥，坚持学下去，会有收获的。</p>
+<h3 id="魔数-magic"><a href="#魔数-magic" class="headerlink" title="魔数(magic)"></a>魔数(magic)</h3><p>很多文件格式都会规定满足该格式的文件必须以某几个固定字节开头，这几个字节主要起标识作用，叫作魔数。class文件的魔数是”0xCAFEBABE”，可以参照classpy打开的ClassFile.class文件看下：<br><img src="http://qiniu.didadu.cn/jvmgo_4.png" alt="jvmgo_4"><br>所以，class文件以固定的4个字节(CAFEBABE)开头。在class_file.go文件中添加读取魔数的方法：</p>
+          <!--noindex-->
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/01/05/自己动手写JVM四【解析class文件（二）】/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/03/自己动手写JVM三【解析class文件（一）】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/01/03/自己动手写JVM三【解析class文件（一）】/" itemprop="url">
+                  自己动手写JVM三【解析class文件（一）】
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-03T16:22:12+08:00">
+                2017-01-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>上一章节已经实现了读取class文件，测试的时候还打印出一堆杂乱无章的数字，本章就来学习下，这些数字到底是什么，如何解析这些class文件。</p>
+<h3 id="class文件"><a href="#class文件" class="headerlink" title="class文件"></a>class文件</h3><p>作为类信息的载体，每个class文件都完整地定义了一个类，也就是说所有的信息都包含在那一堆数字当中，我们可以通过网络下载、从数据库加载，甚至是在运行中直接生成class文件。所以，class文件并非特指位于磁盘中的.class文件，而是泛指任何格式符合规范的class数据。<br>为了更好的理解class文件，我们再建一个java项目，和go项目同级，该项目的作用就是在需要的时候测试自己写的JVM。现在，新建一个class：</p>
+          <!--noindex-->
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/01/03/自己动手写JVM三【解析class文件（一）】/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/28/Redis学习笔记十六【使用Redis构建应用程序组件-消息拉取】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/12/28/Redis学习笔记十六【使用Redis构建应用程序组件-消息拉取】/" itemprop="url">
+                  Redis学习笔记十六【使用Redis构建应用程序组件-消息拉取】
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-28T11:28:46+08:00">
+                2016-12-28
               </time>
             
 
@@ -653,326 +922,10 @@
 
       
         
-          <p>计数信号量也是一种锁，它可以让用户限制一项资源最多能够同时被多少个进程访问，计数信号量和锁的区别在于，当客户端获取锁失败时，通常会选择等待；而当客户端获取计数信号量失败时，通常会选择立即返回失败结果。下面模拟一下，最多同时只允许5个进程同时访问一个资源。</p>
-<h3 id="构建基本的计数信号量"><a href="#构建基本的计数信号量" class="headerlink" title="构建基本的计数信号量"></a>构建基本的计数信号量</h3><p>构建计数信号量时要考虑的事情和构建其他类型的锁时要考虑的事情大部分都是相同的，比如判断时哪个客户端取得了锁，如何处理客户端在获得锁之后奔溃的情况，以及如何处理锁超时的问题。为了使多个信号量持有者的信息都存储到同一个结构里面，将使用有序集合来构建计数信号量。就是为每个尝试获取信号量的进程生成一个唯一标识符，将这个标识符用作有序集合的成员，对应的分值是尝试获取信号量时的Unix时间戳。</p>
+          <p>多个客户端在互相发送和接收消息的时候，通常会使用以下两种方式来传递消息。第一种时消息推送，也就是由消息发送者来确保所有接受者已经成功接收到了消息，Redis内置了PUBLISH和SUBSCRIBE命令可以实现；第二种时消息拉取，这种方法要求接收者自己去获取存储在某种mailbox里的消息。尽管消息推送非常有用，但是客户端因为某些原因而没办法一直保持在线的时候，采用这一消息传递方法的程序就会出现各种各样的问题。本章节将尝试编写不同的消息拉取方式，来替代PUBLISH和SUBSCRIBE。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/12/16/Redis学习笔记十四【使用Redis构建应用程序组件-计数信号量】/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/15/Redis学习笔记十三【使用Redis构建应用程序组件-分布式锁】/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="bboyjing">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="bboyjing's blog">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/12/15/Redis学习笔记十三【使用Redis构建应用程序组件-分布式锁】/" itemprop="url">
-                  Redis学习笔记十三【使用Redis构建应用程序组件-分布式锁】
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-15T10:10:39+08:00">
-                2016-12-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis/" itemprop="url" rel="index">
-                    <span itemprop="name">Redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>本章节，构造分布式锁的目的既不是给同一个进程中的多个线程使用，也不是给同一台机器上的多个进程使用，而是由不同机器上的不同Redis客户端进行获取和释放的。</p>
-<h3 id="锁的重要性"><a href="#锁的重要性" class="headerlink" title="锁的重要性"></a>锁的重要性</h3><p>回忆一下之前学的Redis事物章节中模拟的市场购物场景，购买商品的时候使用了watch去监视市场以及买家的的个人信息来保证购买流程的正常进行。引用书上的性能测试数据来说明性能扩展的必要性，下表将展示市场在重负载情况下运行60秒的结果：</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">卖家、买家数</th>
-<th style="text-align:center">上架商品数量</th>
-<th style="text-align:center">买入商品数量</th>
-<th style="text-align:center">购买重试次数</th>
-<th style="text-align:center">每次购买的平均等待时间</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">1个卖家，1个买家</td>
-<td style="text-align:center">145000</td>
-<td style="text-align:center">27000</td>
-<td style="text-align:center">8000</td>
-<td style="text-align:center">14ms</td>
-</tr>
-<tr>
-<td style="text-align:center">5个卖家，1个买家</td>
-<td style="text-align:center">331000</td>
-<td style="text-align:center">&lt;200</td>
-<td style="text-align:center">5000</td>
-<td style="text-align:center">150ms</td>
-</tr>
-<tr>
-<td style="text-align:center">5个卖家，5个买家</td>
-<td style="text-align:center">206000</td>
-<td style="text-align:center">&lt;600</td>
-<td style="text-align:center">161000</td>
-<td style="text-align:center">498ms</td>
-</tr>
-</tbody>
-</table>
-<p>可以很明显看出watch的性能不具扩展性，下面将使用锁来保证市场在任意时刻只能上架或销售一件商品，看看性能会怎么样。</p>
-          <!--noindex-->
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/12/15/Redis学习笔记十三【使用Redis构建应用程序组件-分布式锁】/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/15/Redis学习笔记十二【使用Redis构建应用程序组件-自动补全】/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="bboyjing">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="bboyjing's blog">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/12/15/Redis学习笔记十二【使用Redis构建应用程序组件-自动补全】/" itemprop="url">
-                  Redis学习笔记十二【使用Redis构建应用程序组件--自动补全】
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-15T00:24:41+08:00">
-                2016-12-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis/" itemprop="url" rel="index">
-                    <span itemprop="name">Redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>前面学习了使用Redis来构建应用程序的基本方法以及所需的工具，本章将会学习更多更有用的工具和技术，并使用它们去构建更具规模的Redis应用。现在模拟一个场景，假设有一家叫Fake Game的游戏公司，每天都有好几百万玩家同时在线游戏。代码示例依然位于<a href="https://github.com/bboyjing/redis-sample" target="_blank" rel="external">redis-sample项目</a>的support模块中。</p>
-<h3 id="自动补全"><a href="#自动补全" class="headerlink" title="自动补全"></a>自动补全</h3><p>在Web领域，自动补全功能大家已经很熟悉了，下面我们用Redis来实现两种自动补全功能，自动补全联系人和通讯录自动补全。</p>
-          <!--noindex-->
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/12/15/Redis学习笔记十二【使用Redis构建应用程序组件-自动补全】/#more" rel="contents">
+            <a class="btn" href="/2016/12/28/Redis学习笔记十六【使用Redis构建应用程序组件-消息拉取】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1008,7 +961,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/11/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><span class="page-number current">12</span><a class="page-number" href="/page/13/">13</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/13/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/11/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><span class="page-number current">12</span><a class="page-number" href="/page/13/">13</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/13/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1041,7 +994,7 @@
       <section class="site-overview sidebar-panel sidebar-panel-active">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -1049,7 +1002,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1057,7 +1010,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1066,7 +1019,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1128,7 +1081,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

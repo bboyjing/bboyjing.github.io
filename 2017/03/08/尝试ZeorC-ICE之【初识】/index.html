@@ -91,14 +91,14 @@
 <meta property="og:url" content="http://yoursite.com/2017/03/08/尝试ZeorC-ICE之【初识】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="本系列博客的目的是为了学习ZeroC Ice的使用，并且和实际项目框架相结合，最后考虑是否能将这一产品引入到当前项目中，或者为新项目的技术选型多一个备选方案。到底什么是ZeroC Ice？用一句话概括就是支持多语言的RPC框架。暂且不去管它的优缺点，得先学了再说。本系列的知识点来自《ZeroC Ice》权威指南和官网文档。在这里向《ZeroC Ice》权威指南的作者表示敬意，这是目前关于ZeroC">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_1.png">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_2.png">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_3.png">
-<meta property="og:updated_time" content="2017-03-09T19:13:06.000Z">
+<meta property="og:image" content="http://qiniu.didadu.cn/zeroc_ice_1.png">
+<meta property="og:image" content="http://qiniu.didadu.cn/zeroc_ice_2.png">
+<meta property="og:image" content="http://qiniu.didadu.cn/zeroc_ice_3.png">
+<meta property="og:updated_time" content="2019-02-05T17:14:21.304Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="尝试ZeorC ICE之【初识】">
 <meta name="twitter:description" content="本系列博客的目的是为了学习ZeroC Ice的使用，并且和实际项目框架相结合，最后考虑是否能将这一产品引入到当前项目中，或者为新项目的技术选型多一个备选方案。到底什么是ZeroC Ice？用一句话概括就是支持多语言的RPC框架。暂且不去管它的优缺点，得先学了再说。本系列的知识点来自《ZeroC Ice》权威指南和官网文档。在这里向《ZeroC Ice》权威指南的作者表示敬意，这是目前关于ZeroC">
-<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_1.png">
+<meta name="twitter:image" content="http://qiniu.didadu.cn/zeroc_ice_1.png">
 
 
 
@@ -278,7 +278,7 @@
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -366,7 +366,7 @@
       
         <p>本系列博客的目的是为了学习ZeroC Ice的使用，并且和实际项目框架相结合，最后考虑是否能将这一产品引入到当前项目中，或者为新项目的技术选型多一个备选方案。<br>到底什么是ZeroC Ice？用一句话概括就是支持多语言的RPC框架。暂且不去管它的优缺点，得先学了再说。本系列的知识点来自《ZeroC Ice》权威指南和<a href="https://doc.zeroc.com/display/Ice36/Ice+Manual" target="_blank" rel="external">官网文档</a>。在这里向《ZeroC Ice》权威指南的作者表示敬意，这是目前关于ZeroC Ice唯一的一本书。ZeroC是一家公司，Ice是该公司的产品，全称Internet Communications Engine。Ice遵循GPLv2开源协议，如果使用过程中出现问题，ZeroC公司可以提供收费支持。不扯了，下面正式开始学习。</p>
 <a id="more"></a>
-<h3 id="安装Ice"><a href="#安装Ice" class="headerlink" title="安装Ice"></a>安装Ice</h3><p><a href="https://zeroc.com/distributions/ice" target="_blank" rel="external">Ice官网的distributions</a>有详细的安装步骤，选择与自己机器匹配的系统，照着步骤即可。注意安装步骤的上方有下图一句话，表示安装了哪些服务和支持的语言种类(和选择的系统有关)。<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_1.png" alt="zeroc_ice_1"><br>安装完毕后，打开终端输入slice2，然后按下tab键，可以看到支持的语言指令，至于这些指令怎么用，下面就会讲到。<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_2.png" alt="zeroc_ice_2"></p>
+<h3 id="安装Ice"><a href="#安装Ice" class="headerlink" title="安装Ice"></a>安装Ice</h3><p><a href="https://zeroc.com/distributions/ice" target="_blank" rel="external">Ice官网的distributions</a>有详细的安装步骤，选择与自己机器匹配的系统，照着步骤即可。注意安装步骤的上方有下图一句话，表示安装了哪些服务和支持的语言种类(和选择的系统有关)。<br><img src="http://qiniu.didadu.cn/zeroc_ice_1.png" alt="zeroc_ice_1"><br>安装完毕后，打开终端输入slice2，然后按下tab键，可以看到支持的语言指令，至于这些指令怎么用，下面就会讲到。<br><img src="http://qiniu.didadu.cn/zeroc_ice_2.png" alt="zeroc_ice_2"></p>
 <h3 id="如何支持多语言"><a href="#如何支持多语言" class="headerlink" title="如何支持多语言"></a>如何支持多语言</h3><p>目前我们能从字面上看到Ice的一个优势，就是支持多语言。要怎样才能支持市面上一些主流开发语言呢，总不能让人家去统一吧。所以Ice采用了通过与编程语言无关的中立语言的方式来描述服务的接口，该语言叫Slice。先使用Slice编写接口描述，然后使用Ice提供的工具(就是上面提到的slice2×××)生成目标语言。下面我们就先来学习Slice这门中立语言。</p>
 <h4 id="Slice的基本数据结构"><a href="#Slice的基本数据结构" class="headerlink" title="Slice的基本数据结构"></a>Slice的基本数据结构</h4><p>下表列举了Slice定义的基本数据类型：</p>
 <table>
@@ -437,7 +437,7 @@
 <p>结构体很好地对应于Java Bean对象，应该是会用的最多的复合数据类型，不过它有一个限制：不能嵌套，作为入门学习资料，还是把代码贴出来，下面是一个错误的示范：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">// demo表示文件名</div><div class="line">module demo &#123;</div><div class="line">    struct TwoPoints &#123;</div><div class="line">        // Illegal!</div><div class="line">        struct Point &#123;</div><div class="line">            short x;</div><div class="line">            short y;</div><div class="line">        &#125;;</div><div class="line">        Point coord1;</div><div class="line">        Point coord2;</div><div class="line">    &#125;;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
 <p>我们把上面错误的示范跑一下，看看会怎么样，顺便借此机会建个<a href="https://github.com/bboyjing/attempt_ice" target="_blank" rel="external">项目attempt_ice</a>，在根目录下新建demo.ice(slice文件的后缀为ice)，然后把上面错误的示范贴到文件中，执行步骤如下：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">cd ~/IdeaProjects/attempt_ice</div><div class="line">slice2java demo.ice</div><div class="line">//结果如下</div><div class="line">/home/zhangjing/IdeaProjects/attempt_ice/demo.ice:4: syntax error</div><div class="line">...</div></pre></td></tr></table></figure></p>
 <p>下面修改成正确的姿势：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">module demo &#123;</div><div class="line">    struct Point &#123;</div><div class="line">        short x;</div><div class="line">        short y;</div><div class="line">    &#125;;</div><div class="line">    struct TwoPoints &#123;</div><div class="line">        Point coord1;</div><div class="line">        Point coord2;</div><div class="line">    &#125;;</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
-<p>再次执行<code>slice2java demo.ice</code>，会生成demo目录以及一些java文件，如下：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_3.png" alt="zeroc_ice_3"><br>稍微解释下生成的文件：</p>
+<p>再次执行<code>slice2java demo.ice</code>，会生成demo目录以及一些java文件，如下：<br><img src="http://qiniu.didadu.cn/zeroc_ice_3.png" alt="zeroc_ice_3"><br>稍微解释下生成的文件：</p>
 <ul>
 <li>demo目录：对应module后面的关键字，表示内容都生成在demo目录中</li>
 <li>Point.java和PointHolder.java文件是根据struct Point生成的</li>
@@ -552,7 +552,7 @@
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -560,7 +560,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -568,7 +568,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -577,7 +577,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -655,7 +655,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

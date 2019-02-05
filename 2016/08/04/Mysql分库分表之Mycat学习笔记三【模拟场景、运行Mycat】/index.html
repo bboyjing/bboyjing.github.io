@@ -91,13 +91,13 @@
 <meta property="og:url" content="http://yoursite.com/2016/08/04/Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="上一章我们对Mycat配置有了个初步的了解，现在我们就基于之前的配置，并且模拟一个简单的订单场景，来跑通Mycat。假设我们构建2000万条订单数据，需要以id mod运算之后存储到两台Mysql中，下面我们就一步一步的来实现。 启动Docker中的两台Mysql容器123456#因为之前已经启动过容器，如果没有主动删除过，先查看下其状态sudo docker ps -a#若容器处于Exited状">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/mycat_5.png">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/mycat_6.png">
-<meta property="og:updated_time" content="2016-08-09T10:22:50.000Z">
+<meta property="og:image" content="http://qiniu.didadu.cn/mycat_5.png">
+<meta property="og:image" content="http://qiniu.didadu.cn/mycat_6.png">
+<meta property="og:updated_time" content="2019-02-05T17:14:21.210Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】">
 <meta name="twitter:description" content="上一章我们对Mycat配置有了个初步的了解，现在我们就基于之前的配置，并且模拟一个简单的订单场景，来跑通Mycat。假设我们构建2000万条订单数据，需要以id mod运算之后存储到两台Mysql中，下面我们就一步一步的来实现。 启动Docker中的两台Mysql容器123456#因为之前已经启动过容器，如果没有主动删除过，先查看下其状态sudo docker ps -a#若容器处于Exited状">
-<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/mycat_5.png">
+<meta name="twitter:image" content="http://qiniu.didadu.cn/mycat_5.png">
 
 
 
@@ -277,7 +277,7 @@
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -369,10 +369,10 @@
 <h3 id="连接两台Mysql并分别新建数据库order-db"><a href="#连接两台Mysql并分别新建数据库order-db" class="headerlink" title="连接两台Mysql并分别新建数据库order_db"></a>连接两台Mysql并分别新建数据库order_db</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">mysql -h127.0.0.1 -P3306 -uroot -pbboyjing</div><div class="line">create database order_db;</div><div class="line">exit</div><div class="line"></div><div class="line">mysql -h127.0.0.1 -P3316 -uroot -pbboyjing</div><div class="line">create database order_db;</div><div class="line">exit</div></pre></td></tr></table></figure>
 <h3 id="启动Mycat"><a href="#启动Mycat" class="headerlink" title="启动Mycat"></a>启动Mycat</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>进入Mycat安装目录</div><div class="line">cd /opt/mycat</div><div class="line"><span class="meta">#</span>启动Mycat</div><div class="line">bin/mycat start</div></pre></td></tr></table></figure>
 <h3 id="通过Mysql客户端连接Mycat"><a href="#通过Mysql客户端连接Mycat" class="headerlink" title="通过Mysql客户端连接Mycat"></a>通过Mysql客户端连接Mycat</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>查看启动日志（出现connected successfuly MySQLConnection表示启动成功）</div><div class="line">vim logs/mycat.log</div><div class="line"><span class="meta"></span></div><div class="line">#由日志可以看出Mycat端口为8066和9066，其中8066为数据端口、9066为管理端口</div><div class="line"><span class="meta">#</span>下面我们通过server.xml中配置的用户来连接Mycat，出现mysql交互界面表示连接成功</div><div class="line">mysql -h127.0.0.1 -P8066 -uroot -pbboyjing</div><div class="line"><span class="meta"></span></div><div class="line">#查看databases</div><div class="line"><span class="meta">mysql&gt;</span> show databases;</div><div class="line">+----------+</div><div class="line">| DATABASE |</div><div class="line">+----------+</div><div class="line">| OrderDB  |</div><div class="line">+----------+</div><div class="line"><span class="meta">#</span>出现的是server.xml中配置的逻辑库（schema）</div></pre></td></tr></table></figure>
-<p>到此表示Mycat服务正常启动，并且通过Mysql客户端可以连通，上面最后一步show databases的结果如下图所示：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/mycat_5.png" alt="图5"></p>
+<p>到此表示Mycat服务正常启动，并且通过Mysql客户端可以连通，上面最后一步show databases的结果如下图所示：<br><img src="http://qiniu.didadu.cn/mycat_5.png" alt="图5"></p>
 <h3 id="设计Order表"><a href="#设计Order表" class="headerlink" title="设计Order表"></a>设计Order表</h3><p>简单地设计一张order表，位于order_db库中，表结构如下：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`order`</span> (</div><div class="line">  <span class="string">`id`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="string">`status`</span> tinyint(<span class="number">4</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="string">`price`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">  <span class="string">`create_time`</span> <span class="built_in">bigint</span>(<span class="number">20</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</div><div class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>)</div><div class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span> <span class="keyword">DEFAULT</span> <span class="keyword">CHARSET</span>=utf8</div></pre></td></tr></table></figure></p>
 <p>基于上一步Mysql客户端中操作<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>切换至OrderDB库</div><div class="line"><span class="meta">mysql&gt;</span> use OrderDB;</div><div class="line"><span class="meta"></span></div><div class="line">#执行简表语句，成功后会在两台Mysql中都新建相同的order表</div><div class="line"><span class="meta">mysql&gt;</span> CREATE TABLE `order` (</div><div class="line">    -&gt;   `id` int(11) NOT NULL,</div><div class="line">    -&gt;   `status` tinyint(4) NOT NULL,</div><div class="line">    -&gt;   `price` int(11) NOT NULL,</div><div class="line">    -&gt;   `create_time` bigint(20) NOT NULL,</div><div class="line">    -&gt;   PRIMARY KEY (`id`)</div><div class="line">    -&gt; ) ENGINE=InnoDB DEFAULT CHARSET=utf8;</div></pre></td></tr></table></figure></p>
-<p>成功的输出如下：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/mycat_6.png" alt="图6"></p>
+<p>成功的输出如下：<br><img src="http://qiniu.didadu.cn/mycat_6.png" alt="图6"></p>
 <p>环境准备工作已经差不多了，下面一章将准备新建一个Java项目来使用Mycat。</p>
 
       
@@ -480,7 +480,7 @@
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -488,7 +488,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -496,7 +496,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -505,7 +505,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -583,7 +583,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

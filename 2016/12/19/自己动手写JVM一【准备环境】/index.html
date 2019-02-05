@@ -91,13 +91,13 @@
 <meta property="og:url" content="http://yoursite.com/2016/12/19/自己动手写JVM一【准备环境】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="之前看过两遍《深入理解java虚拟机》，能吸收点知识，但是远远没有能够深入理解。最近购入张秀宏著的《自己动手写Java虚拟机》一书，抱着想要更深地理解JVM的目的去学习，并记录下学习笔记。第一章节还是先来准备环境。 Java关于Java环境的准备步骤就不赘述了，本人使用的版本是1.8.0_91 Go这本书的JVM实现是用Go写的，之前没有接触过，在这一学习过程中顺带就把Go也简单地学习下了。Go的">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_1.png">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_2.png">
-<meta property="og:updated_time" content="2016-12-27T05:23:28.000Z">
+<meta property="og:image" content="http://qiniu.didadu.cn/jvmgo_1.png">
+<meta property="og:image" content="http://qiniu.didadu.cn/jvmgo_2.png">
+<meta property="og:updated_time" content="2019-02-05T17:14:21.311Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="自己动手写JVM一【准备环境】">
 <meta name="twitter:description" content="之前看过两遍《深入理解java虚拟机》，能吸收点知识，但是远远没有能够深入理解。最近购入张秀宏著的《自己动手写Java虚拟机》一书，抱着想要更深地理解JVM的目的去学习，并记录下学习笔记。第一章节还是先来准备环境。 Java关于Java环境的准备步骤就不赘述了，本人使用的版本是1.8.0_91 Go这本书的JVM实现是用Go写的，之前没有接触过，在这一学习过程中顺带就把Go也简单地学习下了。Go的">
-<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_1.png">
+<meta name="twitter:image" content="http://qiniu.didadu.cn/jvmgo_1.png">
 
 
 
@@ -277,7 +277,7 @@
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -380,14 +380,14 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">~ go version</div><div class="line">go version go1.7.4 linux/amd64</div></pre></td></tr></table></figure>
 </li>
 </ol>
-<p>Go环境安装完毕，编辑器本人还是选用Intellij IDEA，安装个Go插件，直接在线安装即可，顺便附上<a href="https://github.com/go-lang-plugin-org" target="_blank" rel="external">插件地址</a>。安装完毕之后，新建个项目，放到在$GOPATH目录下。Go的源文件位于src目录下，Go语言的代码是通过package来组织的，可以在src下建自己想要的包名。下面建个Go文件测试下：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_1.png" alt="jvmgo_1"><br>根据上述图片可以看出，项目放在$GOPATH目录下，包和go源文件都位于src目录下。这里再稍微讲解下helloworld.go文件，package main是一个比较特殊的package。这个package里会定义一个独立的程序，这个程序是可以运行的，而不是像其它package一样对应一个library。在main这个package里，main函数也是一个特殊的函数，这是我们整个程序的入口，所以helloworld.go是个可运行go文件。在idea中可以直接右键运行程序，这个没啥好说的。但还是有必要了解下Go提供的命令行工具：</p>
+<p>Go环境安装完毕，编辑器本人还是选用Intellij IDEA，安装个Go插件，直接在线安装即可，顺便附上<a href="https://github.com/go-lang-plugin-org" target="_blank" rel="external">插件地址</a>。安装完毕之后，新建个项目，放到在$GOPATH目录下。Go的源文件位于src目录下，Go语言的代码是通过package来组织的，可以在src下建自己想要的包名。下面建个Go文件测试下：<br><img src="http://qiniu.didadu.cn/jvmgo_1.png" alt="jvmgo_1"><br>根据上述图片可以看出，项目放在$GOPATH目录下，包和go源文件都位于src目录下。这里再稍微讲解下helloworld.go文件，package main是一个比较特殊的package。这个package里会定义一个独立的程序，这个程序是可以运行的，而不是像其它package一样对应一个library。在main这个package里，main函数也是一个特殊的函数，这是我们整个程序的入口，所以helloworld.go是个可运行go文件。在idea中可以直接右键运行程序，这个没啥好说的。但还是有必要了解下Go提供的命令行工具：</p>
 <ul>
 <li><p>直接运行</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">cd /home/zhangjing/IdeaProjects/jvmgo/go</div><div class="line"><span class="meta">#</span>go run将运行go文件</div><div class="line">go run src/cn.didadu/hello/helloworld.go</div></pre></td></tr></table></figure>
 </li>
 <li><p>先编译再运行</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">cd /home/zhangjing/IdeaProjects/jvmgo/go</div><div class="line"><span class="meta">#</span>生成可执行文件</div><div class="line">go install cn.didadu/hello</div><div class="line"><span class="meta">#</span>生成类库</div><div class="line">go install cn.didadu/jvmgo</div></pre></td></tr></table></figure>
-<p>要注意下go install命令，目录只需要从src的子目录开始，目标也是目录不是文件，执行install命令的时候应该是从$GOPATH下的src目录开始查找给定的包。这样的话，第一行的cd命令就是多于的了。go install命令执行之后会在$GOPATH目录下新建bin目录，和src同级，会把helloworld.go编译成和包名一致的可执行文件(hello)放到到bin目录中。这个bin目录也就是go工程放置可执行文件的目录了。另外会看到还有一个pkg目录，该目录是放置非可执行文件的类库目录。<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_2.png" alt="jvmgo_2"></p>
+<p>要注意下go install命令，目录只需要从src的子目录开始，目标也是目录不是文件，执行install命令的时候应该是从$GOPATH下的src目录开始查找给定的包。这样的话，第一行的cd命令就是多于的了。go install命令执行之后会在$GOPATH目录下新建bin目录，和src同级，会把helloworld.go编译成和包名一致的可执行文件(hello)放到到bin目录中。这个bin目录也就是go工程放置可执行文件的目录了。另外会看到还有一个pkg目录，该目录是放置非可执行文件的类库目录。<br><img src="http://qiniu.didadu.cn/jvmgo_2.png" alt="jvmgo_2"></p>
 </li>
 </ul>
 <p>至此，环境准备工作就做好了，下面就可以开始学习了。示例代码位于<a href="https://github.com/bboyjing/jvmgo" target="_blank" rel="external">本人gitbub仓库jvmgo</a>项目下。</p>
@@ -546,7 +546,7 @@
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -554,7 +554,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -562,7 +562,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -571,7 +571,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -649,7 +649,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

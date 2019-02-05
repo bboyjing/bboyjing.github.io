@@ -91,12 +91,12 @@
 <meta property="og:url" content="http://yoursite.com/2017/01/16/自己动手写JVM十【解析class文件（八）】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="本章节继续学习属性相关信息 解析属性表Code属性Code时变长属性，只存在于method_info结构中。Code属性中存放字节码等方法相关信息，其结构定义如下：">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_27.png">
-<meta property="og:updated_time" content="2017-01-23T22:25:22.000Z">
+<meta property="og:image" content="http://qiniu.didadu.cn/jvmgo_27.png">
+<meta property="og:updated_time" content="2019-02-05T17:14:21.376Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="自己动手写JVM十【解析class文件（八）】">
 <meta name="twitter:description" content="本章节继续学习属性相关信息 解析属性表Code属性Code时变长属性，只存在于method_info结构中。Code属性中存放字节码等方法相关信息，其结构定义如下：">
-<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_27.png">
+<meta name="twitter:image" content="http://qiniu.didadu.cn/jvmgo_27.png">
 
 
 
@@ -276,7 +276,7 @@
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -367,7 +367,7 @@
 <a id="more"></a>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">Code_attribute &#123;</div><div class="line">    u2 attribute_name_index;</div><div class="line">    u4 attribute_length;</div><div class="line">    u2 max_stack;</div><div class="line">    u2 max_locals;</div><div class="line">    u4 code_length;</div><div class="line">    u1 code[code_length];</div><div class="line">    u2 exception_table_length;</div><div class="line">    &#123;   u2 start_pc;</div><div class="line">        u2 end_pc;</div><div class="line">        u2 handler_pc;</div><div class="line">        u2 catch_type;</div><div class="line">    &#125; exception_table[exception_table_length];</div><div class="line">    u2 attributes_count;</div><div class="line">    attribute_info attributes[attributes_count];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>max_stack给出操作数栈的最大深度，max_locals给出局部变量表大小。接着是字节码，存在u1表中。最后时异常处理表和属性表。这些信息后面都会涉及到，这里就先一笔带过。相关代码位于attr_go文件中，下面列出其中一部分：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">type</span> CodeAttribute <span class="keyword">struct</span> &#123;</div><div class="line">	cp             ConstantPool</div><div class="line">	maxStack       <span class="keyword">uint16</span></div><div class="line">	maxLocals      <span class="keyword">uint16</span></div><div class="line">	code           []<span class="keyword">byte</span></div><div class="line">	exceptionTable []*ExceptionTableEntry</div><div class="line">	attributes     []AttributeInfo</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">type</span> ExceptionTableEntry <span class="keyword">struct</span> &#123;</div><div class="line">	startPc   <span class="keyword">uint16</span></div><div class="line">	endPc     <span class="keyword">uint16</span></div><div class="line">	handlerPc <span class="keyword">uint16</span></div><div class="line">	catchType <span class="keyword">uint16</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 读取Code属性</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *CodeAttribute)</span> <span class="title">readInfo</span><span class="params">(reader *ClassReader)</span></span> &#123;</div><div class="line">	<span class="comment">// 读取2个字节的maxStack</span></div><div class="line">	self.maxStack = reader.readUint16()</div><div class="line">	<span class="comment">// 读取2个字节的maxLocals</span></div><div class="line">	self.maxLocals = reader.readUint16()</div><div class="line">	<span class="comment">// 读取4个字节的code长度</span></div><div class="line">	codeLength := reader.readUint32()</div><div class="line">	<span class="comment">// 读取指定字节数的code</span></div><div class="line">	self.code = reader.readBytes(codeLength)</div><div class="line">	<span class="comment">// 读取异常处理表</span></div><div class="line">	self.exceptionTable = readExceptionTable(reader)</div><div class="line">	self.attributes = readAttributes(reader, self.cp)</div><div class="line">&#125;</div><div class="line">...</div></pre></td></tr></table></figure></p>
-<p>ClassFile.class的Code的class文件如下：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_27.png" alt="jvmgo_27"></p>
+<p>ClassFile.class的Code的class文件如下：<br><img src="http://qiniu.didadu.cn/jvmgo_27.png" alt="jvmgo_27"></p>
 <h4 id="Exception属性"><a href="#Exception属性" class="headerlink" title="Exception属性"></a>Exception属性</h4><p>Exception是变长属性，记录方法抛出的异常表，其结构如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Exceptions_attribute &#123;</div><div class="line">    u2 attribute_name_index;</div><div class="line">    u4 attribute_length;</div><div class="line">    u2 number_of_exceptions;</div><div class="line">    u2 exception_index_table[number_of_exceptions];</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
 <p>Exception属性也比较简单，不做过多解释了，相关代码位于attr_exceptions.go文件中，可自行查看。</p>
 <h4 id="LineNumberTable和LocalVariableTable属性"><a href="#LineNumberTable和LocalVariableTable属性" class="headerlink" title="LineNumberTable和LocalVariableTable属性"></a>LineNumberTable和LocalVariableTable属性</h4><p>LineNumberTable属性表存放方法的行号信息，LocalVariableTable存放方法的局部变量信息。这两种属性和前面介绍的SourceFIle属性都属于调试信息，都不是运行时必需的。代码也不贴出来了，分别位于attr_line_number_table.go和attr_local_variable_table.go文件中。</p>
@@ -483,7 +483,7 @@
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -491,7 +491,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -499,7 +499,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -508,7 +508,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -586,7 +586,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

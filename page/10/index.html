@@ -266,12 +266,12 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/16/自己动手写JVM十【解析class文件（八）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/06/自己动手写JVM十五【指令集和解释器（三）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/16/自己动手写JVM十【解析class文件（八）】/" itemprop="url">
-                  自己动手写JVM十【解析class文件（八）】
+                <a class="post-title-link" href="/2017/02/06/自己动手写JVM十五【指令集和解释器（三）】/" itemprop="url">
+                  自己动手写JVM十五【指令集和解释器（三）】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-16T10:12:06+08:00">
-                2017-01-16
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-06T10:07:09+08:00">
+                2017-02-06
               </time>
             
 
@@ -361,11 +361,11 @@
 
       
         
-          <p>本章节继续学习属性相关信息</p>
-<h3 id="解析属性表"><a href="#解析属性表" class="headerlink" title="解析属性表"></a>解析属性表</h3><h4 id="Code属性"><a href="#Code属性" class="headerlink" title="Code属性"></a>Code属性</h4><p>Code时变长属性，只存在于method_info结构中。Code属性中存放字节码等方法相关信息，其结构定义如下：</p>
+          <p>本章节继续学习指令集和解释器。</p>
+<h3 id="类型转换指令"><a href="#类型转换指令" class="headerlink" title="类型转换指令"></a>类型转换指令</h3><p>类型转换指令大致对应Java语言中的基本类型强制转换操作。按照被转换变量的类型，类型转换指令可以分为4种：i2x系列指令把int变量强制转换成其他类型；l2x系列指令把long变量强制转换成其他类型；f2x系列指令把float变量强制转换成其他类型；d2x系列指令把double变量强制转换成其他类型。该指令实现代码位于/instructions/conversions包下，下面以d2x系类指令为例来学习下，其代码位于d2x.go文件中：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/16/自己动手写JVM十【解析class文件（八）】/#more" rel="contents">
+            <a class="btn" href="/2017/02/06/自己动手写JVM十五【指令集和解释器（三）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -406,12 +406,12 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/12/自己动手写JVM九【解析class文件（七）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/31/自己动手写JVM十四【指令集和解释器（二）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -431,8 +431,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/12/自己动手写JVM九【解析class文件（七）】/" itemprop="url">
-                  自己动手写JVM九【解析class文件（七）】
+                <a class="post-title-link" href="/2017/01/31/自己动手写JVM十四【指令集和解释器（二）】/" itemprop="url">
+                  自己动手写JVM十四【指令集和解释器（二）】
                 </a>
               
             
@@ -446,8 +446,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-12T14:01:29+08:00">
-                2017-01-12
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-31T14:36:22+08:00">
+                2017-01-31
               </time>
             
 
@@ -501,11 +501,11 @@
 
       
         
-          <p>本章节开始学习属性表相关信息，上一节找到的main()方法的字节码就出现在属性表中，属性表可谓是个大杂烩，里面存储了各式各样的信息。下面我们就来详细讨论讨论。</p>
-<h3 id="解析属性表"><a href="#解析属性表" class="headerlink" title="解析属性表"></a>解析属性表</h3><h4 id="AttributeInfo接口"><a href="#AttributeInfo接口" class="headerlink" title="AttributeInfo接口"></a>AttributeInfo接口</h4><p>和常量池类似，各种属性表达的信息也各不相同，因此无法用同一的结构来定义。不同之处在于，常量是由Java虚拟机规范严格定义的，共有14种。但是属性是可以扩展的，不同的虚拟机实现可以定义自己的属性类型，所以Java虚拟机规范没有使用tag，而是使用属性名来区别不同的属性。属性的结构定义如下：</p>
+          <p>本章节继续学习指令集和解释器。</p>
+<h3 id="存储指令"><a href="#存储指令" class="headerlink" title="存储指令"></a>存储指令</h3><p>和加载指令刚好相反，存储指令把变量从操作数栈顶弹出，然后存入局部变量表。和加载指令一样，存储指令也可以分为6类。存储指令相关代码位于/instructions/stores包下。下面以lstore系列指令为例来学习下，其实现代码位于lstore.go文件中：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/12/自己动手写JVM九【解析class文件（七）】/#more" rel="contents">
+            <a class="btn" href="/2017/01/31/自己动手写JVM十四【指令集和解释器（二）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -546,12 +546,12 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/11/自己动手写JVM八【解析class文件（六）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/24/自己动手写JVM十三【指令集和解释器（一）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -571,8 +571,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/11/自己动手写JVM八【解析class文件（六）】/" itemprop="url">
-                  自己动手写JVM八【解析class文件（六）】
+                <a class="post-title-link" href="/2017/01/24/自己动手写JVM十三【指令集和解释器（一）】/" itemprop="url">
+                  自己动手写JVM十三【指令集和解释器（一）】
                 </a>
               
             
@@ -586,8 +586,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-11T16:34:31+08:00">
-                2017-01-11
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-24T11:56:18+08:00">
+                2017-01-24
               </time>
             
 
@@ -641,12 +641,11 @@
 
       
         
-          <p>本章节继续学习常量池相关信息</p>
-<h3 id="常量池"><a href="#常量池" class="headerlink" title="常量池"></a>常量池</h3><p>接上一章节</p>
-<h4 id="CONSTANT-Fieldref-info"><a href="#CONSTANT-Fieldref-info" class="headerlink" title="CONSTANT_Fieldref_info"></a>CONSTANT_Fieldref_info</h4><p>CONSTANT_Fieldref_info表示字段符号引用，其结构体如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">CONSTANT_Fieldref_info &#123;</div><div class="line">    u1 tag;</div><div class="line">    u2 class_index;</div><div class="line">    u2 name_and_type_index;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+          <p>本章节将在前面讲的基础上编写一个简单的解释器，并且实现一些具有代表性的指令，本章涉及到的go代码位于instructions包下。</p>
+<h3 id="字节码和指令集"><a href="#字节码和指令集" class="headerlink" title="字节码和指令集"></a>字节码和指令集</h3><p>Java虚拟机顾名思义，就是一台虚拟的机器，而字节码就是运行在这台虚拟机器上的机器码。字节码中存放编码后的Java虚拟机指令，每条指令都以一个单字节的操作码开头，这就是字节码名称的由来。看到这里才知道，之前的理解有些误区，只有Java方法(非抽象方法和本地方法)的代码才会编译成字节码，所以不能说整个class文件就是字节码，它只是包含字节码。由于只使用一个字节表示操作码，显而易见，Java虚拟机最多只能支持256条指令。到第八版为止，Java虚拟机规范已经定义了205条指令，操作码分别是0x00到0xCA、OxFE和0xFF。这205条指令构成了Java虚拟机的指令集。和汇编语言雷系，为了便于记忆，Java虚拟机规范给每个操作码都指定了一个助记符。比如操作码是0x00这条指令，因为它什么都不做，所以它的助记符是nop(no operation)。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/11/自己动手写JVM八【解析class文件（六）】/#more" rel="contents">
+            <a class="btn" href="/2017/01/24/自己动手写JVM十三【指令集和解释器（一）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -687,12 +686,12 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/10/自己动手写JVM七【解析class文件（五）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/23/自己动手写JVM十二【运行时数据区（二）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -712,8 +711,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/10/自己动手写JVM七【解析class文件（五）】/" itemprop="url">
-                  自己动手写JVM七【解析class文件（五）】
+                <a class="post-title-link" href="/2017/01/23/自己动手写JVM十二【运行时数据区（二）】/" itemprop="url">
+                  自己动手写JVM十二【运行时数据区（二）】
                 </a>
               
             
@@ -727,8 +726,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-10T17:48:37+08:00">
-                2017-01-10
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-23T11:47:29+08:00">
+                2017-01-23
               </time>
             
 
@@ -782,12 +781,11 @@
 
       
         
-          <p>本章节继续学习常量池相关信息</p>
-<h3 id="常量池"><a href="#常量池" class="headerlink" title="常量池"></a>常量池</h3><p>接上一章节</p>
-<h4 id="CONSTANT-String-info"><a href="#CONSTANT-String-info" class="headerlink" title="CONSTANT_String_info"></a>CONSTANT_String_info</h4><p>CONSTANT_String_info常量表示java.lang.String字面量，结构如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">CONSTANT_String_info &#123;</div><div class="line">    u1 tag;</div><div class="line">    u2 string_index;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+          <p>本章我们来重点分析下局部变量表和操作数栈，并测试本章代码。</p>
+<h3 id="局部变量表和操作数栈实例详解"><a href="#局部变量表和操作数栈实例详解" class="headerlink" title="局部变量表和操作数栈实例详解"></a>局部变量表和操作数栈实例详解</h3><p>下面以圆形的周长为例进行分析，首先简单的Java代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Math</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        System.out.println(circumference(<span class="number">1.6f</span>));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">float</span> <span class="title">circumference</span><span class="params">(<span class="keyword">float</span> r)</span> </span>&#123;</div><div class="line">        <span class="keyword">float</span> pi = <span class="number">3.14f</span>;</div><div class="line">        <span class="keyword">float</span> c = <span class="number">2</span> * pi * r;</div><div class="line">        <span class="keyword">return</span> c;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/10/自己动手写JVM七【解析class文件（五）】/#more" rel="contents">
+            <a class="btn" href="/2017/01/23/自己动手写JVM十二【运行时数据区（二）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -828,12 +826,12 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/09/自己动手写JVM六【解析class文件（四）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/22/自己动手写JVM十一【运行时数据区（一）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -853,8 +851,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/09/自己动手写JVM六【解析class文件（四）】/" itemprop="url">
-                  自己动手写JVM六【解析class文件（四）】
+                <a class="post-title-link" href="/2017/01/22/自己动手写JVM十一【运行时数据区（一）】/" itemprop="url">
+                  自己动手写JVM十一【运行时数据区（一）】
                 </a>
               
             
@@ -868,8 +866,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-09T23:24:00+08:00">
-                2017-01-09
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-22T15:45:36+08:00">
+                2017-01-22
               </time>
             
 
@@ -923,12 +921,11 @@
 
       
         
-          <p>本章节继续学习ClassFile中各项所代表的含义。</p>
-<h3 id="常量池"><a href="#常量池" class="headerlink" title="常量池"></a>常量池</h3><p>常量池占据了class文件很大一部分数据，里面存储着各式各样的常量信息，包括数字和字符串常量、类和接口名，字段和方法等等，下面我们就来详细了解常量池和各种常量。</p>
-<h4 id="ConstantPool结构体"><a href="#ConstantPool结构体" class="headerlink" title="ConstantPool结构体"></a>ConstantPool结构体</h4><p>constant_pool.go文件中定义了ConstantPool类型，常量池实际上也是一个表，所以ConstantPool被定义成ConstantInfo的数组。所以，要理解常量池，得先去看ConstantInfo是什么，然后再回过来，此处未完待续，接着往下看。</p>
+          <p>到目前为止，已经实现了搜索、解析class文件，本章节就来讨论下如何初步实现运行时数据区。</p>
+<h3 id="运行时数据区概述"><a href="#运行时数据区概述" class="headerlink" title="运行时数据区概述"></a>运行时数据区概述</h3><p>在运行Java程序时，Java虚拟机需要使用内存在存放各式各样的数据。Java虚拟机规范把这些内存区域叫作运行时数据区。运行时数据区可以分成两类：一类是多线程共享的，另一类则是线程私有的。多线程共享的运行时数据去需要在Java虚拟机启动时创建浩，在Java虚拟机退出时销毁。线程私有的运行时数据区则是在线程创建时才创建，线程退出时销毁。<br>线程私有的运行时数据区用于辅助执行Java字节码。每个线程有自己的pc寄存器和Java虚拟机栈。Java虚拟机栈又由栈帧构成，栈帧中保存方法执行的状态，包括局部变量表和操作数栈等。本章节将开始学习如何初步实现线程私有的运行时数据区。<br>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/09/自己动手写JVM六【解析class文件（四）】/#more" rel="contents">
+            <a class="btn" href="/2017/01/22/自己动手写JVM十一【运行时数据区（一）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -964,7 +961,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -997,7 +994,7 @@
       <section class="site-overview sidebar-panel sidebar-panel-active">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -1005,7 +1002,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1013,7 +1010,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1022,7 +1019,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1084,7 +1081,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

@@ -91,7 +91,7 @@
 <meta property="og:url" content="http://yoursite.com/2016/12/22/Redis学习笔记十五【使用Redis构建应用程序组件-任务队列】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="本章节将学习如何使用Redis来构建任务队列，实现类似RabbitMQ之类的消息队列的功能。 先进先出队列依然使用之前虚构的例子，现在来实现通过电子邮件来订阅商品交易市场中已售出的商品的相关信息。因为对外发电子邮件可能会有非常高的延迟，甚至可能会出现发送失败的情况，所以将使用任务队列来记录邮件的收信人以及发送邮件的原因，并构建一个可以在邮件发送服务器运行变得缓慢的时候，以并行方式一次发送多封邮件的">
-<meta property="og:updated_time" content="2016-12-26T00:58:54.000Z">
+<meta property="og:updated_time" content="2019-02-05T17:10:58.797Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Redis学习笔记十五【使用Redis构建应用程序组件-任务队列】">
 <meta name="twitter:description" content="本章节将学习如何使用Redis来构建任务队列，实现类似RabbitMQ之类的消息队列的功能。 先进先出队列依然使用之前虚构的例子，现在来实现通过电子邮件来订阅商品交易市场中已售出的商品的相关信息。因为对外发电子邮件可能会有非常高的延迟，甚至可能会出现发送失败的情况，所以将使用任务队列来记录邮件的收信人以及发送邮件的原因，并构建一个可以在邮件发送服务器运行变得缓慢的时候，以并行方式一次发送多封邮件的">
@@ -274,7 +274,7 @@
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -508,7 +508,7 @@
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -516,7 +516,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -524,7 +524,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -533,7 +533,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -611,7 +611,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

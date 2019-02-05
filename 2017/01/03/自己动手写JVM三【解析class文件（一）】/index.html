@@ -91,12 +91,12 @@
 <meta property="og:url" content="http://yoursite.com/2017/01/03/自己动手写JVM三【解析class文件（一）】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="上一章节已经实现了读取class文件，测试的时候还打印出一堆杂乱无章的数字，本章就来学习下，这些数字到底是什么，如何解析这些class文件。 class文件作为类信息的载体，每个class文件都完整地定义了一个类，也就是说所有的信息都包含在那一堆数字当中，我们可以通过网络下载、从数据库加载，甚至是在运行中直接生成class文件。所以，class文件并非特指位于磁盘中的.class文件，而是泛指任何">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_3.png">
-<meta property="og:updated_time" content="2017-01-23T22:12:00.000Z">
+<meta property="og:image" content="http://qiniu.didadu.cn/jvmgo_3.png">
+<meta property="og:updated_time" content="2019-02-05T17:14:21.315Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="自己动手写JVM三【解析class文件（一）】">
 <meta name="twitter:description" content="上一章节已经实现了读取class文件，测试的时候还打印出一堆杂乱无章的数字，本章就来学习下，这些数字到底是什么，如何解析这些class文件。 class文件作为类信息的载体，每个class文件都完整地定义了一个类，也就是说所有的信息都包含在那一堆数字当中，我们可以通过网络下载、从数据库加载，甚至是在运行中直接生成class文件。所以，class文件并非特指位于磁盘中的.class文件，而是泛指任何">
-<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_3.png">
+<meta name="twitter:image" content="http://qiniu.didadu.cn/jvmgo_3.png">
 
 
 
@@ -276,7 +276,7 @@
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -366,7 +366,7 @@
 <h3 id="class文件"><a href="#class文件" class="headerlink" title="class文件"></a>class文件</h3><p>作为类信息的载体，每个class文件都完整地定义了一个类，也就是说所有的信息都包含在那一堆数字当中，我们可以通过网络下载、从数据库加载，甚至是在运行中直接生成class文件。所以，class文件并非特指位于磁盘中的.class文件，而是泛指任何格式符合规范的class数据。<br>为了更好的理解class文件，我们再建一个java项目，和go项目同级，该项目的作用就是在需要的时候测试自己写的JVM。现在，新建一个class：</p>
 <a id="more"></a>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClassFile</span> </span>&#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">boolean</span> FLAG = <span class="keyword">true</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">byte</span> BYTE = <span class="number">123</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">char</span> X = <span class="string">'X'</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">short</span> SHORT = <span class="number">12345</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> INT = <span class="number">123456789</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> LONG = <span class="number">12345678901L</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">float</span> PI = <span class="number">3.14f</span>;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">double</span> E = <span class="number">2.71828</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> RuntimeException </span>&#123;</div><div class="line">        System.out.println(<span class="string">"Hello, World!"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>上述代码很简单，是为了学习编译后的class文件。《自己动手写Java虚拟机》的作者写了classpy的图形化工具，可以方便地查看反编译后的class文件。具体如何使用请参照<a href="https://github.com/zxh0/classpy" target="_blank" rel="external">作者的Github站点</a>。编译ClassFile，用classpy打开ClassFile.class:<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/jvmgo_3.png" alt="jvmgo_3"><br>各种看不懂啊，没有关系，慢慢来。构成class文件的基本数据单位是以16进制表示的一个字节，默认按大端方式存储，可以把整个class文件当成一个字节流来处理。<br>Java虚拟机规范使用一种类似C语言的结构体来描述class文件，这种伪结构只有两种数据类型：无符号数和表。其中无符号数是基本数据类型以u1、u2和u4来分别代表1、2和4个字节无符号数。表是由多个无符号数或者其他表作为数据项的复合数据类型，所有的表都习惯以_info结尾。下表列出calss文件的构成：</p>
+<p>上述代码很简单，是为了学习编译后的class文件。《自己动手写Java虚拟机》的作者写了classpy的图形化工具，可以方便地查看反编译后的class文件。具体如何使用请参照<a href="https://github.com/zxh0/classpy" target="_blank" rel="external">作者的Github站点</a>。编译ClassFile，用classpy打开ClassFile.class:<br><img src="http://qiniu.didadu.cn/jvmgo_3.png" alt="jvmgo_3"><br>各种看不懂啊，没有关系，慢慢来。构成class文件的基本数据单位是以16进制表示的一个字节，默认按大端方式存储，可以把整个class文件当成一个字节流来处理。<br>Java虚拟机规范使用一种类似C语言的结构体来描述class文件，这种伪结构只有两种数据类型：无符号数和表。其中无符号数是基本数据类型以u1、u2和u4来分别代表1、2和4个字节无符号数。表是由多个无符号数或者其他表作为数据项的复合数据类型，所有的表都习惯以_info结尾。下表列出calss文件的构成：</p>
 <table>
 <thead>
 <tr>
@@ -630,7 +630,7 @@
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -638,7 +638,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -646,7 +646,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -655,7 +655,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -733,7 +733,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

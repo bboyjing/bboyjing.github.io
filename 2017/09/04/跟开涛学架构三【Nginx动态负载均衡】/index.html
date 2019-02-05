@@ -91,12 +91,12 @@
 <meta property="og:url" content="http://yoursite.com/2017/09/04/跟开涛学架构三【Nginx动态负载均衡】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="本系列第一章节我们就知道了如何配置upstream。下面要学习的是如何不写死服务列表，而是通过服务注册、发现的方式来实现upstream列表的动态变更。书中是使用Consul来实现的，它是一款开源的分布式服务注册与发现系统。简单来说，其核心思想就是，upstream服务向Consul注册服务，Nginx能监听到Consul上注册的服务变更，然后修改upstream列表，最后重启Nginx。本人也没">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/hunger_4.png">
-<meta property="og:updated_time" content="2017-09-07T17:18:38.000Z">
+<meta property="og:image" content="http://qiniu.didadu.cn/hunger_4.png">
+<meta property="og:updated_time" content="2019-02-05T17:14:21.428Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="跟开涛学架构三【Nginx动态负载均衡】">
 <meta name="twitter:description" content="本系列第一章节我们就知道了如何配置upstream。下面要学习的是如何不写死服务列表，而是通过服务注册、发现的方式来实现upstream列表的动态变更。书中是使用Consul来实现的，它是一款开源的分布式服务注册与发现系统。简单来说，其核心思想就是，upstream服务向Consul注册服务，Nginx能监听到Consul上注册的服务变更，然后修改upstream列表，最后重启Nginx。本人也没">
-<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/hunger_4.png">
+<meta name="twitter:image" content="http://qiniu.didadu.cn/hunger_4.png">
 
 
 
@@ -276,7 +276,7 @@
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -371,7 +371,7 @@
 <li>Web UI。Consul自带Web UI，而且-dev模式下是默认启动的，访问<code>localhost:8500/ui</code>即可。</li>
 </ol>
 <h3 id="注册服务"><a href="#注册服务" class="headerlink" title="注册服务"></a>注册服务</h3><p>将服务注册到Consul。和Consul的交互可以使用HTTP协议，发送如下请求可以注册一个服务到Consul：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">curl -X PUT http://localhost:8500/v1/agent/service/register -d '</div><div class="line">&#123;</div><div class="line">  "ID": "real_server_1",</div><div class="line">  "Name": "real_server",</div><div class="line">  "Tags": ["dev"],</div><div class="line">  "Address": "127.0.0.1",</div><div class="line">  "Port": 8081</div><div class="line">&#125;</div><div class="line">'</div></pre></td></tr></table></figure></p>
-<p>成功之后登录控制台，会看到SERVICES下多出了一个real_server服务：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/hunger_4.png" alt="hunger_4"><br>书中注册服务是请求的catalog API，但是注册完之后过会儿会被自动deregister，查了下文档，换成上述API了。另外，有一点和zookeeper不太一样的是，停止Consul后，之前注册的服务就消失了。不知道和目前测试用的是单节点有没关系，如果线上准备使用该工具，还得详细地看完文档再说。解释下上述API的几个参数：</p>
+<p>成功之后登录控制台，会看到SERVICES下多出了一个real_server服务：<br><img src="http://qiniu.didadu.cn/hunger_4.png" alt="hunger_4"><br>书中注册服务是请求的catalog API，但是注册完之后过会儿会被自动deregister，查了下文档，换成上述API了。另外，有一点和zookeeper不太一样的是，停止Consul后，之前注册的服务就消失了。不知道和目前测试用的是单节点有没关系，如果线上准备使用该工具，还得详细地看完文档再说。解释下上述API的几个参数：</p>
 <ul>
 <li>ID：代表要注册的服务的唯一标识</li>
 <li>Name：表示一组服务的名称</li>
@@ -518,7 +518,7 @@
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -526,7 +526,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -534,7 +534,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -543,7 +543,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -621,7 +621,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

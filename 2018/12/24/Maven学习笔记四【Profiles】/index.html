@@ -1,0 +1,819 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.proxy.ustclug.org/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Tool," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本节来学习下Maven的Profiles 介绍Build ProfilesApache Maven 2.0竭尽全力确保构建是可移植的。除其他之外，这意味着允许在POM中进行构建配置，避免所有文件系统的引用。并且更加依赖本地存储库来存储实现这一点所需的元数据。 然而，有时可移植性并不是完全可能的。某些条件下，插件可能需要配置本地文件系统路径。在其他情况下，需要一个稍微不同的依赖集，并且项目的arti">
+<meta name="keywords" content="Java,Tool">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Maven学习笔记四【Profiles】">
+<meta property="og:url" content="http://yoursite.com/2018/12/24/Maven学习笔记四【Profiles】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="本节来学习下Maven的Profiles 介绍Build ProfilesApache Maven 2.0竭尽全力确保构建是可移植的。除其他之外，这意味着允许在POM中进行构建配置，避免所有文件系统的引用。并且更加依赖本地存储库来存储实现这一点所需的元数据。 然而，有时可移植性并不是完全可能的。某些条件下，插件可能需要配置本地文件系统路径。在其他情况下，需要一个稍微不同的依赖集，并且项目的arti">
+<meta property="og:updated_time" content="2019-02-05T17:09:48.202Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Maven学习笔记四【Profiles】">
+<meta name="twitter:description" content="本节来学习下Maven的Profiles 介绍Build ProfilesApache Maven 2.0竭尽全力确保构建是可移植的。除其他之外，这意味着允许在POM中进行构建配置，避免所有文件系统的引用。并且更加依赖本地存储库来存储实现这一点所需的元数据。 然而，有时可移植性并不是完全可能的。某些条件下，插件可能需要配置本地文件系统路径。在其他情况下，需要一个稍微不同的依赖集，并且项目的arti">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/24/Maven学习笔记四【Profiles】/"/>
+
+
+
+
+
+  <title> Maven学习笔记四【Profiles】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/24/Maven学习笔记四【Profiles】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Maven学习笔记四【Profiles】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-24T15:45:55+08:00">
+                2018-12-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Maven/" itemprop="url" rel="index">
+                    <span itemprop="name">Maven</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本节来学习下Maven的Profiles</p>
+<h3 id="介绍Build-Profiles"><a href="#介绍Build-Profiles" class="headerlink" title="介绍Build Profiles"></a>介绍Build Profiles</h3><p>Apache Maven 2.0竭尽全力确保构建是可移植的。除其他之外，这意味着允许在POM中进行构建配置，避免所有文件系统的引用。并且更加依赖本地存储库来存储实现这一点所需的元数据。</p>
+<p>然而，有时可移植性并不是完全可能的。某些条件下，插件可能需要配置本地文件系统路径。在其他情况下，需要一个稍微不同的依赖集，并且项目的artifact名称可能需要稍微调整一下。在另一种情况下，甚至可能需要在构建生命周期中包含一个完整的插件，这取决于所检测到的构建环境。</p>
+<p>为了解决这些情况，Maven 2.0引入了构建概要文件的概念。配置文件使用POM本身可用元素的子集(外加一个额外的部分)来指定，并以各种方式触发。他们在构建时修改POM，并用于互补的集合中，以便为一组目标环境提供等效但不同的参数（例如，在开发、测试和生产环境中提供appserver根的路径）。因此，概要文件很容易导致来自团队不同成员的构建结果不同。但是，如果使用得当，可以在使用概要文件的同时仍然保持项目的可移植性。这也将最小化maven -f选项的使用，该选项允许用户使用不同的参数或配置创建另一个POM，从而使其更易于维护，因为它只在一个POM上运行。</p>
+<a id="more"></a>
+<h3 id="配置文件的不同类型以及定义在哪里"><a href="#配置文件的不同类型以及定义在哪里" class="headerlink" title="配置文件的不同类型以及定义在哪里"></a>配置文件的不同类型以及定义在哪里</h3><ul>
+<li>Per Project - 定义在pom文件中 <code>(pom.xml)</code></li>
+<li>Per User  - 定义在 <a href="http://maven.apache.org/ref/current/maven-settings/settings.html" target="_blank" rel="external">Maven-settings</a> 文件中<code>(%USER_HOME%/.m2/settings.xml)</code></li>
+<li>Global - 定义在<a href="http://maven.apache.org/ref/current/maven-settings/settings.html" target="_blank" rel="external">全局 Maven-settings</a> <code>(${maven.home}/conf/settings.xml)</code></li>
+<li>Profile descriptor - 位于 <a href="http://maven.apache.org/ref/2.2.1/maven-profile/profiles.html" target="_blank" rel="external">project basedir <code>(profiles.xml)</code></a> 文件的描述符（不支持Maven 3.0）</li>
+</ul>
+<h3 id="如何触发Profile"><a href="#如何触发Profile" class="headerlink" title="如何触发Profile"></a>如何触发Profile</h3><p>配置文件可以通过以下几种方式触发/激活：</p>
+<ul>
+<li>Explicitly - 显示地</li>
+<li>Through Maven settings - 通过Maven设置</li>
+<li>Based on environment variables - 基于环境变量</li>
+<li>OS settings - 操作系统设置</li>
+<li>Present or missing files - 提交或丢失文件</li>
+</ul>
+<h4 id="配置文件激活的详细信息"><a href="#配置文件激活的详细信息" class="headerlink" title="配置文件激活的详细信息"></a>配置文件激活的详细信息</h4><p>可以使用-P CLI选项显式指定概要文件。此选项接受一个参数，该参数是要使用的概要文件id的逗号分隔列表。当指定此选项时，除了激活已配置的概要文件外，还将激活选项参数中指定的概要文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn groupId:artifactId:goal -P profile-1,profile-2</div></pre></td></tr></table></figure>
+<p>可以通过<code>&lt;activeProfiles&gt;</code>标签在maven设置中激活概要文件。如下，接受<code>&lt;activeProfiles&gt;</code>元素地列表，每个元素都包含一个概要文件id：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">settings</span>&gt;</span></div><div class="line">  ...</div><div class="line">  <span class="tag">&lt;<span class="name">activeProfiles</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">activeProfile</span>&gt;</span>profile-1<span class="tag">&lt;/<span class="name">activeProfile</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">activeProfiles</span>&gt;</span></div><div class="line">  ...</div><div class="line"><span class="tag">&lt;/<span class="name">settings</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>在<code>&lt;activeProfiles&gt;</code>标签中列出的配置文件将在每次项目使用时被默认激活。</p>
+<p>可以根据构建环境的检测状态自动触发概要文件。这些触发器是通过概要文件中<code>&lt;activation&gt;</code>部分指定的。 目前，这种检测仅限于JDK版本的前缀匹配、系统属性的存在与否或系统属性的值。下面有些例子：</p>
+<p>当JDK的版本以”1.4”开头时，以下配置将触发配置文件:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">profiles</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">profile</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">activation</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">jdk</span>&gt;</span>1.4<span class="tag">&lt;/<span class="name">jdk</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">activation</span>&gt;</span></div><div class="line">    ...</div><div class="line">  <span class="tag">&lt;/<span class="name">profile</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">profiles</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>范围匹配也可以在Maven 2.1中使用：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">profiles</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">profile</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">activation</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">jdk</span>&gt;</span>[1.3,1.6)<span class="tag">&lt;/<span class="name">jdk</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">activation</span>&gt;</span></div><div class="line">    ...</div><div class="line">  <span class="tag">&lt;/<span class="name">profile</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">profiles</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>下面将基于操作系统设置激活。有关操作系统值的更多细节，请参见<a href="http://maven.apache.org/enforcer/enforcer-rules/requireOS.html" target="_blank" rel="external">Maven execucer</a>插件。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">profiles</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">profile</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">activation</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">os</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>Windows XP<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">family</span>&gt;</span>Windows<span class="tag">&lt;/<span class="name">family</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">arch</span>&gt;</span>x86<span class="tag">&lt;/<span class="name">arch</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.2600<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">os</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">activation</span>&gt;</span></div><div class="line">    ...</div><div class="line">  <span class="tag">&lt;/<span class="name">profile</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">profiles</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>当系统属性”debug”指定为任意值时，将激活以下配置文件:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">profiles</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">profile</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">activation</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>debug<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">activation</span>&gt;</span></div><div class="line">    ...</div><div class="line">  <span class="tag">&lt;/<span class="name">profile</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">profiles</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>当系统属性”debug”没有被定义时，将激活以下配置文件:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">profiles</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">profile</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">activation</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>!debug<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">activation</span>&gt;</span></div><div class="line">    ...</div><div class="line">  <span class="tag">&lt;/<span class="name">profile</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">profiles</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>如果没有定义系统属性”debug”，或者定义的值不为”true”，则会激活以下概要文件;</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">profiles</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">profile</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">activation</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>debug<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>!true<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">activation</span>&gt;</span></div><div class="line">    ...</div><div class="line">  <span class="tag">&lt;/<span class="name">profile</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">profiles</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>要激活它，你需要在命令行中输入其中一个:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mvn groupId:artifactId:goal</div><div class="line">mvn groupId:artifactId:goal -Ddebug=false</div></pre></td></tr></table></figure>
+<p>下个示例，当环境变量”environment”被指定到”test”时，出发概要文件：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">profiles</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">profile</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">activation</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>environment<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>test<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">activation</span>&gt;</span></div><div class="line">    ...</div><div class="line">  <span class="tag">&lt;/<span class="name">profile</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">profiles</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>要激活它，可以在命令行输入:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn groupId:artifactId:goal -Denvironment=test</div></pre></td></tr></table></figure>
+<p>从Maven 3.0开始，POM中的配置文件也可以基于settings.xml中配置的active profiles属性被激活。</p>
+<p>注意：像FOO这样的环境变量可以作为表单env.FOO的属性使用。进一步注意，环境变量名在Windows上被规范化为所有大写。</p>
+<p>当生成文件<code>target/generated-sources/axistools/wsdl2java/org/apache/maven</code>丢失时，下面示例将触发概要文件：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">profiles</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">profile</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">activation</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">file</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">missing</span>&gt;</span>target/generated-sources/axistools/wsdl2java/org/apache/maven<span class="tag">&lt;/<span class="name">missing</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">file</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">activation</span>&gt;</span></div><div class="line">    ...</div><div class="line">  <span class="tag">&lt;/<span class="name">profile</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">profiles</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>在Maven 2.0.9中，可以插入标记<code>&lt;exists&gt;</code>和<code>&lt;missing&gt;</code>。支持的变量是系统属性，如<code>${user.home}</code>和<code>${env.HOME}</code>。请注意，POM本身定义的属性和值在这里不能用于插值。例如上面的示例触发器，不能使用<code>${project.build.directory}</code>，只能硬编码路径。</p>
+<p>配置文件也可以默认激活，使用如下配置:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">profiles</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">profile</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">id</span>&gt;</span>profile-1<span class="tag">&lt;/<span class="name">id</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">activation</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">activeByDefault</span>&gt;</span>true<span class="tag">&lt;/<span class="name">activeByDefault</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">activation</span>&gt;</span></div><div class="line">    ...</div><div class="line">  <span class="tag">&lt;/<span class="name">profile</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">profiles</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>这个概要文件将作用于所有构建，除非使用上面列举的方法之一激活同意POM中的另一个概要文件。当POM中的配置文件在命令行上或通过其激活配置文件被激活时，默认激活的所有配置文件将自动停用。</p>
+<h4 id="停用配置文件"><a href="#停用配置文件" class="headerlink" title="停用配置文件"></a>停用配置文件</h4><p>从Maven 2.0.10开始，可以使用命令行停用一个或多个概要文件，方法是在它们的标识符前加上字符’!’或’-‘：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn groupId:artifactId:goal -P !profile-1,!profile-2</div></pre></td></tr></table></figure>
+<p>这可以用于停用标记为activeByDefault的配置文件，或者通过其激活配置激活的配置文件。</p>
+<h3 id="POM的哪些区域可以根据每种类型的概要文件进行定制"><a href="#POM的哪些区域可以根据每种类型的概要文件进行定制" class="headerlink" title="POM的哪些区域可以根据每种类型的概要文件进行定制"></a>POM的哪些区域可以根据每种类型的概要文件进行定制</h3><p>既然我们已经讨论了在哪里指定概要文件，以及如何激活它们，那么我们可以在概要文件中指定什么将是非常有用的。与配置文件的其他方面一样，这个答案并不简单。</p>
+<p>根据选择配置概要文件的位置，可以访问不同的POM配置选项。</p>
+<h4 id="外部文件中的配置文件"><a href="#外部文件中的配置文件" class="headerlink" title="外部文件中的配置文件"></a>外部文件中的配置文件</h4><p>在外部文件中指定配置文件（也就是说在settings.xml或 profiles.xml文件中）是不可移植的。任何看起来很有可能更改构建结果的内容都仅限于POM中的内联概要文件。像存储库列表这样的东西，可能仅仅是已批准项目的专有存储库，并且不会改变构建的结果。因此，将只能修改<code>&lt; repository &gt;</code>和<code>&lt; pluginrepository &gt;</code>部分，外加一个额外的<code>&lt;properties&gt;</code>部分。</p>
+<p><code>&lt;properties&gt;</code>部分允许指定自由形式的键-值对，这些键-值对将包含在POM的插值过程中。这允许以<code>${profile. provied .path}</code>的形式指定插件配置。</p>
+<h4 id="POM中的配置文件"><a href="#POM中的配置文件" class="headerlink" title="POM中的配置文件"></a>POM中的配置文件</h4><p>另一方面，如果概要文件可以在POM中合理地指定，那么将有更多的选择空间。当然，代价是只能修改当前项目以及子模块。由于这些概要文件是内联指定的，因此有更好的机会保持可移植性。因此，有理由说可以向它们添加更多的信息，而不会有其他用户无法获得这些信息的风险。</p>
+<p>POM中指定的配置文件可以修改以下POM元素：</p>
+<ul>
+<li><code>&lt;repositories&gt;</code></li>
+<li><code>&lt;pluginRepositories&gt;</code></li>
+<li><code>&lt;dependencies&gt;</code></li>
+<li><code>&lt;plugins&gt;</code></li>
+<li><code>&lt;properties&gt;</code> (实际上在主POM中不可用，但是在后台使用)</li>
+<li><code>&lt;modules&gt;</code></li>
+<li><code>&lt;reporting&gt;</code></li>
+<li><code>&lt;dependencyManagement&gt;</code></li>
+<li><code>&lt;distributionManagement&gt;</code></li>
+<li><code>&lt;build&gt;</code> 元素的子集，包含如下：<ul>
+<li><code>&lt;defaultGoal&gt;</code></li>
+<li><code>&lt;resources&gt;</code></li>
+<li><code>&lt;testResources&gt;</code></li>
+<li><code>&lt;finalName&gt;</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="lt-profiles-gt-之外的POM元素"><a href="#lt-profiles-gt-之外的POM元素" class="headerlink" title="&lt;profiles&gt;之外的POM元素"></a><code>&lt;profiles&gt;</code>之外的POM元素</h4><p>不允许在POM-profiles之外修改某些POM元素，因为当POM部署到存储库系统时，这些运行时修改将不会被分发，从而使该人员对该项目的构建与其他人完全不同。虽然可以在一定程度上通过为外部概要文件提供的选项做到这一点，但是风险是有限的。另一个原因是这个POM信息有时会从父POM中重用。</p>
+<p>外部文件，如 <code>settings.xml</code> and <code>profiles.xml</code>，也不支持POM-profiles之外的元素。让我们以这个场景为详细说明。当有效的POM部署到远程存储库时，任何人都可以从存储库中提取它的信息，并使用它直接构建Maven项目。现在，想象一下，如果我们可以在依赖项中设置对构建非常重要的概要文件，或者在settings.xml文件中的POM-profiles之外的任何其他元素设置概要文件。那么，很可能我们不能期望其他人使用存储库中的POM并能够构建它。我们还必须考虑如何与其他人共享settings.xml文件。注意，太多的文件配置是非常令人困惑的，并且难以维护。底线是，既然它是构建数据，所以就应该在POM中。Maven 2的目标之一是将运行构建所需的所有信息合并到单个文件中，或POM的文件层次结构中。</p>
+<h3 id="配置文件陷阱"><a href="#配置文件陷阱" class="headerlink" title="配置文件陷阱"></a>配置文件陷阱</h3><p>我们已经提到，向构建中添加概要文件可能会破坏项目的可移植性。我们甚至强调了概要文件可能破坏项目可移植性的情况。但是，有必要重申这些观点，以便更连贯地讨论在使用概要文件时要避免的一些缺陷。</p>
+<p>在使用概要文件时，有两个主要问题需要记住。首先是外部属性，通常用于插件配置。这些可能会破坏项目的可移植性。另一个更微妙的方面是对一组自然概要文件的不完整规范。</p>
+<h4 id="外部属性"><a href="#外部属性" class="headerlink" title="外部属性"></a>外部属性</h4><p>外部属性定义涉及pom.xml文件之外，但没有在其内部相应的配置文件中定义的任何属性值。POM中属性最明显的用法是在插件配置中。虽然没有属性也有可能破坏项目的可移植性，但是这些东西可能具有导致构建失败的微妙影响。例如，在settings.xml的概要文件中指定appserver路径。当团队中另一个用户视图在没有类似的settings.xml的情况下构建时，可呢个导致集成测试失败。考虑如下web项目的pom.xml片段：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  ...</div><div class="line">  <span class="tag">&lt;<span class="name">build</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.myco.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spiffy-integrationTest-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">appserverHome</span>&gt;</span>$&#123;appserver.home&#125;<span class="tag">&lt;/<span class="name">appserverHome</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></div><div class="line">      ...</div><div class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">build</span>&gt;</span></div><div class="line">  ...</div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>现在，在本地<code>${user.home}/.m2/settings.xml</code>中，将有如下配置:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">settings</span>&gt;</span></div><div class="line">  ...</div><div class="line">  <span class="tag">&lt;<span class="name">profiles</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">profile</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">id</span>&gt;</span>appserverConfig<span class="tag">&lt;/<span class="name">id</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">properties</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">appserver.home</span>&gt;</span>/path/to/appserver<span class="tag">&lt;/<span class="name">appserver.home</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">properties</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">profile</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">profiles</span>&gt;</span></div><div class="line"> </div><div class="line">  <span class="tag">&lt;<span class="name">activeProfiles</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">activeProfile</span>&gt;</span>appserverConfig<span class="tag">&lt;/<span class="name">activeProfile</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">activeProfiles</span>&gt;</span></div><div class="line">  ...</div><div class="line"><span class="tag">&lt;/<span class="name">settings</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>构建集成测试生命周期阶段时，因为您提供的路径允许测试插件安装和测试这个web应用程序，集成测试通过。</p>
+<p>但是，当其他同事试图构建集成测试时，他的构建非常失败，抱怨它不能解决插件配置参数<code>&lt;appserverHome&gt;</code>，或者更糟糕的是，该参数值-字面意思<code>${appserver.home}</code>无效。</p>
+<p>恭喜，现在的项目是不可移植的。将这个配置内联到你的pom.xml中，可以帮助缓解这一问题，但它有一个明显的缺点:现在每个项目层次结构必须指定此信息。由于Maven为项目继承提供了良好的支持，所以可以将这种配置保留在团队级POM的<code>&lt;pluginManagement&gt;</code>部分或类似的部分中，并简单地继承路径。</p>
+<p>另一个不太吸引人的答案可能是开发环境的标准化。然而，这往往会损害Maven能够提供的生产力增益。</p>
+<h4 id="自然轮廓集的不完整规范"><a href="#自然轮廓集的不完整规范" class="headerlink" title="自然轮廓集的不完整规范"></a>自然轮廓集的不完整规范</h4><p>除了上述可移植性破坏因素之外，概要文件很容易无法涵盖所有情况。当你这样做的时候，你通常会离开你的目标环境。让我们以pom.xml为例：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  ...</div><div class="line">  <span class="tag">&lt;<span class="name">build</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.myco.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spiffy-integrationTest-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">appserverHome</span>&gt;</span>$&#123;appserver.home&#125;<span class="tag">&lt;/<span class="name">appserverHome</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></div><div class="line">      ...</div><div class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">build</span>&gt;</span></div><div class="line">  ...</div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>现在，考虑以下概要文件，它将在pom.xml中内联指定：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  ...</div><div class="line">  <span class="tag">&lt;<span class="name">profiles</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">profile</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">id</span>&gt;</span>appserverConfig-dev<span class="tag">&lt;/<span class="name">id</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">activation</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">name</span>&gt;</span>env<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">value</span>&gt;</span>dev<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">activation</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">properties</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">appserver.home</span>&gt;</span>/path/to/dev/appserver<span class="tag">&lt;/<span class="name">appserver.home</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">properties</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">profile</span>&gt;</span></div><div class="line"> </div><div class="line">    <span class="tag">&lt;<span class="name">profile</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">id</span>&gt;</span>appserverConfig-dev-2<span class="tag">&lt;/<span class="name">id</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">activation</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">name</span>&gt;</span>env<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">value</span>&gt;</span>dev-2<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">activation</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">properties</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">appserver.home</span>&gt;</span>/path/to/another/dev/appserver2<span class="tag">&lt;/<span class="name">appserver.home</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">properties</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">profile</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">profiles</span>&gt;</span></div><div class="line">  ..</div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>执行如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn -Denv=dev-2 integration-test</div></pre></td></tr></table></figure>
+<p>构建成功，并且应用ID为appserverConfig-dev-2概要文件给出的属性。</p>
+<p>执行如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn -Denv=dev integration-test</div></pre></td></tr></table></figure>
+<p>构建成功，并且应用ID为appserverConfig-dev概要文件给出的属性。</p>
+<p>但是，执行如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn -Denv=production integration-test</div></pre></td></tr></table></figure>
+<p>为什么不会构建成功呢。因为所得到的<code>${appserver.home}</code>的非插值字面值不是部署和测试web应用的有效路径。在编写配置文件时，我们没有考虑生产环境的情况。生产环境、以及测试甚至是本地环境构成了一组自然的目标环境，我们可能希望为其构建集成测试生命周期阶段。这个自然集的不完整规范意味着我们将有效的目标环境有效地限制到开发环境。团队的其他成员可能看不到其中的奥妙。所以当构建概要文件来处理诸如此类的情况时，请确保处理整个目标集。</p>
+<p>另外，用户特定的配置文件也可以以类似的方式工作。这意味着，当团队添加新开发人员时，以用户为主键配置的不同环境的概要文件就会生效。猜想这对新手来说是个有用的训练，但如果用这种方式把它们扔给狼群就不好了。同样，一定要考虑整个配置文件集。</p>
+<h3 id="如何知道在构建过程中哪些概要文件是有用的"><a href="#如何知道在构建过程中哪些概要文件是有用的" class="headerlink" title="如何知道在构建过程中哪些概要文件是有用的"></a>如何知道在构建过程中哪些概要文件是有用的</h3><p>确定活动概要文件将帮助用户了解在构建期间执行了哪些特定概要文件。我们可以使用Maven Help插件来判断在构建过程中哪些配置文件是有效的。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn help:active-profiles</div></pre></td></tr></table></figure>
+<p>我们弄个小例子来消化下，沿用之前的my-app项目，修改pom.xml文件，添加如下内容：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">~❯ vim ~/my-app/pom.xml</div><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  ...</div><div class="line">  <span class="tag">&lt;<span class="name">profiles</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">profile</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">id</span>&gt;</span>appserverConfig-dev<span class="tag">&lt;/<span class="name">id</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">activation</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">name</span>&gt;</span>env<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">value</span>&gt;</span>dev<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">activation</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">properties</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">appserver.home</span>&gt;</span>/path/to/dev/appserver<span class="tag">&lt;/<span class="name">appserver.home</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">properties</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">profile</span>&gt;</span></div><div class="line"> </div><div class="line">    <span class="tag">&lt;<span class="name">profile</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">id</span>&gt;</span>appserverConfig-dev-2<span class="tag">&lt;/<span class="name">id</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">activation</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">name</span>&gt;</span>env<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">value</span>&gt;</span>dev-2<span class="tag">&lt;/<span class="name">value</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">activation</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">properties</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">appserver.home</span>&gt;</span>/path/to/another/dev/appserver2<span class="tag">&lt;/<span class="name">appserver.home</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">properties</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">profile</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">profiles</span>&gt;</span></div><div class="line">  ..</div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>执行如下命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">~❯ cd my-app/</div><div class="line">~❯ mvn help:active-profiles -Denv=dev</div><div class="line">输出将会包含如下内容：</div><div class="line">The following profiles are active:</div><div class="line">- appserverConfig-dev (source: com.mycompany.app:my-app:1.0-SNAPSHOT)</div></pre></td></tr></table></figure>
+<p>从上面的结果可以看出profile的ID，以及其来源。</p>
+<p>下面我们在settings.xml文件中声明了一个概要文件：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">~❯ vim ~/.m2/settings.xml</div><div class="line">&lt;settings&gt;</div><div class="line">  ...</div><div class="line">  &lt;profiles&gt;</div><div class="line">    &lt;profile&gt;</div><div class="line">      &lt;id&gt;appserverConfig&lt;/id&gt;</div><div class="line">      &lt;properties&gt;</div><div class="line">        &lt;appserver.home&gt;/path/to/appserver&lt;/appserver.home&gt;</div><div class="line">      &lt;/properties&gt;</div><div class="line">    &lt;/profile&gt;</div><div class="line">  &lt;/profiles&gt;</div><div class="line"> </div><div class="line">  &lt;activeProfiles&gt;</div><div class="line">    &lt;activeProfile&gt;appserverConfig&lt;/activeProfile&gt;</div><div class="line">  &lt;/activeProfiles&gt;</div><div class="line">  ...</div><div class="line">&lt;/settings&gt;</div></pre></td></tr></table></figure>
+<p>测试下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">~❯ cd my-app/</div><div class="line">~/my-app❯ mvn help:active-profiles</div><div class="line">输出将会包含如下内容：</div><div class="line">The following profiles are active:</div><div class="line"> - appserverConfig (source: external)</div></pre></td></tr></table></figure>
+<p>如上所示，输出正式settings.xml中配置的profile ID，而且source的值变成external，表示是外部配置的。</p>
+<p>如果在setting.xml中设置了默认激活的配置文件，但是pom文件中也激活了配置文件，哪个配置文件会对构建产生影响呢：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">~❯ cd my-app/</div><div class="line">~/my-app❯ mvn help:active-profiles -P appserverConfig-dev</div><div class="line">输出将包含如下内容：</div><div class="line">The following profiles are active:</div><div class="line"> - appserverConfig (source: external)</div><div class="line"> - appserverConfig-dev (source: com.mycompany.app:my-app:1.0-SNAPSHOT)</div></pre></td></tr></table></figure>
+<p>尽管它列出了两个活动概要文件，但我们不确定其中哪个已经应用。要查看对构建执行的影响：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">~❯ cd my-app/</div><div class="line">~/my-app❯  mvn help:effective-pom -P appserverConfig-dev</div><div class="line">输出包含如下内容：</div><div class="line">...</div><div class="line">&lt;properties&gt;</div><div class="line">  &lt;appserver.home&gt;/path/to/appserver&lt;/appserver.home&gt;</div><div class="line">&lt;/properties&gt;</div></pre></td></tr></table></figure>
+<p>这会将此构建配置的有效POM打印到控制台。 从输出可以看出<code>&lt;appserver.home&gt;</code>的值是settings.xml中设置的。所以settings.xml比pom.xml中配置的概要文件拥有更高的优先级。</p>
+<p>通过命令行参数-Doutput=effective-pom.xml，可以将上述输出内容重定向到指定的文件中。</p>
+<h3 id="命名约定"><a href="#命名约定" class="headerlink" title="命名约定"></a>命名约定</h3><p>到目前为止，我们已经注意到概要文件是解决针对不同目标环境的不同构建配置需求问题的一种自然的方法。上面，我们讨论了解决这种情况的“自然配置文件集”的概念，以及考虑需要的整个配置文件集的重要性。</p>
+<p>然而，如何组织和管理该集合的演化问题也很重要。正如优秀的开发人员努力编写自我文档化的代码一样，重要的是概要ID能够表示它们的预期用途。这样做的一个好方法是使用公共系统属性触发器作为概要文件名称的一部分。这可能导致诸如env-dev、env-test和env-prod之类的名称用于由系统属性env触发的概要文件。这样的系统在如何激活针对特定环境的构建方面留下了非常直观的提示。因此，要激活测试环境的构建，只需要通过发出以下命令来激活env-test：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mvn -Denv=test &lt;phase&gt;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Tool/" rel="tag"># Tool</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/22/Maven学习笔记三【POM文件】/" rel="next" title="Maven学习笔记三【POM文件】">
+                <i class="fa fa-chevron-left"></i> Maven学习笔记三【POM文件】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/25/Maven学习笔记五【Repositories】/" rel="prev" title="Maven学习笔记五【Repositories】">
+                Maven学习笔记五【Repositories】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">105</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#介绍Build-Profiles"><span class="nav-number">1.</span> <span class="nav-text">介绍Build Profiles</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置文件的不同类型以及定义在哪里"><span class="nav-number">2.</span> <span class="nav-text">配置文件的不同类型以及定义在哪里</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何触发Profile"><span class="nav-number">3.</span> <span class="nav-text">如何触发Profile</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置文件激活的详细信息"><span class="nav-number">3.1.</span> <span class="nav-text">配置文件激活的详细信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#停用配置文件"><span class="nav-number">3.2.</span> <span class="nav-text">停用配置文件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#POM的哪些区域可以根据每种类型的概要文件进行定制"><span class="nav-number">4.</span> <span class="nav-text">POM的哪些区域可以根据每种类型的概要文件进行定制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#外部文件中的配置文件"><span class="nav-number">4.1.</span> <span class="nav-text">外部文件中的配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#POM中的配置文件"><span class="nav-number">4.2.</span> <span class="nav-text">POM中的配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lt-profiles-gt-之外的POM元素"><span class="nav-number">4.3.</span> <span class="nav-text"><profiles>之外的POM元素</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置文件陷阱"><span class="nav-number">5.</span> <span class="nav-text">配置文件陷阱</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#外部属性"><span class="nav-number">5.1.</span> <span class="nav-text">外部属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自然轮廓集的不完整规范"><span class="nav-number">5.2.</span> <span class="nav-text">自然轮廓集的不完整规范</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何知道在构建过程中哪些概要文件是有用的"><span class="nav-number">6.</span> <span class="nav-text">如何知道在构建过程中哪些概要文件是有用的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#命名约定"><span class="nav-number">7.</span> <span class="nav-text">命名约定</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

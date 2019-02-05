@@ -1,0 +1,791 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.proxy.ustclug.org/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Tool," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="从业开始Maven就一直在用，但没有系统地去学习，这两天搜了一下关于Maven的书籍，比较少而且时间也比较长了。浏览了下官网，有个索引页面写的挺清楚的，所以就将其作为学习教材，采用不完全翻译的方式记录下来。仅作用于个人学习、以及分享，如涉及到版权问题，将立即停止更新。 安装关于Maven的安装，参照官网。本人当前安装的环境如下： 123456~❯ mvn --versionApache Maven">
+<meta name="keywords" content="Java,Tool">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Maven学习笔记一【Quick Start】">
+<meta property="og:url" content="http://yoursite.com/2018/12/19/Maven学习笔记一【Quick Start】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="从业开始Maven就一直在用，但没有系统地去学习，这两天搜了一下关于Maven的书籍，比较少而且时间也比较长了。浏览了下官网，有个索引页面写的挺清楚的，所以就将其作为学习教材，采用不完全翻译的方式记录下来。仅作用于个人学习、以及分享，如涉及到版权问题，将立即停止更新。 安装关于Maven的安装，参照官网。本人当前安装的环境如下： 123456~❯ mvn --versionApache Maven">
+<meta property="og:updated_time" content="2019-02-05T17:10:58.779Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Maven学习笔记一【Quick Start】">
+<meta name="twitter:description" content="从业开始Maven就一直在用，但没有系统地去学习，这两天搜了一下关于Maven的书籍，比较少而且时间也比较长了。浏览了下官网，有个索引页面写的挺清楚的，所以就将其作为学习教材，采用不完全翻译的方式记录下来。仅作用于个人学习、以及分享，如涉及到版权问题，将立即停止更新。 安装关于Maven的安装，参照官网。本人当前安装的环境如下： 123456~❯ mvn --versionApache Maven">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/19/Maven学习笔记一【Quick Start】/"/>
+
+
+
+
+
+  <title> Maven学习笔记一【Quick Start】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/19/Maven学习笔记一【Quick Start】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Maven学习笔记一【Quick Start】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-19T16:08:37+08:00">
+                2018-12-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Maven/" itemprop="url" rel="index">
+                    <span itemprop="name">Maven</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>从业开始Maven就一直在用，但没有系统地去学习，这两天搜了一下关于Maven的书籍，比较少而且时间也比较长了。浏览了下官网，有个<a href="http://maven.apache.org/guides/index.html" target="_blank" rel="external">索引页面</a>写的挺清楚的，所以就将其作为学习教材，采用不完全翻译的方式记录下来。仅作用于个人学习、以及分享，如涉及到版权问题，将立即停止更新。</p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>关于Maven的安装，参照<a href="http://maven.apache.org/install.html" target="_blank" rel="external">官网</a>。本人当前安装的环境如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">~❯ mvn --version</div><div class="line">Apache Maven 3.6.0 (97c98ec64a1fdfee7767ce5ffb20918da4f719f3; 2018-10-25T02:41:47+08:00)</div><div class="line">Maven home: /usr/local/apache-maven-3.6.0</div><div class="line">Java version: 11.0.1, vendor: Oracle Corporation, runtime: /Library/Java/JavaVirtualMachines/jdk-11.0.1.jdk/Contents/Home</div><div class="line">Default locale: zh_CN_#Hans, platform encoding: UTF-8</div><div class="line">OS name: "mac os x", version: "10.14.1", arch: "x86_64", family: "mac"</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>如上<code>mvn --version</code>是我们使用Maven的第一命令，如要查询所有命令可以通过<code>mvn --help</code>输出。</p>
+<h3 id="创建一个项目"><a href="#创建一个项目" class="headerlink" title="创建一个项目"></a>创建一个项目</h3><p>在命令行中执行如下命令来创建一个项目：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">~❯ mvn archetype:generate \</div><div class="line">-DgroupId=com.mycompany.app \</div><div class="line">-DartifactId=my-app \</div><div class="line">-DarchetypeArtifactId=maven-archetype-quickstart \</div><div class="line">-DarchetypeVersion=1.4 \</div><div class="line">-DinteractiveMode=false</div></pre></td></tr></table></figure>
+<p>成功之后会在当前文件夹生成一个与artifactId同名的目录，即my-app。通常情况下，这一步通过IDEA里提供的可视界面来完成。my-app下的组织结构相信大家都非常清楚了，就没必要解释了，有需要的话可以参照<a href="http://maven.apache.org/guides/introduction/introduction-to-the-standard-directory-layout.html" target="_blank" rel="external">官网标准目录布局</a>的介绍。上述命令执行了一个Maven的行为：archetype:generate，并且将各种参数传递给该行为。前缀archetype是提供行为的插件，上述行为的意思是基于maven-archetype-quickstart原型创建一个简单的项目。其中pom.xml还是有必要来看下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span> <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></div><div class="line">  <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</div><div class="line">  <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></div><div class="line"></div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.mycompany.app<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>my-app<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"></div><div class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>my-app<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">  <span class="comment">&lt;!-- FIXME change it to the project's website --&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">url</span>&gt;</span>http://www.example.com<span class="tag">&lt;/<span class="name">url</span>&gt;</span></div><div class="line"></div><div class="line">  <span class="tag">&lt;<span class="name">properties</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">project.build.sourceEncoding</span>&gt;</span>UTF-8<span class="tag">&lt;/<span class="name">project.build.sourceEncoding</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">maven.compiler.source</span>&gt;</span>1.7<span class="tag">&lt;/<span class="name">maven.compiler.source</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">maven.compiler.target</span>&gt;</span>1.7<span class="tag">&lt;/<span class="name">maven.compiler.target</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">properties</span>&gt;</span></div><div class="line">  ...</div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>下面列出pom.xml每个标签的含义：</p>
+<ul>
+<li><strong>project</strong> 这是pom.xml文件的顶级元素</li>
+<li><strong>modelVersion</strong> 该元素指定POM使用的对象模型的版本，该属性很少更改</li>
+<li><strong>groupId</strong> 该元素指定创建项目的组织的唯一标识符。groupId是项目的关键标识符之一，通常设置成组织的域名</li>
+<li><strong>artifactId</strong> 可以理解为该项目的名称，打包出来的文件会使用到该名称</li>
+<li><strong>packaging</strong> 该项目使用的包类型，不仅仅是打包的类型，如果不写则默认为jar</li>
+<li><strong>version</strong> 指定项目的版本，打包出来的文件会使用到该属性</li>
+<li><strong>name</strong> 项目的显示名称</li>
+<li><strong>url</strong> 指定项目生成的site的url</li>
+<li><strong>description</strong> 项目的描述信息</li>
+</ul>
+<h3 id="项目编译"><a href="#项目编译" class="headerlink" title="项目编译"></a>项目编译</h3><p>执行如下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">~❯ cd my-app</div><div class="line">~/my-app❯ mvn compile</div></pre></td></tr></table></figure>
+<p>编译后的文件生成在target/classes目录下。</p>
+<h3 id="项目打包"><a href="#项目打包" class="headerlink" title="项目打包"></a>项目打包</h3><p>执行如下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">~❯ cd my-app</div><div class="line">~/my-app❯ mvn package</div></pre></td></tr></table></figure>
+<p>打包成功后会在target目录下生成jar文件。和上面执行命令<code>mvn archetype:generate</code>不同，该命令表示一个阶段，而不是一个行为目标。阶段是构建生命周期中的一个步骤，是有序序列中的其中一个。当给定一个阶段时，Maven将执行序列中的每个阶段，直到包括定义的阶段为止。例如，如果执行compile阶段，实际执行的阶段将是：</p>
+<ol>
+<li>validate</li>
+<li>generate-sources</li>
+<li>process-sources</li>
+<li>generate-resources</li>
+<li>process-resources</li>
+<li>compile</li>
+</ol>
+<p>可以使用如下命令测试生成的jar：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">~/my-app❯ java -cp target/my-app-1.0-SNAPSHOT.jar com.mycompany.app.App</div><div class="line">Hello World!</div></pre></td></tr></table></figure>
+<p>稍微解释下上面的命令，-cp指定类运行所依赖其他类的路径，com.mycompany.app.App表示要运行的类，将会执行其定义的入口方法main。</p>
+<h3 id="运行Maven工具"><a href="#运行Maven工具" class="headerlink" title="运行Maven工具"></a>运行Maven工具</h3><h4 id="Maven阶段"><a href="#Maven阶段" class="headerlink" title="Maven阶段"></a>Maven阶段</h4><p>如下虽然不是一个全面的列表，但是这些是最常见的执行的默认生命周期阶段。</p>
+<ul>
+<li><strong>validate</strong>：验证项目是否正确，所有的必要信息是否都可用</li>
+<li><strong>compile</strong>：编译项目的源代码</li>
+<li><strong>test</strong>：使用合适的单元测试框架测试编译后的源代码。这些测试不需要被打包或部署</li>
+<li><strong>package</strong>：将编译后的代码以其可分发的格式打包，例如JAR</li>
+<li><strong>integration-test</strong>：如果需要，将包处理并部署到可以运行集成测试的环境中</li>
+<li><strong>verify</strong>：运行任何检查以验证包是否有效并满足质量标准</li>
+<li><strong>install</strong>：将包安装到本地存储库中，作为本地其他项目的依赖项使用</li>
+<li><strong>deploy</strong>：在集成或发布环境中操作，将最终包复制到远程存储库，以便与其他开发人员和项目共享</li>
+</ul>
+<p>除了上述默认列表之外，还有两个Maven生命周期值得注意。他们是：</p>
+<ul>
+<li><strong>clean</strong>：清理以前构建的内容</li>
+<li><strong>site</strong>：为该项目生成站点文档</li>
+</ul>
+<p>阶段实际上映射到底层行为。每个阶段执行的具体行为取决于项目的打包类型。例如，如果项目类型是jar, package将执行jar:jar；如果项目类型是war，则执行war:war。</p>
+<p>有趣的是，阶段和目标可以是按顺序执行的，比如：<code>mvn clean dependency:copy-dependencies package</code>。此命令将清理项目、复制依赖项并打包项目按顺序执行。</p>
+<h4 id="生成站点"><a href="#生成站点" class="headerlink" title="生成站点"></a>生成站点</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">~❯ cd my-app</div><div class="line">~/my-app❯ mvn site</div></pre></td></tr></table></figure>
+<p>成功之后将会在target目录下生成site目录，打开index.html可以看到项目的一些信息，比如依赖、使用的插件之类。</p>
+<h3 id="SNAPSHOT"><a href="#SNAPSHOT" class="headerlink" title="SNAPSHOT"></a>SNAPSHOT</h3><p>看下之前打包的jar文件，其名为my-app-1.0-SNAPSHOT.jar，这里的SNAPSHOT指的是开发分支中的最新代码，不能保证代码是稳定的或不变的。相反release版本是不变的。换句话说，快照版本是最终“发布”版本之前的“开发”版本。快照比它的发布“更早”。</p>
+<p>在发布过程中<strong>x.y-SNAPSHOT</strong>将变成 <strong>x.y</strong>，同时发布过程还将开发版本增加到<strong>x.(y+1)-SNAPSHOT</strong>。例如，版本<strong>1.0-SNAPSHOT</strong>作为版本<strong>1.0</strong>发布，新的开发版本将变成<strong>1.1-SNAPSHOT</strong>。</p>
+<h3 id="使用插件"><a href="#使用插件" class="headerlink" title="使用插件"></a>使用插件</h3><p>每当想为Maven项目定制构建时，都可以通过添加或重新配置插件来完成。</p>
+<p>下面的例子将配置Java编译器以允许JDK 5.0源代码，将如下代码添加的pom文件中：</p>
+ <figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">...</div><div class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-compiler-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">source</span>&gt;</span>1.5<span class="tag">&lt;/<span class="name">source</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">target</span>&gt;</span>1.5<span class="tag">&lt;/<span class="name">target</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></div><div class="line">...</div></pre></td></tr></table></figure>
+<p>我们可以看到Maven中的所有插件看起来都很像一个依赖项——在某些方面确实如此。这个插件将自动下载和使用，如果不指定版本将使用最新的，否则使用指定版本号的插件。</p>
+<p>配置元素将给定的参数应用于编译器插件的每个行为。在上面的例子中，编译器插件已经作为构建过程的一部分使用了，这里只是更改了配置。还可以向流程中添加新的行为，并配置特定的行为。这里只是先了解下插件的概念，后面会再深入学习。</p>
+<h3 id="JAR中添加资源"><a href="#JAR中添加资源" class="headerlink" title="JAR中添加资源"></a>JAR中添加资源</h3><p>另一种不需要对POM进行任何更改就可以满足的常见方式是，将资源打包到JAR文件中。对于这个常见任务，Maven再次依赖于标准目录布局，这意味着通过使用标准的Maven约定，将这些资源放在标准目录结构中来将其打包到jar中。其实也就是resources目录，目前这个目录默认没有创建出来，我们自行创建，然后在其中添加一个名为application.properties的文件。解压下打包的jar文件看看什么样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">~❯ cd my-app      </div><div class="line">~/my-app❯ mkdir -p src/main/resources</div><div class="line">~/my-app❯ touch src/main/resources/application.properties</div><div class="line">~/my-app❯ mvn clean package</div><div class="line">~/my-app❯ cd target</div><div class="line">~/my-app/target❯ mkdir my-app &amp;&amp; tar -zxvf my-app-1.0-SNAPSHOT.jar -C my-app</div><div class="line">~/my-app/target❯ cd my-app</div><div class="line">~/my-app/target/my-app❯ tree</div><div class="line">├── META-INF</div><div class="line">│   ├── MANIFEST.MF</div><div class="line">│   └── maven</div><div class="line">│       └── com.mycompany.app</div><div class="line">│           └── my-app</div><div class="line">│               ├── pom.properties</div><div class="line">│               └── pom.xml</div><div class="line">├── application.properties</div><div class="line">└── com</div><div class="line">    └── mycompany</div><div class="line">        └── app</div><div class="line">            └── App.class</div></pre></td></tr></table></figure>
+<p>可以看到在解压出来的根目录生成了application.properties文件，同时还有个 META-INF目录，这个是Maven自动生成的。关注下 MANIFEST.MF，该文件定义了与扩展和包相关的数据，其中有个Main-Class属性，配置正确的话，可以打出一个可执行jar包。下面我们通过修改pom.xml的如下插件来实现该功能：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">plugin</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>maven-jar-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.0.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">archive</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">manifestEntries</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">Main-Class</span>&gt;</span>com.mycompany.app.App<span class="tag">&lt;/<span class="name">Main-Class</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">manifestEntries</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">archive</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>修改完之后来测试下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">~❯ cd my-app</div><div class="line">~/my-app❯ mvn clean package</div><div class="line">~/my-app❯ java -jar target/my-app-1.0-SNAPSHOT.jar</div><div class="line">Hello World!</div></pre></td></tr></table></figure>
+<h3 id="过滤资源文件"><a href="#过滤资源文件" class="headerlink" title="过滤资源文件"></a>过滤资源文件</h3><p>有时资源文件需要包含只能在构建时提供的值。要在Maven中实现这一点，可以使用${<property name="">}语法将包含该值的属性引用放入资源文件。属性可以是pom文件中定义的值、 用户settings.xml中定义的值、外部属性文件中定义的值或系统属性。</property></p>
+<h4 id="直接使用pom文件中的标签属性值"><a href="#直接使用pom文件中的标签属性值" class="headerlink" title="直接使用pom文件中的标签属性值"></a>直接使用pom文件中的标签属性值</h4><p>要在复制时使用Maven筛选资源，只需将筛选设置为true，作用于pom.xml中的资源目录:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">resources</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">resource</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">directory</span>&gt;</span>src/main/resources<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">filtering</span>&gt;</span>true<span class="tag">&lt;/<span class="name">filtering</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">resource</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">resources</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>下面修改之前添加的application.properties文件，在其中添加获取pom.xml中project的一些信息：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">~❯ vim ~/my-app/src/main/resources/application.properties</div><div class="line">application.name=$&#123;project.name&#125;</div><div class="line">application.version=$&#123;project.version&#125;</div></pre></td></tr></table></figure>
+<p>可以执行以下命令进行测试，process-resources是复制和筛选资源的构建生命周期阶段。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">~❯ cd my-app</div><div class="line">~/my-app❯ mvn process-resources</div><div class="line">~/my-app❯ cat target/classes/application.properties</div><div class="line">application.name=my-app</div><div class="line">application.version=1.0-SNAPSHOT</div></pre></td></tr></table></figure>
+<h4 id="引用外部文件的属性值"><a href="#引用外部文件的属性值" class="headerlink" title="引用外部文件的属性值"></a>引用外部文件的属性值</h4><p>要引用外部文件中定义的属性，需要在pom.xml中添加对该外部文件的引用。首先，我们创建一个外部属性文件，并将其命名为src/main/filters/filter.properties:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">~❯ cd my-app</div><div class="line">~/my-app❯ mkdir -p src/main/filters</div><div class="line">~/my-app❯ vim src/main/filters/filter.properties</div><div class="line">my.filter.value=hello!</div></pre></td></tr></table></figure>
+<p>filters是Maven的目录，作用就是存放资源文件。接下来，我们将在pom.xml中添加对这个新文件的引用:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">build</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">filters</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">filter</span>&gt;</span>src/main/resources/filter.properties<span class="tag">&lt;/<span class="name">filter</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">filters</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>最后修改application.properties，添加如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">~❯ vim ~/my-app/src/main/resources/application.properties</div><div class="line">message=$&#123;my.filter.value&#125;</div></pre></td></tr></table></figure>
+<p>测试下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">~❯ cd my-app</div><div class="line">~/my-app❯ mvn process-resources</div><div class="line">~/my-app❯ cat target/classes/application.properties</div><div class="line">application.name=my-app</div><div class="line">application.version=1.0-SNAPSHOT</div><div class="line">message=hello!</div></pre></td></tr></table></figure>
+<h4 id="在pom文件中自定义属性"><a href="#在pom文件中自定义属性" class="headerlink" title="在pom文件中自定义属性"></a>在pom文件中自定义属性</h4><p>作为定义my.filter的替代方法，可以直接在pom的properties部分中定义它：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">my.properties.value</span>&gt;</span>hello from pom<span class="tag">&lt;/<span class="name">my.properties.value</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>修改application.properties，添加如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">~❯ vim ~/my-app/src/main/resources/application.properties</div><div class="line">msssage2=$&#123;my.properties.value&#125;</div></pre></td></tr></table></figure>
+<p>测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">~❯ cd my-app</div><div class="line">~/my-app❯ mvn process-resources</div><div class="line">~/my-app❯ cat target/classes/application.properties</div><div class="line">application.name=my-app</div><div class="line">application.version=1.0-SNAPSHOT</div><div class="line">message=hello!</div><div class="line">msssage2=hello from pom</div></pre></td></tr></table></figure>
+<h4 id="获取系统属性"><a href="#获取系统属性" class="headerlink" title="获取系统属性"></a>获取系统属性</h4><p>过滤资源还可以从系统属性中获取值，无论是Java的内置属性或者是标准Java -D参数在命令行上定义的属性。修改application.properties文件，添加如下内容：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">~❯ vim ~/my-app/src/main/resources/application.properties</div><div class="line">java.version=$&#123;java.version&#125;</div><div class="line">command.line.prop=$&#123;command.line.prop&#125;</div></pre></td></tr></table></figure>
+<p>下面进行测试：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">~❯ cd my-app</div><div class="line">~/my-app❯ mvn process-resources "-Dcommand.line.prop=hello again"</div><div class="line">~/my-app❯ cat target/classes/application.properties</div><div class="line">application.name=my-app</div><div class="line">application.version=1.0-SNAPSHOT</div><div class="line">message=hello!</div><div class="line">msssage2=hello from pom</div><div class="line">java.version=11.0.1</div><div class="line">command.line.prop=hello again</div></pre></td></tr></table></figure>
+<p>本篇是一个简单的Quick Start，后面将会继续深入。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Tool/" rel="tag"># Tool</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/22/跟开涛学架构七【HTTP缓存】/" rel="next" title="跟开涛学架构七【HTTP缓存】">
+                <i class="fa fa-chevron-left"></i> 跟开涛学架构七【HTTP缓存】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/21/Maven学习笔记二【构建生命周期】/" rel="prev" title="Maven学习笔记二【构建生命周期】">
+                Maven学习笔记二【构建生命周期】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">105</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建一个项目"><span class="nav-number">2.</span> <span class="nav-text">创建一个项目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#项目编译"><span class="nav-number">3.</span> <span class="nav-text">项目编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#项目打包"><span class="nav-number">4.</span> <span class="nav-text">项目打包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运行Maven工具"><span class="nav-number">5.</span> <span class="nav-text">运行Maven工具</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Maven阶段"><span class="nav-number">5.1.</span> <span class="nav-text">Maven阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#生成站点"><span class="nav-number">5.2.</span> <span class="nav-text">生成站点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SNAPSHOT"><span class="nav-number">6.</span> <span class="nav-text">SNAPSHOT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用插件"><span class="nav-number">7.</span> <span class="nav-text">使用插件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JAR中添加资源"><span class="nav-number">8.</span> <span class="nav-text">JAR中添加资源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#过滤资源文件"><span class="nav-number">9.</span> <span class="nav-text">过滤资源文件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#直接使用pom文件中的标签属性值"><span class="nav-number">9.1.</span> <span class="nav-text">直接使用pom文件中的标签属性值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#引用外部文件的属性值"><span class="nav-number">9.2.</span> <span class="nav-text">引用外部文件的属性值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#在pom文件中自定义属性"><span class="nav-number">9.3.</span> <span class="nav-text">在pom文件中自定义属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取系统属性"><span class="nav-number">9.4.</span> <span class="nav-text">获取系统属性</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

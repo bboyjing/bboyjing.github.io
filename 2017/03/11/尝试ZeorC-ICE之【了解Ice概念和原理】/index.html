@@ -91,13 +91,13 @@
 <meta property="og:url" content="http://yoursite.com/2017/03/11/尝试ZeorC-ICE之【了解Ice概念和原理】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="本章我们来稍微了解下Ice概念和原理，前面已经跑通过一个小例子，再回过来看概念和原理，可能会容易理解一些。作为一个复杂的RPC平台，Ice也创造了很多概念和术语，其中一个名词就是Slice，这个前面已经学习过了，但现在也只是会用，具体生成那一坨文件还没有细看。下面我们从几个基本概念来看下。 Ice Object关于Ice Object，截取《ZeroC Ice权威指南》中的一句话:">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_5.png">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_6.png">
-<meta property="og:updated_time" content="2017-03-13T00:34:36.000Z">
+<meta property="og:image" content="http://qiniu.didadu.cn/zeroc_ice_5.png">
+<meta property="og:image" content="http://qiniu.didadu.cn/zeroc_ice_6.png">
+<meta property="og:updated_time" content="2019-02-05T17:14:21.302Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="尝试ZeorC ICE之【了解Ice概念和原理】">
 <meta name="twitter:description" content="本章我们来稍微了解下Ice概念和原理，前面已经跑通过一个小例子，再回过来看概念和原理，可能会容易理解一些。作为一个复杂的RPC平台，Ice也创造了很多概念和术语，其中一个名词就是Slice，这个前面已经学习过了，但现在也只是会用，具体生成那一坨文件还没有细看。下面我们从几个基本概念来看下。 Ice Object关于Ice Object，截取《ZeroC Ice权威指南》中的一句话:">
-<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_5.png">
+<meta name="twitter:image" content="http://qiniu.didadu.cn/zeroc_ice_5.png">
 
 
 
@@ -277,7 +277,7 @@
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -393,13 +393,13 @@
 <li>一个具体的Proxy可以用一个包括Endpoint信息的字符串描述，比如HelloService:default -p 10000，表示在远端的TCP端口10000上绑定的一个HelloService对象的Proxy。</li>
 </ul>
 <p>目前直观的感觉是一个Proxy对应一个Endpoint，也就是一个访问地址。Proxy有Direct Proxy与Indirect Proxy两种。前者是直接绑定某个远端Object的访问地址，就像上面引用的代码一样，这种情况下地址是写死的。后者则不绑定远程Object的某个具体通信地址，但是Endpoint的名称一定是有的，由于没有远程对象的地址信息，因此，需要借助寻址服务Location Service来获取对应的Ice Object的通信地址。如果要真的使用该产品的话，我想客户端肯定是采用Indirect Proxy这种方式来发现服务。</p>
-<h3 id="Location-Service"><a href="#Location-Service" class="headerlink" title="Location Service"></a>Location Service</h3><p>Location Service其实就是利用了Ice的注册表来实现Object Identity到Endpoint的查询服务，通俗的讲也就是服务的发现。Ice的注册表中保持了Ice Object、Object Proxy、Server等相关信息，属于IceGrid体系的重要组成部分，这种注册表组件也是大多数分布式系统的关键组件之一。<br>理解Indirect Proxy对于理解和掌握Ice来说非常重要，因为在IceGrid这种分布式框架中，所有Proxy都是Indirect的，从而实现了复杂的负载均衡和故障恢复机制。其调用过程如下：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_5.png" alt="zeroc_ice_5"></p>
+<h3 id="Location-Service"><a href="#Location-Service" class="headerlink" title="Location Service"></a>Location Service</h3><p>Location Service其实就是利用了Ice的注册表来实现Object Identity到Endpoint的查询服务，通俗的讲也就是服务的发现。Ice的注册表中保持了Ice Object、Object Proxy、Server等相关信息，属于IceGrid体系的重要组成部分，这种注册表组件也是大多数分布式系统的关键组件之一。<br>理解Indirect Proxy对于理解和掌握Ice来说非常重要，因为在IceGrid这种分布式框架中，所有Proxy都是Indirect的，从而实现了复杂的负载均衡和故障恢复机制。其调用过程如下：<br><img src="http://qiniu.didadu.cn/zeroc_ice_5.png" alt="zeroc_ice_5"></p>
 <ul>
 <li>客户端发起对远程Ice Object的方法InitialOp的调用</li>
 <li>客户端寻址，Indirect Proxy向Location Service发出查询命令，Location Service收到请求后从注册表Registry中获取对应Object的地址信息并返回</li>
 <li>客户端Ice Proxy直接跟远程对象建立通信连接，实现调用</li>
 </ul>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>最后总结下上面学到的术语，并加以补充。在Ice中，Ice Object、Object Adapter、Servant属于服务端的概念，它们存在于一个Ice Server中，这个Server容器通常是一个IceBox进程，暂且可以理解为一个Tomcat。ASM(Active Servant Map)是一个对象标识符(Object Identity)到对应Servant的查询表，也就是Ice Object到Servant的映射表，当一个客户端在某个Endpoint上发起对某个Ice Object的请求访问时，ASM用来快速定位到具体的Servant上，以便高效地委派请求。下面给出一张示意图：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/zeroc_ice_6.png" alt="zeroc_ice_6"><br>再看下Ice中另外一个重要概念–Replication，即让Object Adapter拥有多个访问地址，其目标是在多个机器上部署相同的Server来实现服务的负载均衡和容错机制，具体如何使用，我们后面再说。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>最后总结下上面学到的术语，并加以补充。在Ice中，Ice Object、Object Adapter、Servant属于服务端的概念，它们存在于一个Ice Server中，这个Server容器通常是一个IceBox进程，暂且可以理解为一个Tomcat。ASM(Active Servant Map)是一个对象标识符(Object Identity)到对应Servant的查询表，也就是Ice Object到Servant的映射表，当一个客户端在某个Endpoint上发起对某个Ice Object的请求访问时，ASM用来快速定位到具体的Servant上，以便高效地委派请求。下面给出一张示意图：<br><img src="http://qiniu.didadu.cn/zeroc_ice_6.png" alt="zeroc_ice_6"><br>再看下Ice中另外一个重要概念–Replication，即让Object Adapter拥有多个访问地址，其目标是在多个机器上部署相同的Server来实现服务的负载均衡和容错机制，具体如何使用，我们后面再说。</p>
 <p>本章节就到此结束，算初步了解了Ice的一些概念和原理，具体如何使用，后面将借助一些案例来学习。</p>
 
       
@@ -507,7 +507,7 @@
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -515,7 +515,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -523,7 +523,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -532,7 +532,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -610,7 +610,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

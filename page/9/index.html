@@ -266,12 +266,12 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/31/自己动手写JVM十四【指令集和解释器（二）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/09/自己动手写JVM二十【类和对象（三）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/31/自己动手写JVM十四【指令集和解释器（二）】/" itemprop="url">
-                  自己动手写JVM十四【指令集和解释器（二）】
+                <a class="post-title-link" href="/2017/02/09/自己动手写JVM二十【类和对象（三）】/" itemprop="url">
+                  自己动手写JVM二十【类和对象（三）】
                 </a>
               
             
@@ -306,8 +306,568 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-31T14:36:22+08:00">
-                2017-01-31
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-09T16:50:41+08:00">
+                2017-02-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h3 id="类和字段符号引用解析"><a href="#类和字段符号引用解析" class="headerlink" title="类和字段符号引用解析"></a>类和字段符号引用解析</h3><h4 id="类符号引用解析"><a href="#类符号引用解析" class="headerlink" title="类符号引用解析"></a>类符号引用解析</h4><p>先修改class.go文件，添加判断是否能访问其他类的函数：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// self class是否能被other class访问</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Class)</span> <span class="title">isAccessibleTo</span><span class="params">(other *Class)</span> <span class="title">bool</span></span> &#123;</div><div class="line">	<span class="comment">/*</span></div><div class="line">		若self class访问标识为public或者两个类在同一个包下，则可以访问</div><div class="line">		暂时简单地按照包名来检查类是否属于同一个包</div><div class="line">	 */</div><div class="line">	<span class="keyword">return</span> self.IsPublic() ||</div><div class="line">		self.getPackageName() == other.getPackageName()</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 获取包名</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Class)</span> <span class="title">getPackageName</span><span class="params">()</span> <span class="title">string</span></span> &#123;</div><div class="line">	<span class="keyword">if</span> i := strings.LastIndex(self.name, <span class="string">"/"</span>); i &gt;= <span class="number">0</span> &#123;</div><div class="line">		<span class="keyword">return</span> self.name[:i]</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> <span class="string">""</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+          <!--noindex-->
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/02/09/自己动手写JVM二十【类和对象（三）】/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/09/自己动手写JVM十九【类和对象（二）】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/02/09/自己动手写JVM十九【类和对象（二）】/" itemprop="url">
+                  自己动手写JVM十九【类和对象（二）】
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-09T00:45:41+08:00">
+                2017-02-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>本章继续学习类和对象。</p>
+<h3 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h3><p>Java虚拟机的类加载系统十分复杂，本节将初步实现一个简化版的类加载器，后面还会进行扩展。定义ClassLoader结构体，位于class_loader.go文件下：</p>
+          <!--noindex-->
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/02/09/自己动手写JVM十九【类和对象（二）】/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/08/自己动手写JVM十八【类和对象（一）】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/02/08/自己动手写JVM十八【类和对象（一）】/" itemprop="url">
+                  自己动手写JVM十八【类和对象（一）】
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-08T10:15:09+08:00">
+                2017-02-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>本章将实现线程共享的运行时数据区，包括方法去和运行时常量池。将进一步处理ClassFile结构体，把它加以转换，放进方法去以后供后续使用。还会初步讨论类和对象的设计，实现一个简单的类加载器，并且实现类和对象相关的部分指令。本章实现代码位于/rtdata/heap包下，先将之间定义的object.go文件移到heap包下，注意修改包名，以及使用到Object结构体的文件(slot.go、local_vars.go、operand_stack.go)。</p>
+<h3 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h3><p>方法区是运行时数据区的一块逻辑区域，由多个线程共享。方法区主要存放从class文件获取的类信息，此外，类变量也存放在方法区中。当Java虚拟机第一次使用某个类时，它会搜索类路径，找到相应的class文件，然后读取并解析class文件，把相关信息放进方法区。至于方法区到底位于何处，是固定大小还是动态调整，是否参与垃圾回收，以及如何在方法区内存放类数据等，Java虚拟机规范并没有明确规定。下面先来看看有哪些信息需要放进方法区。</p>
+<!--原作者把本章代码放到/rtdata/heap包下，虽然Java虚拟机规范把方法区描述为堆的一个逻辑部分，但是它却有一个别名叫作Non-heap(非堆)，目的应该是与Java堆区分开。所以我们把方法区这部分实现放到/rtdata/nonheap包下，-->
+          <!--noindex-->
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/02/08/自己动手写JVM十八【类和对象（一）】/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/07/自己动手写JVM十七【指令集和解释器（五）】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/02/07/自己动手写JVM十七【指令集和解释器（五）】/" itemprop="url">
+                  自己动手写JVM十七【指令集和解释器（五）】
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-07T13:34:02+08:00">
+                2017-02-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h3 id="解释器"><a href="#解释器" class="headerlink" title="解释器"></a>解释器</h3><p>指令集已经实现得差不多了，本节将编写一个简单的解释器。这个解释器目前只能执行一个Java方法，后面的章节中会不断完善。解释器实现代码位于/instructions/interpreter.go文件中。</p>
+<p>要实现解释器，还有些额外的代码需要完善：</p>
+          <!--noindex-->
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/02/07/自己动手写JVM十七【指令集和解释器（五）】/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/06/自己动手写JVM十六【指令集和解释器（四）】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/02/06/自己动手写JVM十六【指令集和解释器（四）】/" itemprop="url">
+                  自己动手写JVM十六【指令集和解释器（四）】
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-06T13:27:44+08:00">
+                2017-02-06
               </time>
             
 
@@ -362,569 +922,11 @@
       
         
           <p>本章节继续学习指令集和解释器。</p>
-<h3 id="存储指令"><a href="#存储指令" class="headerlink" title="存储指令"></a>存储指令</h3><p>和加载指令刚好相反，存储指令把变量从操作数栈顶弹出，然后存入局部变量表。和加载指令一样，存储指令也可以分为6类。存储指令相关代码位于/instructions/stores包下。下面以lstore系列指令为例来学习下，其实现代码位于lstore.go文件中：</p>
+<h3 id="控制指令"><a href="#控制指令" class="headerlink" title="控制指令"></a>控制指令</h3><p>控制指令共有11条，本节实现其中的3条指令：goto、tableswitch和lookupswitch。该系列指令代码位于/instructions/control包下。</p>
+<h4 id="goto指令"><a href="#goto指令" class="headerlink" title="goto指令"></a>goto指令</h4><p>goto指令实现代码位于goto.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// goto指令结构体</span></div><div class="line"><span class="keyword">type</span> GOTO <span class="keyword">struct</span>&#123; base.BranchInstruction &#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *GOTO)</span> <span class="title">Execute</span><span class="params">(frame *rtdata.Frame)</span></span> &#123;</div><div class="line">	<span class="comment">// 无条件跳转</span></div><div class="line">	base.Branch(frame, self.Offset)</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/31/自己动手写JVM十四【指令集和解释器（二）】/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/24/自己动手写JVM十三【指令集和解释器（一）】/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="bboyjing">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="bboyjing's blog">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/01/24/自己动手写JVM十三【指令集和解释器（一）】/" itemprop="url">
-                  自己动手写JVM十三【指令集和解释器（一）】
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-24T11:56:18+08:00">
-                2017-01-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>本章节将在前面讲的基础上编写一个简单的解释器，并且实现一些具有代表性的指令，本章涉及到的go代码位于instructions包下。</p>
-<h3 id="字节码和指令集"><a href="#字节码和指令集" class="headerlink" title="字节码和指令集"></a>字节码和指令集</h3><p>Java虚拟机顾名思义，就是一台虚拟的机器，而字节码就是运行在这台虚拟机器上的机器码。字节码中存放编码后的Java虚拟机指令，每条指令都以一个单字节的操作码开头，这就是字节码名称的由来。看到这里才知道，之前的理解有些误区，只有Java方法(非抽象方法和本地方法)的代码才会编译成字节码，所以不能说整个class文件就是字节码，它只是包含字节码。由于只使用一个字节表示操作码，显而易见，Java虚拟机最多只能支持256条指令。到第八版为止，Java虚拟机规范已经定义了205条指令，操作码分别是0x00到0xCA、OxFE和0xFF。这205条指令构成了Java虚拟机的指令集。和汇编语言雷系，为了便于记忆，Java虚拟机规范给每个操作码都指定了一个助记符。比如操作码是0x00这条指令，因为它什么都不做，所以它的助记符是nop(no operation)。</p>
-          <!--noindex-->
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/24/自己动手写JVM十三【指令集和解释器（一）】/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/23/自己动手写JVM十二【运行时数据区（二）】/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="bboyjing">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="bboyjing's blog">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/01/23/自己动手写JVM十二【运行时数据区（二）】/" itemprop="url">
-                  自己动手写JVM十二【运行时数据区（二）】
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-23T11:47:29+08:00">
-                2017-01-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>本章我们来重点分析下局部变量表和操作数栈，并测试本章代码。</p>
-<h3 id="局部变量表和操作数栈实例详解"><a href="#局部变量表和操作数栈实例详解" class="headerlink" title="局部变量表和操作数栈实例详解"></a>局部变量表和操作数栈实例详解</h3><p>下面以圆形的周长为例进行分析，首先简单的Java代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Math</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        System.out.println(circumference(<span class="number">1.6f</span>));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">float</span> <span class="title">circumference</span><span class="params">(<span class="keyword">float</span> r)</span> </span>&#123;</div><div class="line">        <span class="keyword">float</span> pi = <span class="number">3.14f</span>;</div><div class="line">        <span class="keyword">float</span> c = <span class="number">2</span> * pi * r;</div><div class="line">        <span class="keyword">return</span> c;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-          <!--noindex-->
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/23/自己动手写JVM十二【运行时数据区（二）】/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/22/自己动手写JVM十一【运行时数据区（一）】/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="bboyjing">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="bboyjing's blog">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/01/22/自己动手写JVM十一【运行时数据区（一）】/" itemprop="url">
-                  自己动手写JVM十一【运行时数据区（一）】
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-22T15:45:36+08:00">
-                2017-01-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>到目前为止，已经实现了搜索、解析class文件，本章节就来讨论下如何初步实现运行时数据区。</p>
-<h3 id="运行时数据区概述"><a href="#运行时数据区概述" class="headerlink" title="运行时数据区概述"></a>运行时数据区概述</h3><p>在运行Java程序时，Java虚拟机需要使用内存在存放各式各样的数据。Java虚拟机规范把这些内存区域叫作运行时数据区。运行时数据区可以分成两类：一类是多线程共享的，另一类则是线程私有的。多线程共享的运行时数据去需要在Java虚拟机启动时创建浩，在Java虚拟机退出时销毁。线程私有的运行时数据区则是在线程创建时才创建，线程退出时销毁。<br>线程私有的运行时数据区用于辅助执行Java字节码。每个线程有自己的pc寄存器和Java虚拟机栈。Java虚拟机栈又由栈帧构成，栈帧中保存方法执行的状态，包括局部变量表和操作数栈等。本章节将开始学习如何初步实现线程私有的运行时数据区。<br>
-          <!--noindex-->
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/22/自己动手写JVM十一【运行时数据区（一）】/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/16/Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="bboyjing">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="bboyjing's blog">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/01/16/Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】/" itemprop="url">
-                  Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-16T17:07:25+08:00">
-                2017-01-16
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis/" itemprop="url" rel="index">
-                    <span itemprop="name">Redis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>Redis还特别适用于解决基于搜索的问题，这类问题通常需要使用集合以及有序集合的交集、并集、和差集操作查找符合指定要求的元素。本章就来学习下，如何使用Redis进行搜索。假设一个对文档搜索的场景，如何使用Redis更快地进行搜索。基于搜索的应用程序相关代码位于<a href="https://github.com/bboyjing/redis-sample" target="_blank" rel="external">项目</a>的search模块中。</p>
-          <!--noindex-->
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/16/Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】/#more" rel="contents">
+            <a class="btn" href="/2017/02/06/自己动手写JVM十六【指令集和解释器（四）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -960,7 +962,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -993,7 +995,7 @@
       <section class="site-overview sidebar-panel sidebar-panel-active">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -1001,7 +1003,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1009,7 +1011,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1018,7 +1020,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1080,7 +1082,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

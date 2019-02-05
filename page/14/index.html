@@ -266,12 +266,12 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/06/Redis学习笔记六【Redis命令-三-】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/15/Redis学习笔记十二【使用Redis构建应用程序组件-自动补全】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/12/06/Redis学习笔记六【Redis命令-三-】/" itemprop="url">
-                  Redis学习笔记六【Redis命令(三)】
+                <a class="post-title-link" href="/2016/12/15/Redis学习笔记十二【使用Redis构建应用程序组件-自动补全】/" itemprop="url">
+                  Redis学习笔记十二【使用Redis构建应用程序组件--自动补全】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-06T16:46:59+08:00">
-                2016-12-06
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-15T00:24:41+08:00">
+                2016-12-15
               </time>
             
 
@@ -361,24 +361,11 @@
 
       
         
-          <p>本章节学习一些和数据结构本身没有关系的其他命令</p>
-<h3 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h3><table>
-<thead>
-<tr>
-<th style="text-align:left">命令</th>
-<th style="text-align:center">描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">SORT</td>
-<td style="text-align:center">根据给定的选项，对输入的列表、集合或者有序集合进行排序，返回结果</td>
-</tr>
-</tbody>
-</table>
+          <p>前面学习了使用Redis来构建应用程序的基本方法以及所需的工具，本章将会学习更多更有用的工具和技术，并使用它们去构建更具规模的Redis应用。现在模拟一个场景，假设有一家叫Fake Game的游戏公司，每天都有好几百万玩家同时在线游戏。代码示例依然位于<a href="https://github.com/bboyjing/redis-sample" target="_blank" rel="external">redis-sample项目</a>的support模块中。</p>
+<h3 id="自动补全"><a href="#自动补全" class="headerlink" title="自动补全"></a>自动补全</h3><p>在Web领域，自动补全功能大家已经很熟悉了，下面我们用Redis来实现两种自动补全功能，自动补全联系人和通讯录自动补全。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/12/06/Redis学习笔记六【Redis命令-三-】/#more" rel="contents">
+            <a class="btn" href="/2016/12/15/Redis学习笔记十二【使用Redis构建应用程序组件-自动补全】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -419,12 +406,12 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/11/30/Redis学习笔记五【Redis命令-二-】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/12/Redis学习笔记十一【使用Redis构建支持程序】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -444,8 +431,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/11/30/Redis学习笔记五【Redis命令-二-】/" itemprop="url">
-                  Redis学习笔记五【Redis命令(二)】
+                <a class="post-title-link" href="/2016/12/12/Redis学习笔记十一【使用Redis构建支持程序】/" itemprop="url">
+                  Redis学习笔记十一【使用Redis构建支持程序】
                 </a>
               
             
@@ -459,8 +446,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-30T23:31:49+08:00">
-                2016-11-30
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-12T14:10:22+08:00">
+                2016-12-12
               </time>
             
 
@@ -514,36 +501,11 @@
 
       
         
-          <h3 id="散列-HASH"><a href="#散列-HASH" class="headerlink" title="散列(HASH)"></a>散列(HASH)</h3><p>常用命令：</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">命令</th>
-<th style="text-align:center">描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">HMGET</td>
-<td style="text-align:center">从散列中获取一个或多个值</td>
-</tr>
-<tr>
-<td style="text-align:left">HMSET</td>
-<td style="text-align:center">为散列中的一个或多个键设值</td>
-</tr>
-<tr>
-<td style="text-align:left">HDEL</td>
-<td style="text-align:center">删除散列中一个或多个值，返回成功删除的键值对数量</td>
-</tr>
-<tr>
-<td style="text-align:left">HLEN</td>
-<td style="text-align:center">返回散列包含的键值对数量</td>
-</tr>
-</tbody>
-</table>
+          <p>之前学习了如何将Redis用作整个系统的一部分，这一章将来学习写如何使用Redis来构建辅助程序。代码示例位于<a href="https://github.com/bboyjing/redis-sample" target="_blank" rel="external">redis-sample项目</a>的support模块中。</p>
+<h3 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h3><p>使用列表存储最新的日志记录：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">logRecent</span><span class="params">(String name, String message, String severity)</span> </span>&#123;</div><div class="line">    <span class="keyword">final</span> <span class="keyword">byte</span>[] destination = stringRedisTemplate</div><div class="line">            .getStringSerializer()</div><div class="line">            .serialize(<span class="string">"recent_"</span> + name + <span class="string">"_"</span> + severity);</div><div class="line">    RedisCallback&lt;Object&gt; pipelineCallback = redisConnection -&gt; &#123;</div><div class="line">        redisConnection.lPush(destination,</div><div class="line">                (TIMESTAMP.format(<span class="keyword">new</span> Date()) + <span class="string">' '</span> + message).getBytes());</div><div class="line">        redisConnection.lTrim(destination, <span class="number">0</span>, <span class="number">99</span>);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    &#125;;</div><div class="line">    stringRedisTemplate.executePipelined(pipelineCallback);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/11/30/Redis学习笔记五【Redis命令-二-】/#more" rel="contents">
+            <a class="btn" href="/2016/12/12/Redis学习笔记十一【使用Redis构建支持程序】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -584,12 +546,12 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/11/22/Redis学习笔记四【Redis命令-一-】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/08/Redis学习笔记十【Redis事物】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -609,8 +571,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/11/22/Redis学习笔记四【Redis命令-一-】/" itemprop="url">
-                  Redis学习笔记四【Redis命令(一)】
+                <a class="post-title-link" href="/2016/12/08/Redis学习笔记十【Redis事物】/" itemprop="url">
+                  Redis学习笔记十【Redis事物】
                 </a>
               
             
@@ -624,8 +586,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-22T23:42:37+08:00">
-                2016-11-22
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-08T19:24:54+08:00">
+                2016-12-08
               </time>
             
 
@@ -679,16 +641,11 @@
 
       
         
-          <p>本章以及下面几章将介绍一些第一章没有出现过的常用命令，学习这些命令有助于构建更为复杂的应用。</p>
-<h3 id="字符串-STRING"><a href="#字符串-STRING" class="headerlink" title="字符串(STRING)"></a>字符串(STRING)</h3><p>在Redis中字符串可以存储以下三种类型的值：</p>
-<ul>
-<li>字节串(byte string)</li>
-<li>整数</li>
-<li>浮点数</li>
-</ul>
+          <p>前面章节已经涉及过基本的Redis事物，知晓了Redis的事物和传统的关系型数据库的事物并不相同。Redis虽然有简单的方法可以处理一连串相互一致的读操作和写操作，但是没有办法根据读取到的数据为依据来进行相关操作，这种无法以一致性的形式读取数据的行为将导致某一类型的问题变得难以解决。</p>
+<h3 id="模拟场景演示Redis事物"><a href="#模拟场景演示Redis事物" class="headerlink" title="模拟场景演示Redis事物"></a>模拟场景演示Redis事物</h3><p>下面以一个商品买卖市场为场景，来演示Redis事物的使用，在该场景下，人们可以在市场里自由销售和购买商品。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/11/22/Redis学习笔记四【Redis命令-一-】/#more" rel="contents">
+            <a class="btn" href="/2016/12/08/Redis学习笔记十【Redis事物】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -729,12 +686,12 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/11/03/Redis学习笔记三【使用Redis构建Web应用】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/08/Redis学习笔记九【处理系统故障】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -754,8 +711,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/11/03/Redis学习笔记三【使用Redis构建Web应用】/" itemprop="url">
-                  Redis学习笔记三【使用Redis构建Web应用】
+                <a class="post-title-link" href="/2016/12/08/Redis学习笔记九【处理系统故障】/" itemprop="url">
+                  Redis学习笔记九【处理系统故障】
                 </a>
               
             
@@ -769,8 +726,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-03T19:30:57+08:00">
-                2016-11-03
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-08T16:07:52+08:00">
+                2016-12-08
               </time>
             
 
@@ -824,16 +781,10 @@
 
       
         
-          <p>本章将使用Redis构建一个简单的、完整的Web应用，整个包含如下内容：</p>
-<ul>
-<li>登录cookie</li>
-<li>购物车cookie</li>
-<li>缓存生成的网页</li>
-<li>缓存数据库行</li>
-</ul>
+          <p>如果决定要将Redis用作应用程序唯一的数据存储手段的话，那么就必须确保Redis不会丢失任何数据。根提供了ACID保证的传统关系数据库不同，在使用Redis为后端构建应用程序的时候，我们需要多做一些工作才能保证数据的一致性。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/11/03/Redis学习笔记三【使用Redis构建Web应用】/#more" rel="contents">
+            <a class="btn" href="/2016/12/08/Redis学习笔记九【处理系统故障】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -874,12 +825,12 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/10/23/Redis学习笔记二【Redis数据结构实践】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/08/Redis学习笔记八【Redis主从复制】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -899,8 +850,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/10/23/Redis学习笔记二【Redis数据结构实践】/" itemprop="url">
-                  Redis学习笔记二【Redis数据结构实践】
+                <a class="post-title-link" href="/2016/12/08/Redis学习笔记八【Redis主从复制】/" itemprop="url">
+                  Redis学习笔记八【Redis主从复制】
                 </a>
               
             
@@ -914,8 +865,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-10-23T22:50:20+08:00">
-                2016-10-23
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-08T15:31:49+08:00">
+                2016-12-08
               </time>
             
 
@@ -969,10 +920,10 @@
 
       
         
-          <p>上一章对Redis的5种数据结构有了基本的了解之后，下面来学习下怎样使用这些结构来解决实际问题。下面用Redis构建一个简单的文章投票网站的后端来演示，代码示例依然使用Springboot，给出<a href="https://github.com/bboyjing/redis-sample" target="_blank" rel="external">GitHub地址</a></p>
+          <p>对于高负载应用来说，复制(replication)是不可或缺的一个特性，复制可以让其他服务器拥有一个不断地更新的数据副本，从而使得拥有副本数据的服务器可以用于处理客户端发送的读请求。关系型数据库通常会使用一个主服务器(master)向多个从服务器(slave)发送更行，并使用从服务器来处理所有读请求。Redis也采用了同样的方法来实现自己的复制特性，并将其用作扩展性能的一种手段。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/10/23/Redis学习笔记二【Redis数据结构实践】/#more" rel="contents">
+            <a class="btn" href="/2016/12/08/Redis学习笔记八【Redis主从复制】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1008,7 +959,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/13/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/15/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/13/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/15/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1041,7 +992,7 @@
       <section class="site-overview sidebar-panel sidebar-panel-active">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -1049,7 +1000,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1057,7 +1008,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1066,7 +1017,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1128,7 +1079,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

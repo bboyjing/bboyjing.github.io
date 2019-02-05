@@ -91,12 +91,12 @@
 <meta property="og:url" content="http://yoursite.com/2016/09/06/Zookeeper学习笔记二【使用Zookeeper】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="Zookeeper官网下载下载最新的安装包，目前最新的稳定版是Release 3.4.9(stable)，本课题所有示例都将基于这个版本，整体环境如下：  电脑环境：Ubuntu 16.04 JDK：1.8 Zookeeper：Release 3.4.9(stable)  安装Zookeeper1、创建目录，安装zookeeper手上只有一台测试机器，所以采用伪集群的方式运行zookeeper，下">
-<meta property="og:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zookeeper_2.png">
-<meta property="og:updated_time" content="2016-09-09T01:11:58.000Z">
+<meta property="og:image" content="http://qiniu.didadu.cn/zookeeper_2.png">
+<meta property="og:updated_time" content="2019-02-05T17:14:21.293Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Zookeeper学习笔记二【使用Zookeeper】">
 <meta name="twitter:description" content="Zookeeper官网下载下载最新的安装包，目前最新的稳定版是Release 3.4.9(stable)，本课题所有示例都将基于这个版本，整体环境如下：  电脑环境：Ubuntu 16.04 JDK：1.8 Zookeeper：Release 3.4.9(stable)  安装Zookeeper1、创建目录，安装zookeeper手上只有一台测试机器，所以采用伪集群的方式运行zookeeper，下">
-<meta name="twitter:image" content="http://7xvxof.com1.z0.glb.clouddn.com/zookeeper_2.png">
+<meta name="twitter:image" content="http://qiniu.didadu.cn/zookeeper_2.png">
 
 
 
@@ -276,7 +276,7 @@
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
     <meta itemprop="description" content="">
-    <meta itemprop="image" content="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
   </span>
 
   <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -372,7 +372,7 @@
 <a id="more"></a>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">cd /opt</div><div class="line">sudo mkdir zookeeper-3.4.9</div><div class="line">sudo chmod -R 777 zookeeper-3.4.9</div><div class="line">cd zookeeper-3.4.9</div><div class="line">cp ~/Downloads/zookeeper-3.4.9.tar.gz ./</div><div class="line">mkdir server1 &amp;&amp; tar -zxvf zookeeper-3.4.9.tar.gz -C ./server1 --strip-components 1</div><div class="line">mkdir server2 &amp;&amp; tar -zxvf zookeeper-3.4.9.tar.gz -C ./server2 --strip-components 1</div><div class="line">mkdir server3 &amp;&amp; tar -zxvf zookeeper-3.4.9.tar.gz -C ./server3 --strip-components 1</div><div class="line">rm zookeeper-3.4.9.tar.gz</div></pre></td></tr></table></figure>
 <h4 id="2、修改配置文件"><a href="#2、修改配置文件" class="headerlink" title="2、修改配置文件"></a>2、修改配置文件</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>server1</div><div class="line">mkdir ./server1/data</div><div class="line">cp server1/conf/zoo_sample.cfg server1/conf/zoo.cfg</div><div class="line">vim server1/conf/zoo.cfg</div><div class="line">    #需要修改的属性如下</div><div class="line">    dataDir=/opt/zookeeper-3.4.9/server1/data</div><div class="line">    clientPort=2181</div><div class="line">    server.1=localhost:2888:3888</div><div class="line">    server.2=localhost:2889:3889</div><div class="line">    server.3=localhost:2890:3890</div><div class="line"><span class="meta">#</span>创建与server对应的myid</div><div class="line">echo "1" &gt; server1/data/myid</div><div class="line"><span class="meta"></span></div><div class="line">#server2</div><div class="line">mkdir server2/data</div><div class="line">cp server2/conf/zoo_sample.cfg server2/conf/zoo.cfg</div><div class="line">vim server2/conf/zoo.cfg</div><div class="line">    #需要修改的属性如下</div><div class="line">    dataDir=/opt/zookeeper-3.4.9/server2/data</div><div class="line">    clientPort=2182</div><div class="line">    server.1=localhost:2888:3888</div><div class="line">    server.2=localhost:2889:3889</div><div class="line">    server.3=localhost:2890:3890</div><div class="line"><span class="meta">#</span>创建与server对应的myid</div><div class="line">echo "2" &gt; server2/data/myid</div><div class="line"><span class="meta"></span></div><div class="line">#server3</div><div class="line">mkdir server3/data</div><div class="line">cp server3/conf/zoo_sample.cfg server3/conf/zoo.cfg</div><div class="line">vim server3/conf/zoo.cfg</div><div class="line">    #需要修改的属性如下</div><div class="line">    dataDir=/opt/zookeeper-3.4.9/server3/data</div><div class="line">    clientPort=2183</div><div class="line">    server.1=localhost:2888:3888</div><div class="line">    server.2=localhost:2889:3889</div><div class="line">    server.3=localhost:2890:3890</div><div class="line"><span class="meta">#</span>创建与server对应的myid</div><div class="line">echo "3" &gt; server3/data/myid</div></pre></td></tr></table></figure>
-<h4 id="3、启动服务测试"><a href="#3、启动服务测试" class="headerlink" title="3、启动服务测试"></a>3、启动服务测试</h4><p>下图显示信息表示服务启动正常：<br><img src="http://7xvxof.com1.z0.glb.clouddn.com/zookeeper_2.png" alt="图2"></p>
+<h4 id="3、启动服务测试"><a href="#3、启动服务测试" class="headerlink" title="3、启动服务测试"></a>3、启动服务测试</h4><p>下图显示信息表示服务启动正常：<br><img src="http://qiniu.didadu.cn/zookeeper_2.png" alt="图2"></p>
 <h3 id="客户端脚本"><a href="#客户端脚本" class="headerlink" title="客户端脚本"></a>客户端脚本</h3><p>客户端脚本的测试基于上面安装的Zookeeper服务，之后的所有测试示例同样基于上述服务。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>启动客户端，连上server1的clientPort</div><div class="line">cd /opt/zookeeper-3.4.9</div><div class="line">server1/bin/zkCli.sh</div></pre></td></tr></table></figure></p>
 <h4 id="创建节点"><a href="#创建节点" class="headerlink" title="创建节点"></a>创建节点</h4><p>使用create命令可以创建一个节点：<code>create /first-node bboyjing</code>，表示在Zookeeper的根节点下创建了一个/first-node的节点，并且节点的数据内容是”bboyjing”。</p>
 <h4 id="读取节点"><a href="#读取节点" class="headerlink" title="读取节点"></a>读取节点</h4><p>使用ls命令，可以列出指定节点下的所有子节点：<code>ls /</code>，表示查看根节点下的所有子节点。<br>输出：[first-node, zookeeper]，first-node是之前创建的节点，zookeeper节点是自带的保留节点。<br>使用get命令，可以获取指定节点的数据内容和属性信息：<code>get /first-node</code></p>
@@ -485,7 +485,7 @@
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://7xvag5.com1.z0.glb.clouddn.com/zhangjing.jpg"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
                alt="bboyjing" />
           <p class="site-author-name" itemprop="name">bboyjing</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -493,7 +493,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">99</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -501,7 +501,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-count">12</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -510,7 +510,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -588,7 +588,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

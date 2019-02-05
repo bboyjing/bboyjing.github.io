@@ -1,0 +1,831 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.proxy.ustclug.org/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Tool," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本节来学习Maven地依赖机制。 依赖关系管理是Maven的一个核心特性。管理单个项目的依赖关系很容易。管理由数百个模块组成的项目的依赖关系是可能的。Maven在定义、创建和维护具有良好定义地类路径和库版本的可重复构建方面帮助很大。 传递依赖Maven通过自动包含传递依赖项，来避免查找和指定自己的依赖项所需要的库。 通过从指定的远程存储库中读取依赖项的项目文件，可以简化该特性。通常，这些项目的所有">
+<meta name="keywords" content="Java,Tool">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Maven学习笔记六【依赖机制】">
+<meta property="og:url" content="http://yoursite.com/2018/12/27/Maven学习笔记六【依赖机制】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="本节来学习Maven地依赖机制。 依赖关系管理是Maven的一个核心特性。管理单个项目的依赖关系很容易。管理由数百个模块组成的项目的依赖关系是可能的。Maven在定义、创建和维护具有良好定义地类路径和库版本的可重复构建方面帮助很大。 传递依赖Maven通过自动包含传递依赖项，来避免查找和指定自己的依赖项所需要的库。 通过从指定的远程存储库中读取依赖项的项目文件，可以简化该特性。通常，这些项目的所有">
+<meta property="og:updated_time" content="2019-02-05T17:09:48.190Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Maven学习笔记六【依赖机制】">
+<meta name="twitter:description" content="本节来学习Maven地依赖机制。 依赖关系管理是Maven的一个核心特性。管理单个项目的依赖关系很容易。管理由数百个模块组成的项目的依赖关系是可能的。Maven在定义、创建和维护具有良好定义地类路径和库版本的可重复构建方面帮助很大。 传递依赖Maven通过自动包含传递依赖项，来避免查找和指定自己的依赖项所需要的库。 通过从指定的远程存储库中读取依赖项的项目文件，可以简化该特性。通常，这些项目的所有">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/12/27/Maven学习笔记六【依赖机制】/"/>
+
+
+
+
+
+  <title> Maven学习笔记六【依赖机制】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/27/Maven学习笔记六【依赖机制】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Maven学习笔记六【依赖机制】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-27T14:07:27+08:00">
+                2018-12-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Maven/" itemprop="url" rel="index">
+                    <span itemprop="name">Maven</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本节来学习Maven地依赖机制。</p>
+<p>依赖关系管理是Maven的一个核心特性。管理单个项目的依赖关系很容易。管理由数百个模块组成的项目的依赖关系是可能的。Maven在定义、创建和维护具有良好定义地类路径和库版本的可重复构建方面帮助很大。</p>
+<h3 id="传递依赖"><a href="#传递依赖" class="headerlink" title="传递依赖"></a>传递依赖</h3><p>Maven通过自动包含传递依赖项，来避免查找和指定自己的依赖项所需要的库。</p>
+<p>通过从指定的远程存储库中读取依赖项的项目文件，可以简化该特性。通常，这些项目的所有依赖项都在项目中使用，项目从其父项目继承的依赖项或从其依赖项继承的依赖项也是如此。g</p>
+<p>可以从依赖项收集的几部数量没有限制，只有在发现循环依赖关系时才会出现问题。</p>
+<p>通过传递依赖关系，所包含库地图可以快速增长到相当大。由于这个原因，还有一些附加特性限制了所包含的依赖关系：</p>
+<a id="more"></a>
+<ul>
+<li><em>Dependency mediation</em> - 这决定了当依赖项遇到多个版本时，将选择哪个版本。Maven选择“最近的定义”。也就是说，它使用依赖关系树中与项目最接近地依赖关系版本。我们可以通过在项目的POM重显式地声明版本来保证它。请注意，如果两个依赖版本在依赖树中的深度相同，则第一个声明获胜。<ul>
+<li>“最近的定义” 意味着所使用的版本将是依赖关系树中与项目最接近的版本。例如，如果A、B和C地依赖关系定义为A -&gt; B -&gt; C -&gt; D2.0和A -&gt; E -&gt; D1.0。那么，在构建A时将使用D1.0，因为从A到D，第二条路径更短。可以显式地在A中添加对D2.0的依赖，以强制使用D2.0。</li>
+</ul>
+</li>
+<li><em>Dependency management</em> - 这允许项目作者直接指定在传递依赖项中或在没有指定版本的依赖项中药使用的版本。在上面的示例中，依赖项直接添加到A中，即使A没有直接使用它。相反，A可以在dependencyManagement部分中包含D作为依赖项，并直接控制在引用D时将使用哪个版本。</li>
+<li><em>Dependency scope</em> - 这允许只包含适合于构建当前阶段的依赖项，下面会详细讲到。</li>
+<li><em>Excluded dependencies</em>如果项目X依赖于项目Y，而项目Y依赖于项目Z，项目X的所有者可以使用exclusion标签显式地将项目Z排除。</li>
+<li><em>Optional dependencies</em> - 如果项目Y依赖于项目Z，项目Y的作者可以使用optional元素将项目Z标记为可选依赖项。当项目X依赖于项目Y时，X只依赖于Y，而不依赖于Y的可选依赖项Z。（将可选依赖项视为默认排除可能会有助于理解）</li>
+</ul>
+<p>虽然可传递依赖项可以帮助我们包含隐含的所需依赖项，但是最好是明确指定自己的源代码中所使用的依赖项目。当依赖的项目改变了它本身的依赖关系时，这个最佳实践证明了其价值。</p>
+<p>比如项目A依赖了项目B，并且项目B依赖了项目C。如果直接使用项目C中的组件，而不是在项目A中指定项目C，则当项目B突然更新/删除项目C的依赖时，它可能会导致生成失败。</p>
+<p>直接指定依赖关系的另一个原因是，它为我们的项目提供了更好的文档：可以通过阅读项目中的POM文件了解更多信息。</p>
+<p>Maven还提供了<code>dependency:analyze</code>插件来分析这些依赖关系：它有助于使这种最佳实践更容易实现。</p>
+<h3 id="Dependency-Scope"><a href="#Dependency-Scope" class="headerlink" title="Dependency Scope"></a>Dependency Scope</h3><p>依赖范围用于限制依赖的传递性，并且还用于影响用于各种构建任务的类路径。</p>
+<p>有6种scope可用：</p>
+<ul>
+<li><p><strong>compile</strong></p>
+<p>如果没有指定的话，这是默认作用域。编译依赖项再项目的所有类路径中都可用。此外，这些依赖关系被传播到依赖的项目。</p>
+</li>
+<li><p><strong>provided</strong></p>
+<p>这非常类似于编译，但是表示希望JDK或容器再运行时提供依赖项。例如，在为Java企业应用构建Web应用程序时，您需要将Servlet API和相关Java EE API的依赖关系设置为provided范围，因为web容器提供了这些类。此作用域仅在编译和测试类路径中可用，并且是不可传递的。</p>
+</li>
+<li><p><strong>runtime</strong></p>
+<p>此范围指示编译时不需要依赖项，而执行时需要。它位于运行时和测试类路径中，而不是编译路径中。</p>
+</li>
+<li><p><strong>test</strong></p>
+<p>此范围表明该依赖关系不是应用程序正常使用所必需的，并且仅在测试编译和执行阶段可用。这个分为时不可传递的。</p>
+</li>
+<li><p><strong>system</strong></p>
+<p>这个总用玉与provided作用域类似，指示必须提供显式包含它的JAR。项目重视i可用的，不会在存储库中查找。</p>
+</li>
+<li><p><strong>import</strong></p>
+<p>这个作用域只支持打包类型为pom的<code>&lt;dependencyManagement&gt;</code>标签部分。它指示将依赖项替换为<code>&lt;dependencyManagement&gt;</code>标签中的有效依赖项列表。由于它们被替换，具有导入范围的依赖项实际上不参与限制依赖项地传递。</p>
+</li>
+</ul>
+<p>每个作用域（import除外）以不同的方式影响传递依赖关系，如下表所示。如果将依赖项设置为左列中的范围，则该依赖项与顶行作用域之间的可传递依赖项将导致主项目中的依赖项与交叉点处列出的作用域之间存在依赖关系。如果没有列出范围，则表示将忽略依赖项。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>compile</th>
+<th>provided</th>
+<th>runtime</th>
+<th>test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>compile</td>
+<td>compile(*)</td>
+<td>-</td>
+<td>runtime</td>
+<td>-</td>
+</tr>
+<tr>
+<td>provided</td>
+<td>provided</td>
+<td>-</td>
+<td>provided</td>
+<td>-</td>
+</tr>
+<tr>
+<td>runtime</td>
+<td>runtime</td>
+<td>-</td>
+<td>runtime</td>
+<td>-</td>
+</tr>
+<tr>
+<td>test</td>
+<td>test</td>
+<td>-</td>
+<td>test</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<p>(*)注意：这应该是运行时作用域，因此必须显式列出所有编译依赖项。但是，在这种情况下，所依赖的库从另一个库扩展了一个类，迫使我们在编译时具有可用性。因此，及时编译时依赖项是可传递的，他们仍然是编译范围。</p>
+<h3 id="Dependency-Management"><a href="#Dependency-Management" class="headerlink" title="Dependency Management"></a>Dependency Management</h3><p>依赖关系管理部分是一种集中依赖关系信息的机制。当我们有一组继承公共父类的项目时，可以将有依赖关系的所有信息按在公共POM中，使得子项目可以更简单地引用。通过例子可以很好地说明这种机制。考虑到两个pom扩展了相同的父pom：</p>
+<p>Project A：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  ...</div><div class="line">  <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>group-a<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>artifact-a<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">exclusions</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">exclusion</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>group-c<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>excluded-artifact<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">exclusions</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>group-a<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>artifact-b<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">type</span>&gt;</span>bar<span class="tag">&lt;/<span class="name">type</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">scope</span>&gt;</span>runtime<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>Project B:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  ...</div><div class="line">  <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>group-c<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>artifact-b<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">type</span>&gt;</span>war<span class="tag">&lt;/<span class="name">type</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">scope</span>&gt;</span>runtime<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>group-a<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>artifact-b<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">type</span>&gt;</span>bar<span class="tag">&lt;/<span class="name">type</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">scope</span>&gt;</span>runtime<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>这两个示例pom共享一个公共依赖项，并且每个依赖项都有一个重要的依赖项。这些信息可以像这样放在父POM中:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  ...</div><div class="line">  <span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>group-a<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>artifact-a<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"> </div><div class="line">        <span class="tag">&lt;<span class="name">exclusions</span>&gt;</span></div><div class="line">          <span class="tag">&lt;<span class="name">exclusion</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>group-c<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>excluded-artifact<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">          <span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">exclusions</span>&gt;</span></div><div class="line"> </div><div class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line"> </div><div class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>group-c<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>artifact-b<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">type</span>&gt;</span>war<span class="tag">&lt;/<span class="name">type</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">scope</span>&gt;</span>runtime<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line"> </div><div class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>group-a<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>artifact-b<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">type</span>&gt;</span>bar<span class="tag">&lt;/<span class="name">type</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">scope</span>&gt;</span>runtime<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>然后两个子pom就变得简单多了:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  ...</div><div class="line">  <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>group-a<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>artifact-a<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line"> </div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>group-a<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>artifact-b<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">      <span class="comment">&lt;!-- This is not a jar dependency, so we must specify type. --&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">type</span>&gt;</span>bar<span class="tag">&lt;/<span class="name">type</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  ...</div><div class="line">  <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>group-c<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>artifact-b<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">      <span class="comment">&lt;!-- This is not a jar dependency, so we must specify type. --&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">type</span>&gt;</span>war<span class="tag">&lt;/<span class="name">type</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line"> </div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>group-a<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>artifact-b<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">      <span class="comment">&lt;!-- This is not a jar dependency, so we must specify type. --&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">type</span>&gt;</span>bar<span class="tag">&lt;/<span class="name">type</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>注意:在其中两个依赖项引用中，我们必须指定<code>&lt;type/&gt;</code>元素。这是因为将依赖项引用与DependencyManagement部分匹配的最小信息集实际上是groupid、artifactid、type、classifier。多数情况下，这些依赖关系将引用没有classifier的jar项目，因此type字段默认为jar，classifier默认为null。</p>
+<p>依赖关系管理部分的第二个非常重要的用途是控制可传递依赖关系中使用的版本，以这些项目为例：</p>
+<p>Project A:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>maven<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>A<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">packaging</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">name</span>&gt;</span>A<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">   <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>a<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>b<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">scope</span>&gt;</span>compile<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>c<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">scope</span>&gt;</span>compile<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>d<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">   <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line"> <span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>Project B:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">parent</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>A<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>maven<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">parent</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>maven<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>B<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">packaging</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>B<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>d<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>a<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">scope</span>&gt;</span>runtime<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>c<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">scope</span>&gt;</span>runtime<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>当maven在项目B版本1.0上运行时，无论其pom中指定的版本如何，都将使用a，b，c和d：</p>
+<ul>
+<li>a和c都被申明为项目的依赖项，由于Dependency mediation的介入，而使用版本1.0.两者都将具有运行时范围，因为它是直接指定的</li>
+<li>b在B的父项目依赖管理关系中定义，对于传递依赖项，依赖管理优先于依赖中介，所以如果在a或c的pom中引用它，将选择版本1.0。b也有编译范围。</li>
+<li>最后，由于d在B的依赖关系管理部分中指定，如果d是a或c的依赖关系(或传递依赖关系)，将选择1.0版本–再次因为依赖关系管理优于依赖关系中介，也因为当前pom的声明需要优于其父项目的声明。</li>
+</ul>
+<h4 id="导入依赖项"><a href="#导入依赖项" class="headerlink" title="导入依赖项"></a>导入依赖项</h4><p>上面的示例描述了如何通过继承来指定托管依赖项。但是，在较大的项目中，可能无法实现此目标，因为项目只能继承单个父项目。为了适应这种情况，项目可以从其它项目导入托管依赖项。这是通过将pom申明为具有<code>import</code>范围的依赖项来实现的。</p>
+<p>Project B:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>maven<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>B<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">packaging</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>B<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>maven<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>A<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>d<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>a<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">scope</span>&gt;</span>runtime<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>c<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">scope</span>&gt;</span>runtime<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>假设A是前面例子中定义的pom，最终结果将是相同的。除了d之外，所有A的托管依赖项都将被合并到B中，因为d是在当前pom中定义的。</p>
+<p>Project X:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>maven<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>X<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">packaging</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">name</span>&gt;</span>X<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">   <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>a<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>b<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">scope</span>&gt;</span>compile<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">   <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line"> <span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>Project Y:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>maven<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>Y<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">packaging</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">name</span>&gt;</span>Y<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"> <span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">   <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>a<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>c<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">       <span class="tag">&lt;<span class="name">scope</span>&gt;</span>compile<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">   <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line"> <span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>Project Z:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>maven<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>Z<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">packaging</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>Z<span class="tag">&lt;/<span class="name">name</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>maven<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>X<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>maven<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>Y<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>在上面的示例中，Z从X和Y导入托管依赖项。但是，X和Y都包含依赖项a。在这里，将使用版本1.1，因为X首先被申明，而且在Z的dependencyManagement中没有申明。</p>
+<p>这个过程是递归的。例如，如果X导入了另一个pom，Q。当处理Z时，将显式所有Q的依赖管理项都在X中定义。</p>
+<p>通常当用于定义多个项目构建的一部分的相关工件的“库”时，导入最有效。一个项目使用这些库中的一个或多个工件是相当常见的。但是，有时很难使用与库中分发的版本同步的工件来保留项目中的版本。下面的模式说明了如何创建“物料清单”（BOM）以供其他项目使用。</p>
+<p>项目的根是BOM pom。它定义了将在库中创建的所有工件的版本。希望使用该库的其他项目应将此pom导入其pom的dependencyManagement部分。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span> <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></div><div class="line">    <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</div><div class="line">  <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>bom<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">packaging</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">properties</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">project1Version</span>&gt;</span>1.0.0<span class="tag">&lt;/<span class="name">project1Version</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">project2Version</span>&gt;</span>1.0.0<span class="tag">&lt;/<span class="name">project2Version</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">properties</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>project1<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;project1Version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>project2<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;project1Version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">modules</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">module</span>&gt;</span>parent<span class="tag">&lt;/<span class="name">module</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">modules</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>parent子项目将BOM pom作为其父项目。这是一个正常的多项目pom。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span> <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></div><div class="line">     <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</div><div class="line">  <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">parent</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>bom<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">parent</span>&gt;</span></div><div class="line"> </div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">packaging</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></div><div class="line"> </div><div class="line">  <span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.2.12<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>commons-logging<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>commons-logging<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.1.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">modules</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">module</span>&gt;</span>project1<span class="tag">&lt;/<span class="name">module</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">module</span>&gt;</span>project2<span class="tag">&lt;/<span class="name">module</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">modules</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>接下来是实际的项目pom</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span> <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></div><div class="line">     <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</div><div class="line">  <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">parent</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">parent</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>project1<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;project1Version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">packaging</span>&gt;</span>jar<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></div><div class="line"> </div><div class="line">  <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>log4j<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>log4j<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div><div class="line"> </div><div class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span> <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></div><div class="line">     <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</div><div class="line">  <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">parent</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">parent</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>project2<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;project2Version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">packaging</span>&gt;</span>jar<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></div><div class="line"> </div><div class="line">  <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>commons-logging<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>commons-logging<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>下面的项目展示了如何在另一个项目中使用这个库，而不必指定依赖项目的版本。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span> <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></div><div class="line">     <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</div><div class="line">  <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>use<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">packaging</span>&gt;</span>jar<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></div><div class="line"> </div><div class="line">  <span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>bom<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>project1<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.test<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>project2<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>最后，在创建导入依赖项的项目时，请注意以下事项：</p>
+<ul>
+<li>不要尝试导入当前pom的子模块中定义的pom。尝试这样做会导致构建失败，因为它无法找到pom</li>
+<li>永远不要申明导入pom作为目标pom的父pom。没有办法解决循环，并抛出异常。</li>
+<li>当引用其poms具有传递依赖性的工件时，项目需要将这些工件的版本指定为托管依赖项。不这样做会导致构建失败，因为工件可能没有指定版本。</li>
+</ul>
+<h4 id="System-Dependencies"><a href="#System-Dependencies" class="headerlink" title="System Dependencies"></a>System Dependencies</h4><p>重要提示:此标记已弃用。</p>
+<p>范围系统的依赖关系始终可用，并且不会在存储库中查找。它们通常用于告诉Maven有关JDK或VM提供的依赖关系。因此，系统依赖性对于解决现在由JDK提供的工件的依赖性特别有用，但是可以在之前单独下载。典型示例是JDBC标准扩展或Java身份验证和授权服务（JAAS）。</p>
+<p>一个简单的例子：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  ...</div><div class="line">  <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>javax.sql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jdbc-stdext<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">scope</span>&gt;</span>system<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">systemPath</span>&gt;</span>$&#123;java.home&#125;/lib/rt.jar<span class="tag">&lt;/<span class="name">systemPath</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line">  ...</div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>如果我们的工件由JDK的tools.jar提供，则系统路径将定义如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span>&gt;</span></div><div class="line">  ...</div><div class="line">  <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>sun.jdk<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>tools<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.5.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">scope</span>&gt;</span>system<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">systemPath</span>&gt;</span>$&#123;java.home&#125;/../lib/tools.jar<span class="tag">&lt;/<span class="name">systemPath</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line">  ...</div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Tool/" rel="tag"># Tool</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/25/Maven学习笔记五【Repositories】/" rel="next" title="Maven学习笔记五【Repositories】">
+                <i class="fa fa-chevron-left"></i> Maven学习笔记五【Repositories】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">105</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#传递依赖"><span class="nav-number">1.</span> <span class="nav-text">传递依赖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dependency-Scope"><span class="nav-number">2.</span> <span class="nav-text">Dependency Scope</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dependency-Management"><span class="nav-number">3.</span> <span class="nav-text">Dependency Management</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#导入依赖项"><span class="nav-number">3.1.</span> <span class="nav-text">导入依赖项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#System-Dependencies"><span class="nav-number">3.2.</span> <span class="nav-text">System Dependencies</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
