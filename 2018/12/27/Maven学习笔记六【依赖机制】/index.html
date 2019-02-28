@@ -91,7 +91,7 @@
 <meta property="og:url" content="http://yoursite.com/2018/12/27/Maven学习笔记六【依赖机制】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="本节来学习Maven地依赖机制。 依赖关系管理是Maven的一个核心特性。管理单个项目的依赖关系很容易。管理由数百个模块组成的项目的依赖关系是可能的。Maven在定义、创建和维护具有良好定义地类路径和库版本的可重复构建方面帮助很大。 传递依赖Maven通过自动包含传递依赖项，来避免查找和指定自己的依赖项所需要的库。 通过从指定的远程存储库中读取依赖项的项目文件，可以简化该特性。通常，这些项目的所有">
-<meta property="og:updated_time" content="2019-02-05T17:09:48.190Z">
+<meta property="og:updated_time" content="2019-02-28T16:19:30.526Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Maven学习笔记六【依赖机制】">
 <meta name="twitter:description" content="本节来学习Maven地依赖机制。 依赖关系管理是Maven的一个核心特性。管理单个项目的依赖关系很容易。管理由数百个模块组成的项目的依赖关系是可能的。Maven在定义、创建和维护具有良好定义地类路径和库版本的可重复构建方面帮助很大。 传递依赖Maven通过自动包含传递依赖项，来避免查找和指定自己的依赖项所需要的库。 通过从指定的远程存储库中读取依赖项的项目文件，可以简化该特性。通常，这些项目的所有">
@@ -306,7 +306,7 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Дата создания записи" itemprop="dateCreated datePublished" datetime="2018-12-27T14:07:27+08:00">
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-27T14:07:27+08:00">
                 2018-12-27
               </time>
             
@@ -363,7 +363,7 @@
         <p>本节来学习Maven地依赖机制。</p>
 <p>依赖关系管理是Maven的一个核心特性。管理单个项目的依赖关系很容易。管理由数百个模块组成的项目的依赖关系是可能的。Maven在定义、创建和维护具有良好定义地类路径和库版本的可重复构建方面帮助很大。</p>
 <h3 id="传递依赖"><a href="#传递依赖" class="headerlink" title="传递依赖"></a>传递依赖</h3><p>Maven通过自动包含传递依赖项，来避免查找和指定自己的依赖项所需要的库。</p>
-<p>通过从指定的远程存储库中读取依赖项的项目文件，可以简化该特性。通常，这些项目的所有依赖项都在项目中使用，项目从其父项目继承的依赖项或从其依赖项继承的依赖项也是如此。g</p>
+<p>通过从指定的远程存储库中读取依赖项的项目文件，可以简化该特性。通常，这些项目的所有依赖项都在项目中使用，项目从其父项目继承的依赖项或从其依赖项继承的依赖项也是如此。</p>
 <p>可以从依赖项收集的几部数量没有限制，只有在发现循环依赖关系时才会出现问题。</p>
 <p>通过传递依赖关系，所包含库地图可以快速增长到相当大。由于这个原因，还有一些附加特性限制了所包含的依赖关系：</p>
 <a id="more"></a>
