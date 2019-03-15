@@ -361,7 +361,7 @@
 
       
         
-          <p>逻辑删除在项目中也是很常见的，比较常见的方式是添加一个<code>deleted</code>的标记位，当然也有其他的实现方式。本章节的插件针对的是添加标记位的方式来实现逻辑删除的。如果说没有和<code>deleted</code>标记位一起的唯一联合索引，那是很容易实现的，标志位只要两个值：0、1，然后通过<code>updateByExampleSelective</code>修改就可以了。但是往往我们表中会有唯一索引在，比如说名字不能重复之类的。这个时候我们采取的简单的处理方式是<code>set deleted = deleted + 1</code>来避免删除后不能再次添加同样数据的问题。索性这个插件就提供了两个方法：<code>logicDelete</code>和<code>logicDeleteWithUIndex</code>。</p>
+          <p>逻辑删除在项目中也是很常见的，比较常见的方式是添加一个<code>deleted</code>的标记位，当然也有其他的实现方式。本章节的插件针对的是添加标记位的方式来实现逻辑删除的。如果说没有和<code>deleted</code>标记位一起的唯一联合索引，那是很容易实现的，标志位只要两个值：0、1，然后通过<code>updateByExampleSelective</code>修改就可以了。但是往往我们表中会有唯一索引在，比如说名字不能重复之类的。这个时候我们采取的简单的处理方式是<code>set deleted = deleted + 1</code>来避免无法删除已经删除过的数据的问题。索性这个插件就提供了两个方法：<code>logicDelete</code>和<code>logicDeleteWithUIndex</code>。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
             <a class="btn" href="/2019/03/15/MybatisGenerator插件开发六【逻辑删除】/#more" rel="contents">
