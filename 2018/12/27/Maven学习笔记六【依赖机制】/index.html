@@ -91,7 +91,7 @@
 <meta property="og:url" content="http://yoursite.com/2018/12/27/Maven学习笔记六【依赖机制】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="本节来学习Maven地依赖机制。 依赖关系管理是Maven的一个核心特性。管理单个项目的依赖关系很容易。管理由数百个模块组成的项目的依赖关系是可能的。Maven在定义、创建和维护具有良好定义地类路径和库版本的可重复构建方面帮助很大。 传递依赖Maven通过自动包含传递依赖项，来避免查找和指定自己的依赖项所需要的库。 通过从指定的远程存储库中读取依赖项的项目文件，可以简化该特性。通常，这些项目的所有">
-<meta property="og:updated_time" content="2019-02-28T16:19:30.526Z">
+<meta property="og:updated_time" content="2019-09-16T09:19:38.792Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Maven学习笔记六【依赖机制】">
 <meta name="twitter:description" content="本节来学习Maven地依赖机制。 依赖关系管理是Maven的一个核心特性。管理单个项目的依赖关系很容易。管理由数百个模块组成的项目的依赖关系是可能的。Maven在定义、创建和维护具有良好定义地类路径和库版本的可重复构建方面帮助很大。 传递依赖Maven通过自动包含传递依赖项，来避免查找和指定自己的依赖项所需要的库。 通过从指定的远程存储库中读取依赖项的项目文件，可以简化该特性。通常，这些项目的所有">
@@ -397,10 +397,10 @@
 <p>此范围表明该依赖关系不是应用程序正常使用所必需的，并且仅在测试编译和执行阶段可用。这个分为时不可传递的。</p>
 </li>
 <li><p><strong>system</strong></p>
-<p>这个总用玉与provided作用域类似，指示必须提供显式包含它的JAR。项目重视i可用的，不会在存储库中查找。</p>
+<p>这个作用与provided作用域类似，同之处在于该依赖不从maven仓库中提取，而是从本地文件系统中提取，其会参照systemPath的属性进行提取依赖</p>
 </li>
 <li><p><strong>import</strong></p>
-<p>这个作用域只支持打包类型为pom的<code>&lt;dependencyManagement&gt;</code>标签部分。它指示将依赖项替换为<code>&lt;dependencyManagement&gt;</code>标签中的有效依赖项列表。由于它们被替换，具有导入范围的依赖项实际上不参与限制依赖项地传递。</p>
+<p>这个作用域只支持打包类型为pom的<code>&lt;dependencyManagement&gt;</code>标签部分。它指示将依赖项替换为<code>&lt;dependencyManagement&gt;</code>标签中的有效依赖项列表。能解决maven单继承问题，由于它们被替换，具有导入范围的依赖项实际上不参与限制依赖项地传递。</p>
 </li>
 </ul>
 <p>每个作用域（import除外）以不同的方式影响传递依赖关系，如下表所示。如果将依赖项设置为左列中的范围，则该依赖项与顶行作用域之间的可传递依赖项将导致主项目中的依赖项与交叉点处列出的作用域之间存在依赖关系。如果没有列出范围，则表示将忽略依赖项。</p>
