@@ -266,7 +266,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/06/RocketMQ学习笔记一【Hello-MQ】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/15/MybatisGenerator插件开发六【逻辑删除】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/04/06/RocketMQ学习笔记一【Hello-MQ】/" itemprop="url">
-                  RocketMQ学习笔记一【Hello MQ】
+                <a class="post-title-link" href="/2019/03/15/MybatisGenerator插件开发六【逻辑删除】/" itemprop="url">
+                  MybatisGenerator插件开发六【逻辑删除】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-06T14:25:23+08:00">
-                2017-04-06
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-15T01:08:52+08:00">
+                2019-03-15
               </time>
             
 
@@ -325,8 +325,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/RocketMQ/" itemprop="url" rel="index">
-                    <span itemprop="name">RocketMQ</span>
+                  <a href="/categories/MybatisGenerator/" itemprop="url" rel="index">
+                    <span itemprop="name">MybatisGenerator</span>
                   </a>
                 </span>
 
@@ -361,11 +361,10 @@
 
       
         
-          <p>最近项目需要使用RocketMQ，之前没有使用过，现在花点时间来学习下，顺便记录下学习过程。目前没有去找其他资源，先参照下<a href="https://rocketmq.incubator.apache.org/docs/quick-start/" target="_blank" rel="external">官网</a>文档学学看。</p>
-<h3 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h3><p>基本上都是这套路，先照着Quick Start画个瓢。这里，Quick Start的目的是让使用者在本机快速地搭建RocketMQ系统，并且能够收发消息。对于系统以及软件的要求，官网说的很明确，下面列一下我本机的环境:</p>
+          <p>逻辑删除在项目中也是很常见的，比较常见的方式是添加一个<code>deleted</code>的标记位，当然也有其他的实现方式。本章节的插件针对的是添加标记位的方式来实现逻辑删除的。如果说没有和<code>deleted</code>标记位一起的唯一联合索引，那是很容易实现的，标志位只要两个值：0、1，然后通过<code>updateByExampleSelective</code>修改就可以了。但是往往我们表中会有唯一索引在，比如说名字不能重复之类的。这个时候我们采取的简单的处理方式是<code>set deleted = deleted + 1</code>来避免无法删除已经删除过的数据的问题。索性这个插件就提供了两个方法：<code>logicDelete</code>和<code>logicDeleteWithUIndex</code>。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/04/06/RocketMQ学习笔记一【Hello-MQ】/#more" rel="contents">
+            <a class="btn" href="/2019/03/15/MybatisGenerator插件开发六【逻辑删除】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -406,7 +405,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/05/Java-NIO之【Scalable-IO-in-Java】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/15/MybatisGenerator插件开发五【更新指定条数】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -431,8 +430,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/04/05/Java-NIO之【Scalable-IO-in-Java】/" itemprop="url">
-                  Java NIO之【Scalable IO in Java】
+                <a class="post-title-link" href="/2019/03/15/MybatisGenerator插件开发五【更新指定条数】/" itemprop="url">
+                  MybatisGenerator插件开发五【更新指定条数】
                 </a>
               
             
@@ -446,8 +445,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-05T17:36:07+08:00">
-                2017-04-05
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-15T00:53:49+08:00">
+                2019-03-15
               </time>
             
 
@@ -465,8 +464,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/NIO/" itemprop="url" rel="index">
-                    <span itemprop="name">NIO</span>
+                  <a href="/categories/MybatisGenerator/" itemprop="url" rel="index">
+                    <span itemprop="name">MybatisGenerator</span>
                   </a>
                 </span>
 
@@ -501,18 +500,11 @@
 
       
         
-          <p>看完了并发网的NIO教程，是否有种意犹未尽的感觉。正常情况下，答案应该是肯定的。那我们下面来看下Doug Lea大神写的<a href="http://gee.cs.oswego.edu/dl/cpjslides/nio.pdf" target="_blank" rel="external">Scalable IO in Java</a>，直接可以下载英文版pdf。这边就当边学习边翻译了。</p>
-<h3 id="网络服务"><a href="#网络服务" class="headerlink" title="网络服务"></a>网络服务</h3><p>大部分网路服务有着相同的体系：</p>
-<ul>
-<li>读取请求(Read request)</li>
-<li>对请求进行解码(Decode request)</li>
-<li>处理业务逻辑(Process service)</li>
-<li>对返回值进行编码(Encode reply)</li>
-<li>发送返回值(Send reply)</li>
-</ul>
+          <p>在实际项目中，遇到了这样一个需求，就是只需要更新匹配到的第一条或者前几条数据。不想手动写相关mapper，于是就想着通过插件来实现。想了一下，得益于之前在Example中添加的limit成员变量，只要稍微修改下<code>updateByExampleSelective</code>的SqlMapper实现就可以了。</p>
+<h3 id="修改SqlMap文件"><a href="#修改SqlMap文件" class="headerlink" title="修改SqlMap文件"></a>修改SqlMap文件</h3>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/04/05/Java-NIO之【Scalable-IO-in-Java】/#more" rel="contents">
+            <a class="btn" href="/2019/03/15/MybatisGenerator插件开发五【更新指定条数】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -553,7 +545,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/30/Java-NIO之【通道】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/14/MybatisGenerator插件开发四【批量插入】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -578,8 +570,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/30/Java-NIO之【通道】/" itemprop="url">
-                  Java NIO之【通道】
+                <a class="post-title-link" href="/2019/03/14/MybatisGenerator插件开发四【批量插入】/" itemprop="url">
+                  MybatisGenerator插件开发四【批量插入】
                 </a>
               
             
@@ -593,8 +585,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-30T15:37:57+08:00">
-                2017-03-30
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-14T17:58:58+08:00">
+                2019-03-14
               </time>
             
 
@@ -612,8 +604,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/NIO/" itemprop="url" rel="index">
-                    <span itemprop="name">NIO</span>
+                  <a href="/categories/MybatisGenerator/" itemprop="url" rel="index">
+                    <span itemprop="name">MybatisGenerator</span>
                   </a>
                 </span>
 
@@ -648,10 +640,12 @@
 
       
         
-          <p>通道(Channel)是java.nio的第二个主要创新。它们既不是一个扩展也不是一个增强，而是全新、极好的Java I/O示例，提供与I/O服务的直接连接。Channel用于在字节缓冲区和位于通道另一侧的实例之间有效地传输数据。通道是一种途径，借助该途径，可以用最小的总开销来访问操作系统本身的I/O服务。缓冲区则是通道内部用来发送和接受数据的端点，也可以说是数据的载体。</p>
+          <p>批量插入和分页查询一样，在项目中基本也是不可少的。这里我们要给Mapper添加两个方法：<code>batchInsert</code>和<code>batchInsertSelective</code>，区别是前者全字段插入，后者只插入给定的字段。原来的单条<code>insertSelective</code>是通过对象的值是不是Null来实现的，我们也可以取插入记录的第0条来实现<code>batchInsertSelective</code>。但是，始终感觉有点不对，所以采取了另一种方式，显式地传递要插入地字段来实现。这里就会用到了上一章节写入到Model中的表字段枚举了。</p>
+<p>下面直接上代码。</p>
+<h3 id="修改Mapper接口和SqlMap文件"><a href="#修改Mapper接口和SqlMap文件" class="headerlink" title="修改Mapper接口和SqlMap文件"></a>修改Mapper接口和SqlMap文件</h3>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/03/30/Java-NIO之【通道】/#more" rel="contents">
+            <a class="btn" href="/2019/03/14/MybatisGenerator插件开发四【批量插入】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -692,7 +686,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/28/Java-NIO之【缓冲区】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/14/MybatisGenerator插件开发三【Lombok】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -717,8 +711,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/28/Java-NIO之【缓冲区】/" itemprop="url">
-                  Java NIO之【缓冲区】
+                <a class="post-title-link" href="/2019/03/14/MybatisGenerator插件开发三【Lombok】/" itemprop="url">
+                  MybatisGenerator插件开发三【Lombok】
                 </a>
               
             
@@ -732,8 +726,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-28T10:40:55+08:00">
-                2017-03-28
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-14T17:40:53+08:00">
+                2019-03-14
               </time>
             
 
@@ -751,8 +745,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/NIO/" itemprop="url" rel="index">
-                    <span itemprop="name">NIO</span>
+                  <a href="/categories/MybatisGenerator/" itemprop="url" rel="index">
+                    <span itemprop="name">MybatisGenerator</span>
                   </a>
                 </span>
 
@@ -787,10 +781,11 @@
 
       
         
-          <p>平时写业务代码不一定会直接涉及到底层IO的使用，但是作为一个有点思想的码农，就算用不到，至少也应该知道。所以准备系统地学习下Java NIO，为日后看框架源码打下点基础。本系列博客学习的依据是前人翻译的《Java NIO》中文版，网友对该书褒贬不一，可能各个人群的需求不一样，确实重口难调。但是，没有经历过，怎么知道对自己是否合适。废话不多说了，摆好姿势，开始学习了。先建个项目，用于存放测试用力，本人的项目位于<a href="https://github.com/bboyjing/nio_learn" target="_blank" rel="external">Github</a>。</p>
+          <p>如果我们项目中使用了Lombok，那通过自定义插件也能讲其作用于生成的与数据库表映射的Model类上。在这里，我们会同时把表的字段以枚举的形式写到该类中，具体作何使用的话，下一章节会讲到。</p>
+<h3 id="修改Model类"><a href="#修改Model类" class="headerlink" title="修改Model类"></a>修改Model类</h3><p>直接上代码：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/03/28/Java-NIO之【缓冲区】/#more" rel="contents">
+            <a class="btn" href="/2019/03/14/MybatisGenerator插件开发三【Lombok】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -831,7 +826,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/27/尝试ZeorC-ICE之【从还未入门到放弃】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/14/MybatisGenerator插件开发二【分页】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -856,8 +851,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/27/尝试ZeorC-ICE之【从还未入门到放弃】/" itemprop="url">
-                  尝试ZeorC-ICE之【从还未入门到放弃】
+                <a class="post-title-link" href="/2019/03/14/MybatisGenerator插件开发二【分页】/" itemprop="url">
+                  MybatisGenerator插件开发二【分页】
                 </a>
               
             
@@ -871,8 +866,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-27T11:12:21+08:00">
-                2017-03-27
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-14T16:56:08+08:00">
+                2019-03-14
               </time>
             
 
@@ -890,8 +885,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ZeroC-Ice/" itemprop="url" rel="index">
-                    <span itemprop="name">ZeroC Ice</span>
+                  <a href="/categories/MybatisGenerator/" itemprop="url" rel="index">
+                    <span itemprop="name">MybatisGenerator</span>
                   </a>
                 </span>
 
@@ -926,10 +921,15 @@
 
       
         
-          
-            <p>本想看看这传说中的老牌RPC产品到底好在哪里，但是看到后面，这一堆的属性配置，尤其是大篇幅的xml配置，实在是难以下咽。所以想了几天还是决定放弃了。这个系列的博客就不删了，就当是留个念想吧。</p>
-
-          
+          <p>分页查询在小项目的开发中基本是逃不了的，虽然有基于ThreadLocal的PageHelper插件可以直接使用，但还是想从源头解决问题。针对Mysql来说的话，其实只要在生成的Mapper和SqlMap文件中添加limit和offset就可以了。</p>
+<h3 id="添加limit、offset"><a href="#添加limit、offset" class="headerlink" title="添加limit、offset"></a>添加limit、offset</h3><p>直接上代码：</p>
+          <!--noindex-->
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2019/03/14/MybatisGenerator插件开发二【分页】/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -961,7 +961,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/5/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/7/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1002,7 +1002,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-count">138</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1010,7 +1010,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1019,7 +1019,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1081,7 +1081,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

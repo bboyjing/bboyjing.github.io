@@ -266,7 +266,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/06/自己动手写JVM二十九【本地方法调用（一）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/14/跟开涛学架构六【应用级缓存】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/06/自己动手写JVM二十九【本地方法调用（一）】/" itemprop="url">
-                  自己动手写JVM二十九【本地方法调用（一）】
+                <a class="post-title-link" href="/2017/12/14/跟开涛学架构六【应用级缓存】/" itemprop="url">
+                  跟开涛学架构六【应用级缓存】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-06T10:50:09+08:00">
-                2017-03-06
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-14T11:31:03+08:00">
+                2017-12-14
               </time>
             
 
@@ -325,8 +325,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/Architecture/" itemprop="url" rel="index">
+                    <span itemprop="name">Architecture</span>
                   </a>
                 </span>
 
@@ -361,10 +361,14 @@
 
       
         
-          <p>我们已经知道，要想运行Java程序，除了Java虚拟机之外，还需要Java类库的配合。Java虚拟机和Java类库的配合。Java虚拟机和Java类库一起构成了Java运行环境。Java类库主要用Java语言编写，一些无法用Java语言实现的方法则使用本地语言编写，这些方法叫做本地方法。从本章开始将陆续实现一些Java类中的本地方法。为了不陷入JNI规范的细节之中，我们将使用Go语言来实现。本章的所有代码位于/native包下。</p>
+          <p>缓存的重要性不用多说了，这一章我们来了解下以Java为例的应用级缓存。</p>
+<h3 id="缓存回收策略"><a href="#缓存回收策略" class="headerlink" title="缓存回收策略"></a>缓存回收策略</h3><ol>
+<li>基于空间：指缓存设置了存储空间，如果设置为10MB，当达到存储空间上限时，按照一定的策略移除数据。</li>
+<li>基于容量：指缓存设置了最大大小，当缓存的条目超过最大大小时，按照一定的策略移除旧数据。</li>
+<li>基于时间<br> TTL(Time To Live)：存活期，即缓存数据从创建开始直到到期的一个时间段。<br> TTI(Time To Idle)：空闲期，即缓存数据多久没有被访问后移除缓存的时间。
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/03/06/自己动手写JVM二十九【本地方法调用（一）】/#more" rel="contents">
+            <a class="btn" href="/2017/12/14/跟开涛学架构六【应用级缓存】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -405,7 +409,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/05/自己动手写JVM二十八【数组和字符串（三）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/09/跟开涛学架构五【限流】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -430,8 +434,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/05/自己动手写JVM二十八【数组和字符串（三）】/" itemprop="url">
-                  自己动手写JVM二十八【数组和字符串（三）】
+                <a class="post-title-link" href="/2017/10/09/跟开涛学架构五【限流】/" itemprop="url">
+                  跟开涛学架构五【限流】
                 </a>
               
             
@@ -445,8 +449,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-05T19:57:12+08:00">
-                2017-03-05
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-09T11:03:37+08:00">
+                2017-10-09
               </time>
             
 
@@ -464,8 +468,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/Architecture/" itemprop="url" rel="index">
+                    <span itemprop="name">Architecture</span>
                   </a>
                 </span>
 
@@ -500,10 +504,11 @@
 
       
         
-          <h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><p>在class文件中，字符串是以MUTF8格式保存的，这一点之前了解过了。在Java虚拟机运行期间，字符串以java.lang.String对象的形式存在，而在String对象内部，字符串又是以UTF16格式保存。字符串相关功能大部分都是由String(和StringBuilder类等)类提供的，本节我们只学习一些辅助功能即可。<br>String类有两个实例变量，其中一个是value，类型是字符数组，用于存放UTF16编码后的字符序列。另一个是hash，缓存字符串的哈希码。有兴趣可以再看下Java中String类的实现。</p>
+          <p>限流就是通过一系列手段来控制并发请求量，以保证整个系统可用。下面就先来看常见的限流算法，然后再看如何具体应用。</p>
+<h3 id="限流算法"><a href="#限流算法" class="headerlink" title="限流算法"></a>限流算法</h3><p>常见的限流算法有令牌桶和漏桶。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/03/05/自己动手写JVM二十八【数组和字符串（三）】/#more" rel="contents">
+            <a class="btn" href="/2017/10/09/跟开涛学架构五【限流】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -544,7 +549,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/01/自己动手写JVM二十七【数组和字符串（二）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/13/跟开涛学架构四【Hystrix的使用】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -569,8 +574,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/01/自己动手写JVM二十七【数组和字符串（二）】/" itemprop="url">
-                  自己动手写JVM二十七【数组和字符串（二）】
+                <a class="post-title-link" href="/2017/09/13/跟开涛学架构四【Hystrix的使用】/" itemprop="url">
+                  跟开涛学架构四【Hystrix的使用】
                 </a>
               
             
@@ -584,8 +589,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-01T23:36:48+08:00">
-                2017-03-01
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-13T18:21:16+08:00">
+                2017-09-13
               </time>
             
 
@@ -603,8 +608,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/Architecture/" itemprop="url" rel="index">
+                    <span itemprop="name">Architecture</span>
                   </a>
                 </span>
 
@@ -639,11 +644,11 @@
 
       
         
-          <p>本节继续来学习数组相关指令。</p>
-<h3 id="数组相关指令"><a href="#数组相关指令" class="headerlink" title="数组相关指令"></a>数组相关指令</h3><h4 id="lt-t-gt-aload指令"><a href="#lt-t-gt-aload指令" class="headerlink" title="&lt;t&gt;aload指令"></a>&lt;t&gt;aload指令</h4><p>&lt;t&gt;aload系列指令按索引取元素的值，然后推入操作数栈，其实现代码位于/instructions/loads/xaload.go文件中，其中一共有8条指令，代码基本相似，下面以aaload指令来详细看下：</p>
+          <p>Hystrix是Netflix开源的一款针对分布式系统的延迟和容错库，目的是用来隔离分布式服务故障。它是通过线程池和信号量来是实现的，现在没有概念没关系，先来看怎么用吧。</p>
+<h3 id="Hystrix简单使用"><a href="#Hystrix简单使用" class="headerlink" title="Hystrix简单使用"></a>Hystrix简单使用</h3><p>我们在real_server_1项目上做测试，如下两步即可完成：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/03/01/自己动手写JVM二十七【数组和字符串（二）】/#more" rel="contents">
+            <a class="btn" href="/2017/09/13/跟开涛学架构四【Hystrix的使用】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -684,7 +689,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/23/自己动手写JVM二十六【数组和字符串（一）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/04/跟开涛学架构三【Nginx动态负载均衡】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -709,8 +714,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/02/23/自己动手写JVM二十六【数组和字符串（一）】/" itemprop="url">
-                  自己动手写JVM二十六【数组和字符串（一）】
+                <a class="post-title-link" href="/2017/09/04/跟开涛学架构三【Nginx动态负载均衡】/" itemprop="url">
+                  跟开涛学架构三【Nginx动态负载均衡】
                 </a>
               
             
@@ -724,8 +729,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-23T12:06:48+08:00">
-                2017-02-23
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-04T21:58:56+08:00">
+                2017-09-04
               </time>
             
 
@@ -743,8 +748,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/Architecture/" itemprop="url" rel="index">
+                    <span itemprop="name">Architecture</span>
                   </a>
                 </span>
 
@@ -779,11 +784,10 @@
 
       
         
-          <p>在大部分编程语言中，数组和字符串都是最基本的数据类型。Java虚拟机直接支持数组，对字符串的支持则由java.lang.String和相关的类提供。本章就来学习数组和字符串相关指令。</p>
-<h3 id="数组概述"><a href="#数组概述" class="headerlink" title="数组概述"></a>数组概述</h3><p>数组在Java虚拟机中是个比较特殊的概念。为什么这么说呢，有下面几个原因：</p>
+          <p>本系列第一章节我们就知道了如何配置upstream。下面要学习的是如何不写死服务列表，而是通过服务注册、发现的方式来实现upstream列表的动态变更。书中是使用Consul来实现的，它是一款开源的分布式服务注册与发现系统。简单来说，其核心思想就是，upstream服务向Consul注册服务，Nginx能监听到Consul上注册的服务变更，然后修改upstream列表，最后重启Nginx。本人也没有使用过该产品，就一起来学习下吧。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/02/23/自己动手写JVM二十六【数组和字符串（一）】/#more" rel="contents">
+            <a class="btn" href="/2017/09/04/跟开涛学架构三【Nginx动态负载均衡】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -824,7 +828,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/22/自己动手写JVM二十五【方法调用和返回（三）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/01/跟开涛学架构二【Nginx长连接】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -849,8 +853,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/02/22/自己动手写JVM二十五【方法调用和返回（三）】/" itemprop="url">
-                  自己动手写JVM二十五【方法调用和返回（三）】
+                <a class="post-title-link" href="/2017/09/01/跟开涛学架构二【Nginx长连接】/" itemprop="url">
+                  跟开涛学架构二【Nginx长连接】
                 </a>
               
             
@@ -864,8 +868,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-22T16:54:46+08:00">
-                2017-02-22
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-01T17:32:28+08:00">
+                2017-09-01
               </time>
             
 
@@ -883,8 +887,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/Architecture/" itemprop="url" rel="index">
+                    <span itemprop="name">Architecture</span>
                   </a>
                 </span>
 
@@ -919,11 +923,11 @@
 
       
         
-          <p>本节继续实现方法调用和返回。</p>
-<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>首先要改造命令行工具，增加两个选项。java命令提供-verbose:class选项，可以控制是否把类加载信息输出到控制台。另外参照这个选项增加一个-verbose:inst选项，用来控制是否把指令执行信息输出到控制台，下面是测试步骤：</p>
+          <p>本章节来学习一下如何配置Nginx与上游服务器(real_server)的长连接。本人对这一块也不是很懂，如果只是照着书本添两个配置，可能也达不到学习的效果，下面我就按照自己的方式来浅析下这部分内容。</p>
+<h3 id="服务端长连接支持"><a href="#服务端长连接支持" class="headerlink" title="服务端长连接支持"></a>服务端长连接支持</h3><p>要想支持长连接，需要客户端(Nginx)和服务端(real_server)都支持才行，我们就先来看下服务端对长连接支持的情况。使用real_server_1项目来做测试，其容器为Springboot内嵌的Tomcat，提供服务的协议为HTTP 1.1，默认支持长连接。在没有修改配置的情况下，连接默认存活时间为60秒，对应配置为<code>server.connection-timeout</code>。下面就来验证</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/02/22/自己动手写JVM二十五【方法调用和返回（三）】/#more" rel="contents">
+            <a class="btn" href="/2017/09/01/跟开涛学架构二【Nginx长连接】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -959,7 +963,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/8/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><span class="page-number current">9</span><a class="page-number" href="/page/10/">10</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/10/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1000,7 +1004,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-count">138</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1008,7 +1012,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1017,7 +1021,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1079,7 +1083,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

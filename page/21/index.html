@@ -266,7 +266,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/08/09/SpringBoot自定义参数验证/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/08/Redis学习笔记十【Redis事物】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/08/09/SpringBoot自定义参数验证/" itemprop="url">
-                  SpringBoot自定义参数验证
+                <a class="post-title-link" href="/2016/12/08/Redis学习笔记十【Redis事物】/" itemprop="url">
+                  Redis学习笔记十【Redis事物】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-09T21:26:51+08:00">
-                2016-08-09
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-08T19:24:54+08:00">
+                2016-12-08
               </time>
             
 
@@ -325,8 +325,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/SpringBoot/" itemprop="url" rel="index">
-                    <span itemprop="name">SpringBoot</span>
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -361,10 +361,11 @@
 
       
         
-          <p>项目中需要进行参数验证是件很平常的事儿，Validation框架也已经帮我们做的很好了。但是，为了更贴近业务需求又或者不想为了验证而去写个Bean，所以还是想自己实现个简单的验证功能。项目基于SpringBoot，具体怎么搭建没啥好说的了，下面挑涉及到的几个点，截取项目中的部分代码来展示下是如何实现的。</p>
+          <p>前面章节已经涉及过基本的Redis事物，知晓了Redis的事物和传统的关系型数据库的事物并不相同。Redis虽然有简单的方法可以处理一连串相互一致的读操作和写操作，但是没有办法根据读取到的数据为依据来进行相关操作，这种无法以一致性的形式读取数据的行为将导致某一类型的问题变得难以解决。</p>
+<h3 id="模拟场景演示Redis事物"><a href="#模拟场景演示Redis事物" class="headerlink" title="模拟场景演示Redis事物"></a>模拟场景演示Redis事物</h3><p>下面以一个商品买卖市场为场景，来演示Redis事物的使用，在该场景下，人们可以在市场里自由销售和购买商品。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/08/09/SpringBoot自定义参数验证/#more" rel="contents">
+            <a class="btn" href="/2016/12/08/Redis学习笔记十【Redis事物】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -405,7 +406,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/08/04/Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/08/Redis学习笔记九【处理系统故障】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -430,8 +431,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/08/04/Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】/" itemprop="url">
-                  Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】
+                <a class="post-title-link" href="/2016/12/08/Redis学习笔记九【处理系统故障】/" itemprop="url">
+                  Redis学习笔记九【处理系统故障】
                 </a>
               
             
@@ -445,8 +446,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-04T10:20:01+08:00">
-                2016-08-04
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-08T16:07:52+08:00">
+                2016-12-08
               </time>
             
 
@@ -464,8 +465,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Mycat/" itemprop="url" rel="index">
-                    <span itemprop="name">Mycat</span>
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -500,11 +501,10 @@
 
       
         
-          <p>上一章我们对Mycat配置有了个初步的了解，现在我们就基于之前的配置，并且模拟一个简单的订单场景，来跑通Mycat。假设我们构建2000万条订单数据，需要以id mod运算之后存储到两台Mysql中，下面我们就一步一步的来实现。</p>
-<h3 id="启动Docker中的两台Mysql容器"><a href="#启动Docker中的两台Mysql容器" class="headerlink" title="启动Docker中的两台Mysql容器"></a>启动Docker中的两台Mysql容器</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>因为之前已经启动过容器，如果没有主动删除过，先查看下其状态</div><div class="line">sudo docker ps -a</div><div class="line"><span class="meta"></span></div><div class="line">#若容器处于Exited状态下，将其启动即可(示例是本人自己的CONTAINER ID)</div><div class="line">sudo docker start d1f418414648</div><div class="line">sudo docker start 9d9674cc4fa7</div></pre></td></tr></table></figure>
+          <p>如果决定要将Redis用作应用程序唯一的数据存储手段的话，那么就必须确保Redis不会丢失任何数据。根提供了ACID保证的传统关系数据库不同，在使用Redis为后端构建应用程序的时候，我们需要多做一些工作才能保证数据的一致性。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/08/04/Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】/#more" rel="contents">
+            <a class="btn" href="/2016/12/08/Redis学习笔记九【处理系统故障】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -545,7 +545,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/27/Mysql分库分表之Mycat学习笔记二【配置初探】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/08/Redis学习笔记八【Redis主从复制】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -570,8 +570,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/07/27/Mysql分库分表之Mycat学习笔记二【配置初探】/" itemprop="url">
-                  Mysql分库分表之Mycat学习笔记二【配置初探】
+                <a class="post-title-link" href="/2016/12/08/Redis学习笔记八【Redis主从复制】/" itemprop="url">
+                  Redis学习笔记八【Redis主从复制】
                 </a>
               
             
@@ -585,8 +585,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-27T00:27:36+08:00">
-                2016-07-27
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-08T15:31:49+08:00">
+                2016-12-08
               </time>
             
 
@@ -604,8 +604,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Mycat/" itemprop="url" rel="index">
-                    <span itemprop="name">Mycat</span>
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -640,19 +640,10 @@
 
       
         
-          <p>本章节先了解下Mycat比较重要的部分，即配置文件，就是上一章节中说到的conf目录下的相关内容。</p>
-<h3 id="先看一下Mycat里几个重要的概念"><a href="#先看一下Mycat里几个重要的概念" class="headerlink" title="先看一下Mycat里几个重要的概念"></a>先看一下Mycat里几个重要的概念</h3><ol>
-<li>用户</li>
-<li>逻辑库（schema）</li>
-<li>逻辑表（table）</li>
-<li>分片节点（dataNode）</li>
-<li>分片规则（rule）</li>
-<li>全局序列号（sequence）</li>
-</ol>
-<p>下面就逐个来讲讲，想一个场景，然后把配置都配好，最终要完整的运行起来。</p>
+          <p>对于高负载应用来说，复制(replication)是不可或缺的一个特性，复制可以让其他服务器拥有一个不断地更新的数据副本，从而使得拥有副本数据的服务器可以用于处理客户端发送的读请求。关系型数据库通常会使用一个主服务器(master)向多个从服务器(slave)发送更行，并使用从服务器来处理所有读请求。Redis也采用了同样的方法来实现自己的复制特性，并将其用作扩展性能的一种手段。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/07/27/Mysql分库分表之Mycat学习笔记二【配置初探】/#more" rel="contents">
+            <a class="btn" href="/2016/12/08/Redis学习笔记八【Redis主从复制】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -693,7 +684,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/26/Mysql分库分表之Mycat学习笔记一【序】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/07/Redis学习笔记七【Redis持久化】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -718,8 +709,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/07/26/Mysql分库分表之Mycat学习笔记一【序】/" itemprop="url">
-                  Mysql分库分表之Mycat学习笔记一【序】
+                <a class="post-title-link" href="/2016/12/07/Redis学习笔记七【Redis持久化】/" itemprop="url">
+                  Redis学习笔记七【Redis持久化】
                 </a>
               
             
@@ -733,8 +724,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-26T16:23:59+08:00">
-                2016-07-26
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-07T11:41:29+08:00">
+                2016-12-07
               </time>
             
 
@@ -752,8 +743,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Mycat/" itemprop="url" rel="index">
-                    <span itemprop="name">Mycat</span>
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -788,18 +779,10 @@
 
       
         
-          <p>一直对Mysql分库分表有点兴趣，但是也一直停留在有兴趣的阶段，没有遇到能应用的场景。人生苦短，与其等一个机会，不如自己创造吧。稍微调研了下，选择使用<a href="http://www.mycat.org.cn" target="_blank" rel="external">Mycat</a>这样一款开源产品。没有什么特别的理由，也不去讨论挖掘机哪家强，只是为了学习。</p>
-<h3 id="本机环境"><a href="#本机环境" class="headerlink" title="本机环境"></a>本机环境</h3><ul>
-<li>电脑环境：Ubuntu 16.04</li>
-<li>JDK：1.8</li>
-<li>Docker version 1.11.2</li>
-<li>Mysql 5.7.13</li>
-<li>Mycat 1.5-RELEASE</li>
-<li>Navicat for Mysql</li>
-</ul>
+          <p>本章节我们来看看Redis时如何就爱那个数据存储到硬盘里面，是的数据在Redis重启之后仍然存在的。Redis提供了两种不同的持久化方法来将数据存储到硬盘里面。一种方法叫快照(snapshotting)，它可以将存在于某一时刻的所有数据都写入硬盘里；另一种方法教只追加文件(append-only file, AOF)，它会在执行的写命令复制到硬盘里。这两种方法可以自由搭配使用，具体如何选择，需要根据用书的数据以及应用来决定。下面在Redis安装目录的redis.conf文件中查看下Redis默认的持久化配置：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/07/26/Mysql分库分表之Mycat学习笔记一【序】/#more" rel="contents">
+            <a class="btn" href="/2016/12/07/Redis学习笔记七【Redis持久化】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -840,7 +823,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/20/Neo4j学习笔记十【Spring-Data-Neo4j-Embedded-Driver】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/06/Redis学习笔记六【Redis命令-三-】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -865,8 +848,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/07/20/Neo4j学习笔记十【Spring-Data-Neo4j-Embedded-Driver】/" itemprop="url">
-                  Neo4j学习笔记十【Spring Data Neo4j--Embedded Driver】
+                <a class="post-title-link" href="/2016/12/06/Redis学习笔记六【Redis命令-三-】/" itemprop="url">
+                  Redis学习笔记六【Redis命令(三)】
                 </a>
               
             
@@ -880,8 +863,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-20T11:59:35+08:00">
-                2016-07-20
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-06T16:46:59+08:00">
+                2016-12-06
               </time>
             
 
@@ -899,8 +882,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Neo4j/" itemprop="url" rel="index">
-                    <span itemprop="name">Neo4j</span>
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -935,11 +918,24 @@
 
       
         
-          <p>前面一章我们使用Spring Data以Http的形式访问Neo4j，但是发现用不了内置的强大Api。在SDN官方文档中发现有embedded-driver。下面我们尝试着使用下该驱动。</p>
-<h3 id="搭建环境（基于上一章的项目）"><a href="#搭建环境（基于上一章的项目）" class="headerlink" title="搭建环境（基于上一章的项目）"></a>搭建环境（基于上一章的项目）</h3><h4 id="1、添加embedded-driver依赖"><a href="#1、添加embedded-driver依赖" class="headerlink" title="1、添加embedded-driver依赖"></a>1、添加embedded-driver依赖</h4>
+          <p>本章节学习一些和数据结构本身没有关系的其他命令</p>
+<h3 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h3><table>
+<thead>
+<tr>
+<th style="text-align:left">命令</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">SORT</td>
+<td style="text-align:center">根据给定的选项，对输入的列表、集合或者有序集合进行排序，返回结果</td>
+</tr>
+</tbody>
+</table>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/07/20/Neo4j学习笔记十【Spring-Data-Neo4j-Embedded-Driver】/#more" rel="contents">
+            <a class="btn" href="/2016/12/06/Redis学习笔记六【Redis命令-三-】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -975,7 +971,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/20/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><span class="page-number current">21</span><a class="page-number" href="/page/22/">22</a><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/22/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/20/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><span class="page-number current">21</span><a class="page-number" href="/page/22/">22</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/22/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1016,7 +1012,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-count">138</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1024,7 +1020,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1033,7 +1029,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1095,7 +1091,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

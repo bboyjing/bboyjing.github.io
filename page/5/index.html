@@ -266,7 +266,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/01/跟开涛学架构二【Nginx长连接】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/22/HeadFirst设计模式四【工厂模式】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/09/01/跟开涛学架构二【Nginx长连接】/" itemprop="url">
-                  跟开涛学架构二【Nginx长连接】
+                <a class="post-title-link" href="/2019/10/22/HeadFirst设计模式四【工厂模式】/" itemprop="url">
+                  HeadFirst设计模式四【工厂模式】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-01T17:32:28+08:00">
-                2017-09-01
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-10-22T20:05:00+08:00">
+                2019-10-22
               </time>
             
 
@@ -325,8 +325,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Architecture/" itemprop="url" rel="index">
-                    <span itemprop="name">Architecture</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -361,11 +361,11 @@
 
       
         
-          <p>本章节来学习一下如何配置Nginx与上游服务器(real_server)的长连接。本人对这一块也不是很懂，如果只是照着书本添两个配置，可能也达不到学习的效果，下面我就按照自己的方式来浅析下这部分内容。</p>
-<h3 id="服务端长连接支持"><a href="#服务端长连接支持" class="headerlink" title="服务端长连接支持"></a>服务端长连接支持</h3><p>要想支持长连接，需要客户端(Nginx)和服务端(real_server)都支持才行，我们就先来看下服务端对长连接支持的情况。使用real_server_1项目来做测试，其容器为Springboot内嵌的Tomcat，提供服务的协议为HTTP 1.1，默认支持长连接。在没有修改配置的情况下，连接默认存活时间为60秒，对应配置为<code>server.connection-timeout</code>。下面就来验证</p>
+          <p>本章将学习如何使用工厂模式来解放new操作符，如何从复杂的依赖关系中脱困。</p>
+<h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>书中描述了一个订购披萨的场景，披萨有很多种，但是每一种的制作过程都一样。用户在披萨商店下单，商店根据种类来制作各种披萨。工厂模式的实现使得构造各种类型披萨变得灵活。工厂方法又细分成了三种，分别是：简单工厂、抽象工厂和工厂方法。下面就逐个来看下。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/09/01/跟开涛学架构二【Nginx长连接】/#more" rel="contents">
+            <a class="btn" href="/2019/10/22/HeadFirst设计模式四【工厂模式】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -406,7 +406,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/27/跟开涛学架构一【Nginx负载均衡】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/22/HeadFirst设计模式三【装饰者模式】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -431,8 +431,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/08/27/跟开涛学架构一【Nginx负载均衡】/" itemprop="url">
-                  跟开涛学架构一【Nginx负载均衡】
+                <a class="post-title-link" href="/2019/10/22/HeadFirst设计模式三【装饰者模式】/" itemprop="url">
+                  HeadFirst设计模式三【装饰者模式】
                 </a>
               
             
@@ -446,8 +446,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-27T17:04:08+08:00">
-                2017-08-27
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-10-22T01:19:07+08:00">
+                2019-10-22
               </time>
             
 
@@ -465,8 +465,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Architecture/" itemprop="url" rel="index">
-                    <span itemprop="name">Architecture</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -501,11 +501,11 @@
 
       
         
-          <p>最近在张开涛所著的《亿级流量网站架构核心技术》，粗粗浏览了下，核心思想是围绕着Nginx在转。如果平时没有一些运维实际经验的话，可能整本书看下来效果不是很好。要想吸收更多的知识，光看是没用的，还是得亲自动手操作。书中有不少代码片段，我会尝试尽量把案例都实现，组成可以跑通的完整测试项目，以达到学习的目的。本系列学习笔记的内容大多来自这本书，如果涉及到版权问题，请及时联系本人。下面就进入正题了。</p>
-<h3 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h3><p>目前需要的环境是Java运行环境和Nginx。</p>
+          <p>装饰者模式可以使用对象组合的方式，做到在运行时装饰类，能够在不修改任何底层代码的情况下，给对象赋予新的职责。本章可以称为：给爱用继承的人一个全新的设计眼界。下面我们就来学习下这个模式。</p>
+<h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>书中描述了一个制作饮料的场景，比如星巴克的咖啡，制作一杯咖啡可以加其他配料，而最终的价格会根据调料的不同而不同。装饰者模式的实现方式是以咖啡为基底，使用配料装饰器来装饰，最终形成的就是一杯我们需要的咖啡。概念说不太清楚，直接看下面代码会更直观。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/08/27/跟开涛学架构一【Nginx负载均衡】/#more" rel="contents">
+            <a class="btn" href="/2019/10/22/HeadFirst设计模式三【装饰者模式】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -546,7 +546,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/21/RocketMQ源码分析之【rocketmq-namesrv】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/14/HeadFirst设计模式二【观察者模式】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -571,8 +571,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/04/21/RocketMQ源码分析之【rocketmq-namesrv】/" itemprop="url">
-                  RocketMQ源码分析之【rocketmq-namesrv】
+                <a class="post-title-link" href="/2019/10/14/HeadFirst设计模式二【观察者模式】/" itemprop="url">
+                  HeadFirst设计模式二【观察者模式】
                 </a>
               
             
@@ -586,8 +586,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-21T14:04:19+08:00">
-                2017-04-21
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-10-14T20:56:50+08:00">
+                2019-10-14
               </time>
             
 
@@ -605,8 +605,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/RocketMQ/" itemprop="url" rel="index">
-                    <span itemprop="name">RocketMQ</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -641,14 +641,11 @@
 
       
         
-          <p>本章节将对Name Server进行分析。</p>
-<h3 id="Name-Server作用"><a href="#Name-Server作用" class="headerlink" title="Name Server作用"></a>Name Server作用</h3><p>官方文档对Name Server有一个概括：</p>
-<blockquote>
-<p>Name Server是一个几乎无状态节点，可集群部署，节点之间无任何信息同步。</p>
-</blockquote>
+          <p>观察者模式的核心是订阅、通知，是个非常有用的设计模式，我们下面就来学习下。</p>
+<h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>书中描述了一个气象数据更新的场景。大概意思是，气象站数据会不定时更新，有好几种布告板需要实时显示，而且必须可扩展，可以随时添加、删除布告板。这种情况下就可以使用到订阅通知模式了。这个场景比较简单，实现起来也不复杂，下面就直接看看代码。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/04/21/RocketMQ源码分析之【rocketmq-namesrv】/#more" rel="contents">
+            <a class="btn" href="/2019/10/14/HeadFirst设计模式二【观察者模式】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -689,7 +686,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/18/RocketMQ源码分析之【rocketmq-srvutil】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/14/HeadFirst设计模式一【策略模式】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -714,8 +711,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/04/18/RocketMQ源码分析之【rocketmq-srvutil】/" itemprop="url">
-                  RocketMQ源码分析之【rocketmq-srvutil】
+                <a class="post-title-link" href="/2019/10/14/HeadFirst设计模式一【策略模式】/" itemprop="url">
+                   HeadFirst设计模式一【策略模式】
                 </a>
               
             
@@ -729,8 +726,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-18T15:48:12+08:00">
-                2017-04-18
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-10-14T20:51:44+08:00">
+                2019-10-14
               </time>
             
 
@@ -748,8 +745,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/RocketMQ/" itemprop="url" rel="index">
-                    <span itemprop="name">RocketMQ</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -784,21 +781,11 @@
 
       
         
-          <p>从这一章开始，着手来试着分析RocketMQ的源码。本人fork了源码，准备将读过的代码都加上注释，附上<a href="https://github.com/bboyjing/incubator-rocketmq" target="_blank" rel="external">项目地址</a>。首先看下源码结构，RocketMQ共包含9个核心模块：</p>
-<ul>
-<li>rocketmq-broker</li>
-<li>rocketmq-client</li>
-<li>rocketmq-common</li>
-<li>rocketmq-filtersrv</li>
-<li>rocketmq-namesrv</li>
-<li>rocketmq-remoting</li>
-<li>rocketmq-srvutil</li>
-<li>rocketmq-store</li>
-<li>rocketmq-tools</li>
-</ul>
+          <p>最近打算巩固下设计模式，顺便记录下学习笔记，供日后查阅以及分享给需要的道友。参考书籍为《Head First设计模式》中文版，读书笔记的内容绝大部分来自书籍，同时会添加一些自己的理解。如涉及侵权行为，会立即停止更新，并删除所有所有文章。至于为什么要学设计模式，我也说不清。当你觉得自己的代码怎么写的那么蠢、那么臃肿，怎么改一个小需求到处都要改，这个时候就需要考虑下设计模式了。这本书的代码示例语言使用的是Java，这没啥好说的了，下面就直接开始学习吧。</p>
+<h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>书中使用了一个构造不同类型的鸭子的场景，一步步由浅入深地来讲解该模式，建议去读一下原著，带入感比较强。这里我们就只简述下该场景，我们要构造不同类型的鸭子，每种鸭子都有一些共有的行为；另外其中某一种鸭子可能会有特殊的行为。比如说：呱呱叫（quack），每种鸭子都会叫，但是叫声可能会不一样；飞（fly），像野鸭子会飞，普通的鸭子就不会。这种时候我们该怎样去设计一个可以扩展的鸭子模型呢。最容易想到的是，继承。写一个鸭子父类，定义两个抽象方法，子类去重写。（或者实现接口，这两种方式在策略模式面前没有本质区别）这样能暂时解决问题，但是可能会带来如下缺点：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/04/18/RocketMQ源码分析之【rocketmq-srvutil】/#more" rel="contents">
+            <a class="btn" href="/2019/10/14/HeadFirst设计模式一【策略模式】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -839,7 +826,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/11/RocketMQ学习笔记二【了解RocketMQ概念】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/19/栈空间和大、小端/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -864,8 +851,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/04/11/RocketMQ学习笔记二【了解RocketMQ概念】/" itemprop="url">
-                  RocketMQ学习笔记二【了解RocketMQ概念】
+                <a class="post-title-link" href="/2019/03/19/栈空间和大、小端/" itemprop="url">
+                  栈空间和大、小端
                 </a>
               
             
@@ -879,8 +866,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-11T16:43:50+08:00">
-                2017-04-11
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-19T10:49:34+08:00">
+                2019-03-19
               </time>
             
 
@@ -898,8 +885,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/RocketMQ/" itemprop="url" rel="index">
-                    <span itemprop="name">RocketMQ</span>
+                  <a href="/categories/基础/" itemprop="url" rel="index">
+                    <span itemprop="name">基础</span>
                   </a>
                 </span>
 
@@ -934,10 +921,12 @@
 
       
         
-          <p>在上一章中，我们跑通了Quick Start，也对RocketMQ有了一个大致的了解。先看下一张简单的RocketMQ部署图，有个全局的感官：<br><img src="http://qiniu.didadu.cn/rocketmq_1.png" alt="rocketmq_1"><br>本章节的目的就是了解RocketMQ涉及到的概念以及整体架构介绍。</p>
+          <p>我们在学习程序是如何执行的时候，不免会涉及到栈空间的相关知识，有些地方会通俗地说分配栈空间时，栈是向下增长的，那么这句话到底是什么意思，下面我们就以X86架构为例来看一下。</p>
+<h3 id="向下增长"><a href="#向下增长" class="headerlink" title="向下增长"></a>向下增长</h3><p>我们先来看一下向下增长的理解是什么样的，假设给执行一个方法分配的地址空间为10000~10007，栈空间如下图：</p>
+<p><img src="http://qiniu.didadu.cn/stack_down.jpg" alt="stack_down"></p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/04/11/RocketMQ学习笔记二【了解RocketMQ概念】/#more" rel="contents">
+            <a class="btn" href="/2019/03/19/栈空间和大、小端/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -973,7 +962,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1014,7 +1003,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-count">138</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1022,7 +1011,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1031,7 +1020,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1093,7 +1082,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

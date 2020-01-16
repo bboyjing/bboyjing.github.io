@@ -1,0 +1,735 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.proxy.ustclug.org/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,设计模式," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="这个模式从字面上就大概能知道是什么意思，我们将要学习如何能让用户遍历你的对象而又无法窥视你存储对象的方式。 场景描述假设有两个餐厅，一个是做早餐的，另外一个是做午餐的。其中一个菜单是使用ArrayList来记录菜单项，而另一家用的是数组。现在两家餐厅合并了，在不大改的情况下，两种餐单如何做兼容。先看下两家菜单当前的实现：">
+<meta name="keywords" content="Java,设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HeadFirst设计模式十【迭代器模式】">
+<meta property="og:url" content="http://yoursite.com/2019/11/14/HeadFirst设计模式十【迭代器模式】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="这个模式从字面上就大概能知道是什么意思，我们将要学习如何能让用户遍历你的对象而又无法窥视你存储对象的方式。 场景描述假设有两个餐厅，一个是做早餐的，另外一个是做午餐的。其中一个菜单是使用ArrayList来记录菜单项，而另一家用的是数组。现在两家餐厅合并了，在不大改的情况下，两种餐单如何做兼容。先看下两家菜单当前的实现：">
+<meta property="og:updated_time" content="2019-11-23T02:22:52.270Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HeadFirst设计模式十【迭代器模式】">
+<meta name="twitter:description" content="这个模式从字面上就大概能知道是什么意思，我们将要学习如何能让用户遍历你的对象而又无法窥视你存储对象的方式。 场景描述假设有两个餐厅，一个是做早餐的，另外一个是做午餐的。其中一个菜单是使用ArrayList来记录菜单项，而另一家用的是数组。现在两家餐厅合并了，在不大改的情况下，两种餐单如何做兼容。先看下两家菜单当前的实现：">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/11/14/HeadFirst设计模式十【迭代器模式】/"/>
+
+
+
+
+
+  <title> HeadFirst设计模式十【迭代器模式】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/14/HeadFirst设计模式十【迭代器模式】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                HeadFirst设计模式十【迭代器模式】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-11-14T11:30:55+08:00">
+                2019-11-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这个模式从字面上就大概能知道是什么意思，我们将要学习如何能让用户遍历你的对象而又无法窥视你存储对象的方式。</p>
+<h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>假设有两个餐厅，一个是做早餐的，另外一个是做午餐的。其中一个菜单是使用ArrayList来记录菜单项，而另一家用的是数组。现在两家餐厅合并了，在不大改的情况下，两种餐单如何做兼容。先看下两家菜单当前的实现：</p>
+<a id="more"></a>
+<ol>
+<li><p>两家的菜单项是一样的，有名称、描述、是否是素食、价格</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MenuItem</span> </span>&#123;</div><div class="line">    String name;</div><div class="line">    String description;</div><div class="line">    <span class="keyword">boolean</span> vegetarian;</div><div class="line">    <span class="keyword">double</span> price;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MenuItem</span><span class="params">(String name, String description, <span class="keyword">boolean</span> vegetarian, <span class="keyword">double</span> price)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.name = name;</div><div class="line">        <span class="keyword">this</span>.description = description;</div><div class="line">        <span class="keyword">this</span>.vegetarian = vegetarian;</div><div class="line">        <span class="keyword">this</span>.price = price;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> name;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getDescription</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> description;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isVegetarian</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> vegetarian;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">double</span> <span class="title">getPrice</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> price;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>煎饼屋的菜单使用ArrayList实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PancakeHouseMenu</span> </span>&#123;</div><div class="line">    ArrayList menuItems;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">PancakeHouseMenu</span><span class="params">()</span> </span>&#123;</div><div class="line">        menuItems = <span class="keyword">new</span> ArrayList();</div><div class="line">        addItem(<span class="string">"K&amp;B's Pancake Breakfast"</span>,</div><div class="line">                <span class="string">"Pancakes with scrambled eggs, and toast"</span>,</div><div class="line">                <span class="keyword">true</span>,</div><div class="line">                <span class="number">2.99</span>);</div><div class="line">        addItem(<span class="string">"Regular Pancake Breakfast"</span>,</div><div class="line">                <span class="string">"Pancakes with fried eggs, sausage"</span>,</div><div class="line">                <span class="keyword">false</span>,</div><div class="line">                <span class="number">2.99</span>);</div><div class="line">        addItem(<span class="string">"Blueberry Pancakes"</span>,</div><div class="line">                <span class="string">"Pancakes made with fresh blueberries, and blueberry syrup"</span>,</div><div class="line">                <span class="keyword">true</span>,</div><div class="line">                <span class="number">3.49</span>);</div><div class="line">        addItem(<span class="string">"Waffles"</span>,</div><div class="line">                <span class="string">"Waffles, with your choice of blueberries or strawberries"</span>,</div><div class="line">                <span class="keyword">true</span>,</div><div class="line">                <span class="number">3.59</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addItem</span><span class="params">(String name, String description, <span class="keyword">boolean</span> vegetarian, <span class="keyword">double</span> price)</span> </span>&#123;</div><div class="line">        MenuItem menuItem = <span class="keyword">new</span> MenuItem(name, description, vegetarian, price);</div><div class="line">        menuItems.add(menuItem);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> ArrayList <span class="title">getMenuItems</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> menuItems;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>餐厅的菜单使用数组实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DinerMenu</span> </span>&#123;</div><div class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAX_ITEMS = <span class="number">6</span>;</div><div class="line">    <span class="keyword">int</span> numberOfItems = <span class="number">0</span>;</div><div class="line">    MenuItem[] menuItems;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DinerMenu</span><span class="params">()</span> </span>&#123;</div><div class="line">        menuItems = <span class="keyword">new</span> MenuItem[MAX_ITEMS];</div><div class="line">        addItem(<span class="string">"Vegetarian BLT"</span>,</div><div class="line">                <span class="string">"(Fakin') Bacon with lettuce &amp; tomato on whole wheat"</span>, <span class="keyword">true</span>, <span class="number">2.99</span>);</div><div class="line">        addItem(<span class="string">"BLT"</span>,</div><div class="line">                <span class="string">"Bacon with lettuce &amp; tomato on whole wheat"</span>, <span class="keyword">false</span>, <span class="number">2.99</span>);</div><div class="line">        addItem(<span class="string">"Soup of the day"</span>,</div><div class="line">                <span class="string">"Soup of the day, with a side of potato salad"</span>, <span class="keyword">false</span>, <span class="number">3.29</span>);</div><div class="line">        addItem(<span class="string">"Hotdog"</span>,</div><div class="line">                <span class="string">"A hot dog, with saurkraut, relish, onions, topped with cheese"</span>,</div><div class="line">                <span class="keyword">false</span>, <span class="number">3.05</span>);</div><div class="line">        addItem(<span class="string">"Steamed Veggies and Brown Rice"</span>,</div><div class="line">                <span class="string">"Steamed vegetables over brown rice"</span>, <span class="keyword">true</span>, <span class="number">3.99</span>);</div><div class="line">        addItem(<span class="string">"Pasta"</span>,</div><div class="line">                <span class="string">"Spaghetti with Marinara Sauce, and a slice of sourdough bread"</span>,</div><div class="line">                <span class="keyword">true</span>, <span class="number">3.89</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addItem</span><span class="params">(String name, String description, <span class="keyword">boolean</span> vegetarian, <span class="keyword">double</span> price)</span> </span>&#123;</div><div class="line">        MenuItem menuItem = <span class="keyword">new</span> MenuItem(name, description, vegetarian, price);</div><div class="line">        <span class="keyword">if</span> (numberOfItems &gt;= MAX_ITEMS) &#123;</div><div class="line">            System.out.println(<span class="string">"Sorry, menu is full! Can't add item to menu"</span>);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            menuItems[numberOfItems] = menuItem;</div><div class="line">            numberOfItems = numberOfItems + <span class="number">1</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> MenuItem[] getMenuItems() &#123;</div><div class="line">        <span class="keyword">return</span> menuItems;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>测试打印菜单，从代码可以看出，必须处理两个不一样的菜单。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        PancakeHouseMenu pancakeHouseMenu = <span class="keyword">new</span> PancakeHouseMenu();</div><div class="line">        ArrayList breakfastItems = pancakeHouseMenu.getMenuItems();</div><div class="line"></div><div class="line">        DinerMenu dinerMenu = <span class="keyword">new</span> DinerMenu();</div><div class="line">        MenuItem[] lunchItems = dinerMenu.getMenuItems();</div><div class="line"></div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; breakfastItems.size(); i++) &#123;</div><div class="line">            MenuItem menuItem = (MenuItem) breakfastItems.get(i);</div><div class="line">            System.out.print(menuItem.getName() + <span class="string">" "</span>);</div><div class="line">            System.out.println(menuItem.getPrice() + <span class="string">" "</span>);</div><div class="line">            System.out.println(menuItem.getDescription());</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; lunchItems.length; i++) &#123;</div><div class="line">            MenuItem menuItem = lunchItems[i];</div><div class="line">            System.out.print(menuItem.getName() + <span class="string">" "</span>);</div><div class="line">            System.out.println(menuItem.getPrice() + <span class="string">" "</span>);</div><div class="line">            System.out.println(menuItem.getDescription());</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>下面就来看下迭代器模式如何来处理这个场景。</p>
+<h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><ol>
+<li><p>定义迭代器接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Iterator</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">hasNext</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="function">Object <span class="title">next</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>菜单项目跟上面一样，不贴出来了</p>
+</li>
+<li><p>创建餐厅迭代器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DinerMenuIterator</span> <span class="keyword">implements</span> <span class="title">Iterator</span> </span>&#123;</div><div class="line">    MenuItem[] items;</div><div class="line">    <span class="keyword">int</span> position = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DinerMenuIterator</span><span class="params">(MenuItem[] items)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.items = items;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">hasNext</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (position &gt;= items.length || items[position] == <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">next</span><span class="params">()</span> </span>&#123;</div><div class="line">        MenuItem menuItem = items[position];</div><div class="line">        position = position + <span class="number">1</span>;</div><div class="line">        <span class="keyword">return</span> menuItem;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>改写餐厅菜单，将<code>getMenuItems()</code>替换成<code>createIterator()</code>，其它代码保持不变</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DinerMenu</span> </span>&#123;</div><div class="line">   ......</div><div class="line">    <span class="function"><span class="keyword">public</span> Iterator <span class="title">createIterator</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> DinerMenuIterator(menuItems);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>创煎饼屋菜单迭代器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PancakeHouseMenuIterator</span> <span class="keyword">implements</span> <span class="title">Iterator</span> </span>&#123;</div><div class="line">    ArrayList items;</div><div class="line">    <span class="keyword">int</span> position = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">PancakeHouseMenuIterator</span><span class="params">(ArrayList items)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.items = items;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">hasNext</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> position &lt; items.size();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">next</span><span class="params">()</span> </span>&#123;</div><div class="line">        MenuItem menuItem = (MenuItem) items.get(position);</div><div class="line">        position++;</div><div class="line">        <span class="keyword">return</span> menuItem;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>改写煎饼屋菜单，将<code>getMenuItems()</code>替换成<code>createIterator()</code>，其它代码保持不变</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PancakeHouseMenu</span> </span>&#123;</div><div class="line">    ......</div><div class="line">    <span class="function"><span class="keyword">public</span> Iterator <span class="title">createIterator</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">new</span> PancakeHouseMenuIterator(menuItems);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>测试</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        DinerMenu dinerMenu = <span class="keyword">new</span> DinerMenu();</div><div class="line">        printMenu(dinerMenu.createIterator());</div><div class="line"></div><div class="line">        PancakeHouseMenu pancakeHouseMenu = <span class="keyword">new</span> PancakeHouseMenu();</div><div class="line">        printMenu(pancakeHouseMenu.createIterator());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">printMenu</span><span class="params">(Iterator iterator)</span> </span>&#123;</div><div class="line">        <span class="keyword">while</span> (iterator.hasNext()) &#123;</div><div class="line">            MenuItem menuItem = (MenuItem) iterator.next();</div><div class="line">            System.out.print(menuItem.getName() + <span class="string">" "</span>);</div><div class="line">            System.out.println(menuItem.getPrice() + <span class="string">" "</span>);</div><div class="line">            System.out.println(menuItem.getDescription());</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>这个模式的好处也是显而易见的，利用了迭代器屏蔽了遍历各种集合的实现，这样使用的时候就统一了。迭代器模式就到这里了，这里我们再引出更复杂的一个场景。假如现在需要在餐厅菜单中添加甜点子菜单，目前的数据结构式不支持子菜单功能的，需要重构看来支持这种树形结构。下一章节将学习一种新的模式：组合模式，来解决这个问题。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/设计模式/" rel="tag"># 设计模式</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/05/HeadFirst设计模式九【模板方法模式】/" rel="next" title="HeadFirst设计模式九【模板方法模式】">
+                <i class="fa fa-chevron-left"></i> HeadFirst设计模式九【模板方法模式】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/11/22/HeadFirst设计模式十一【组合模式】/" rel="prev" title="HeadFirst设计模式十一【组合模式】">
+                HeadFirst设计模式十一【组合模式】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">138</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#场景描述"><span class="nav-number">1.</span> <span class="nav-text">场景描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码示例"><span class="nav-number">2.</span> <span class="nav-text">代码示例</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

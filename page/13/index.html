@@ -266,7 +266,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/16/自己动手写JVM十【解析class文件（八）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/07/自己动手写JVM三十三【异常处理（二）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/16/自己动手写JVM十【解析class文件（八）】/" itemprop="url">
-                  自己动手写JVM十【解析class文件（八）】
+                <a class="post-title-link" href="/2017/03/07/自己动手写JVM三十三【异常处理（二）】/" itemprop="url">
+                  自己动手写JVM三十三【异常处理（二）】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-16T10:12:06+08:00">
-                2017-01-16
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-07T00:49:23+08:00">
+                2017-03-07
               </time>
             
 
@@ -361,11 +361,11 @@
 
       
         
-          <p>本章节继续学习属性相关信息</p>
-<h3 id="解析属性表"><a href="#解析属性表" class="headerlink" title="解析属性表"></a>解析属性表</h3><h4 id="Code属性"><a href="#Code属性" class="headerlink" title="Code属性"></a>Code属性</h4><p>Code时变长属性，只存在于method_info结构中。Code属性中存放字节码等方法相关信息，其结构定义如下：</p>
+          <p>本节继续学习异常处理。</p>
+<h3 id="实现athrow指令"><a href="#实现athrow指令" class="headerlink" title="实现athrow指令"></a>实现athrow指令</h3><p>athrow属于引用类指令，在/instructions/references包下创建athrow.go文件，在其中定义athrow指令：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/16/自己动手写JVM十【解析class文件（八）】/#more" rel="contents">
+            <a class="btn" href="/2017/03/07/自己动手写JVM三十三【异常处理（二）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -406,7 +406,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/12/自己动手写JVM九【解析class文件（七）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/06/自己动手写JVM三十二【异常处理（一）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -431,8 +431,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/12/自己动手写JVM九【解析class文件（七）】/" itemprop="url">
-                  自己动手写JVM九【解析class文件（七）】
+                <a class="post-title-link" href="/2017/03/06/自己动手写JVM三十二【异常处理（一）】/" itemprop="url">
+                  自己动手写JVM三十二【异常处理（一）】
                 </a>
               
             
@@ -446,8 +446,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-12T14:01:29+08:00">
-                2017-01-12
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-06T19:36:49+08:00">
+                2017-03-06
               </time>
             
 
@@ -501,11 +501,11 @@
 
       
         
-          <p>本章节开始学习属性表相关信息，上一节找到的main()方法的字节码就出现在属性表中，属性表可谓是个大杂烩，里面存储了各式各样的信息。下面我们就来详细讨论讨论。</p>
-<h3 id="解析属性表"><a href="#解析属性表" class="headerlink" title="解析属性表"></a>解析属性表</h3><h4 id="AttributeInfo接口"><a href="#AttributeInfo接口" class="headerlink" title="AttributeInfo接口"></a>AttributeInfo接口</h4><p>和常量池类似，各种属性表达的信息也各不相同，因此无法用同一的结构来定义。不同之处在于，常量是由Java虚拟机规范严格定义的，共有14种。但是属性是可以扩展的，不同的虚拟机实现可以定义自己的属性类型，所以Java虚拟机规范没有使用tag，而是使用属性名来区别不同的属性。属性的结构定义如下：</p>
+          <p>异常处理是Java语言非常重要的一个语法，本章从Java虚拟机的角度来讨论异常是如何被抛出和处理的。</p>
+<h3 id="异常处理概述"><a href="#异常处理概述" class="headerlink" title="异常处理概述"></a>异常处理概述</h3><p>在Java语言中，异常可以分为两类：Checked异常和Unchecked异常。Unchecked异常包括java.lang.RuntimeException、java.lang.Error以及它们的子类，其他异常都是Checked异常。所有异常都继承自java.lang.Throwable。如果一个方法有可能导致Checked异常抛出，则该方法要么需要捕获该异常并妥善处理，要么必须把该异常列咋自己的Throws子句中，否则无法通过编译。Unchecked异常没有这个限制。不过，Java虚拟机并没有这个规定，这只是Java语言的语法规则。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/12/自己动手写JVM九【解析class文件（七）】/#more" rel="contents">
+            <a class="btn" href="/2017/03/06/自己动手写JVM三十二【异常处理（一）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -546,7 +546,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/11/自己动手写JVM八【解析class文件（六）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/06/自己动手写JVM三十一【本地方法调用（三）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -571,8 +571,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/11/自己动手写JVM八【解析class文件（六）】/" itemprop="url">
-                  自己动手写JVM八【解析class文件（六）】
+                <a class="post-title-link" href="/2017/03/06/自己动手写JVM三十一【本地方法调用（三）】/" itemprop="url">
+                  自己动手写JVM三十一【本地方法调用（三）】
                 </a>
               
             
@@ -586,8 +586,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-11T16:34:31+08:00">
-                2017-01-11
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-06T18:00:09+08:00">
+                2017-03-06
               </time>
             
 
@@ -641,12 +641,12 @@
 
       
         
-          <p>本章节继续学习常量池相关信息</p>
-<h3 id="常量池"><a href="#常量池" class="headerlink" title="常量池"></a>常量池</h3><p>接上一章节</p>
-<h4 id="CONSTANT-Fieldref-info"><a href="#CONSTANT-Fieldref-info" class="headerlink" title="CONSTANT_Fieldref_info"></a>CONSTANT_Fieldref_info</h4><p>CONSTANT_Fieldref_info表示字段符号引用，其结构体如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">CONSTANT_Fieldref_info &#123;</div><div class="line">    u1 tag;</div><div class="line">    u2 class_index;</div><div class="line">    u2 name_and_type_index;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+          <p>本节继续实现一些本地方法。</p>
+<h3 id="字符串拼接和String-intern-方法"><a href="#字符串拼接和String-intern-方法" class="headerlink" title="字符串拼接和String.intern()方法"></a>字符串拼接和String.intern()方法</h3><p>在Java语言中，通过加号来拼接字符串。作为优化，javac编译器会把字符串拼接操作转换成StringBuilder，比如说下面这段代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">String hello = <span class="string">"hello,"</span>;</div><div class="line">String world = <span class="string">"world!"</span>;</div><div class="line">String str = hello + world;</div><div class="line">System.out.println(str);</div></pre></td></tr></table></figure></p>
+<p>很可能会被javac优化成下面这样：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/11/自己动手写JVM八【解析class文件（六）】/#more" rel="contents">
+            <a class="btn" href="/2017/03/06/自己动手写JVM三十一【本地方法调用（三）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -687,7 +687,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/10/自己动手写JVM七【解析class文件（五）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/06/自己动手写JVM三十【本地方法调用（二）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -712,8 +712,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/10/自己动手写JVM七【解析class文件（五）】/" itemprop="url">
-                  自己动手写JVM七【解析class文件（五）】
+                <a class="post-title-link" href="/2017/03/06/自己动手写JVM三十【本地方法调用（二）】/" itemprop="url">
+                  自己动手写JVM三十【本地方法调用（二）】
                 </a>
               
             
@@ -727,8 +727,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-10T17:48:37+08:00">
-                2017-01-10
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-06T15:12:11+08:00">
+                2017-03-06
               </time>
             
 
@@ -782,12 +782,11 @@
 
       
         
-          <p>本章节继续学习常量池相关信息</p>
-<h3 id="常量池"><a href="#常量池" class="headerlink" title="常量池"></a>常量池</h3><p>接上一章节</p>
-<h4 id="CONSTANT-String-info"><a href="#CONSTANT-String-info" class="headerlink" title="CONSTANT_String_info"></a>CONSTANT_String_info</h4><p>CONSTANT_String_info常量表示java.lang.String字面量，结构如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">CONSTANT_String_info &#123;</div><div class="line">    u1 tag;</div><div class="line">    u2 string_index;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+          <h3 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h3><p>本节继续将反射相关内容</p>
+<h4 id="修改类加载器"><a href="#修改类加载器" class="headerlink" title="修改类加载器"></a>修改类加载器</h4><p>Class和Object结构体准备好了，接下来修改类加载器，让每一个加载到方法区中的类都有一个类对象与之关联。修改/rtdata/heap/class_loader.go文件的NewClassLoader()方法：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/10/自己动手写JVM七【解析class文件（五）】/#more" rel="contents">
+            <a class="btn" href="/2017/03/06/自己动手写JVM三十【本地方法调用（二）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -828,7 +827,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/09/自己动手写JVM六【解析class文件（四）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/06/自己动手写JVM二十九【本地方法调用（一）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -853,8 +852,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/09/自己动手写JVM六【解析class文件（四）】/" itemprop="url">
-                  自己动手写JVM六【解析class文件（四）】
+                <a class="post-title-link" href="/2017/03/06/自己动手写JVM二十九【本地方法调用（一）】/" itemprop="url">
+                  自己动手写JVM二十九【本地方法调用（一）】
                 </a>
               
             
@@ -868,8 +867,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-09T23:24:00+08:00">
-                2017-01-09
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-06T10:50:09+08:00">
+                2017-03-06
               </time>
             
 
@@ -923,12 +922,10 @@
 
       
         
-          <p>本章节继续学习ClassFile中各项所代表的含义。</p>
-<h3 id="常量池"><a href="#常量池" class="headerlink" title="常量池"></a>常量池</h3><p>常量池占据了class文件很大一部分数据，里面存储着各式各样的常量信息，包括数字和字符串常量、类和接口名，字段和方法等等，下面我们就来详细了解常量池和各种常量。</p>
-<h4 id="ConstantPool结构体"><a href="#ConstantPool结构体" class="headerlink" title="ConstantPool结构体"></a>ConstantPool结构体</h4><p>constant_pool.go文件中定义了ConstantPool类型，常量池实际上也是一个表，所以ConstantPool被定义成ConstantInfo的数组。所以，要理解常量池，得先去看ConstantInfo是什么，然后再回过来，此处未完待续，接着往下看。</p>
+          <p>我们已经知道，要想运行Java程序，除了Java虚拟机之外，还需要Java类库的配合。Java虚拟机和Java类库的配合。Java虚拟机和Java类库一起构成了Java运行环境。Java类库主要用Java语言编写，一些无法用Java语言实现的方法则使用本地语言编写，这些方法叫做本地方法。从本章开始将陆续实现一些Java类中的本地方法。为了不陷入JNI规范的细节之中，我们将使用Go语言来实现。本章的所有代码位于/native包下。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/09/自己动手写JVM六【解析class文件（四）】/#more" rel="contents">
+            <a class="btn" href="/2017/03/06/自己动手写JVM二十九【本地方法调用（一）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -964,7 +961,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/12/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/14/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/12/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/14/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1005,7 +1002,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-count">138</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1013,7 +1010,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1022,7 +1019,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1084,7 +1081,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

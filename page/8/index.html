@@ -266,7 +266,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/08/尝试ZeorC-ICE之【初识】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/24/Maven学习笔记四【Profiles】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/08/尝试ZeorC-ICE之【初识】/" itemprop="url">
-                  尝试ZeorC ICE之【初识】
+                <a class="post-title-link" href="/2018/12/24/Maven学习笔记四【Profiles】/" itemprop="url">
+                  Maven学习笔记四【Profiles】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-08T13:29:38+08:00">
-                2017-03-08
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-24T15:45:55+08:00">
+                2018-12-24
               </time>
             
 
@@ -325,8 +325,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ZeroC-Ice/" itemprop="url" rel="index">
-                    <span itemprop="name">ZeroC Ice</span>
+                  <a href="/categories/Maven/" itemprop="url" rel="index">
+                    <span itemprop="name">Maven</span>
                   </a>
                 </span>
 
@@ -361,10 +361,13 @@
 
       
         
-          <p>本系列博客的目的是为了学习ZeroC Ice的使用，并且和实际项目框架相结合，最后考虑是否能将这一产品引入到当前项目中，或者为新项目的技术选型多一个备选方案。<br>到底什么是ZeroC Ice？用一句话概括就是支持多语言的RPC框架。暂且不去管它的优缺点，得先学了再说。本系列的知识点来自《ZeroC Ice》权威指南和<a href="https://doc.zeroc.com/display/Ice36/Ice+Manual" target="_blank" rel="external">官网文档</a>。在这里向《ZeroC Ice》权威指南的作者表示敬意，这是目前关于ZeroC Ice唯一的一本书。ZeroC是一家公司，Ice是该公司的产品，全称Internet Communications Engine。Ice遵循GPLv2开源协议，如果使用过程中出现问题，ZeroC公司可以提供收费支持。不扯了，下面正式开始学习。</p>
+          <p>本节来学习下Maven的Profiles</p>
+<h3 id="介绍Build-Profiles"><a href="#介绍Build-Profiles" class="headerlink" title="介绍Build Profiles"></a>介绍Build Profiles</h3><p>Apache Maven 2.0竭尽全力确保构建是可移植的。除其他之外，这意味着允许在POM中进行构建配置，避免所有文件系统的引用。并且更加依赖本地存储库来存储实现这一点所需的元数据。</p>
+<p>然而，有时可移植性并不是完全可能的。某些条件下，插件可能需要配置本地文件系统路径。在其他情况下，需要一个稍微不同的依赖集，并且项目的artifact名称可能需要稍微调整一下。在另一种情况下，甚至可能需要在构建生命周期中包含一个完整的插件，这取决于所检测到的构建环境。</p>
+<p>为了解决这些情况，Maven 2.0引入了构建概要文件的概念。配置文件使用POM本身可用元素的子集(外加一个额外的部分)来指定，并以各种方式触发。他们在构建时修改POM，并用于互补的集合中，以便为一组目标环境提供等效但不同的参数（例如，在开发、测试和生产环境中提供appserver根的路径）。因此，概要文件很容易导致来自团队不同成员的构建结果不同。但是，如果使用得当，可以在使用概要文件的同时仍然保持项目的可移植性。这也将最小化maven -f选项的使用，该选项允许用户使用不同的参数或配置创建另一个POM，从而使其更易于维护，因为它只在一个POM上运行。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/03/08/尝试ZeorC-ICE之【初识】/#more" rel="contents">
+            <a class="btn" href="/2018/12/24/Maven学习笔记四【Profiles】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -405,7 +408,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/07/自己动手写JVM三十三【异常处理（二）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/22/Maven学习笔记三【POM文件】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -430,8 +433,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/07/自己动手写JVM三十三【异常处理（二）】/" itemprop="url">
-                  自己动手写JVM三十三【异常处理（二）】
+                <a class="post-title-link" href="/2018/12/22/Maven学习笔记三【POM文件】/" itemprop="url">
+                  Maven学习笔记三【POM文件】
                 </a>
               
             
@@ -445,8 +448,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-07T00:49:23+08:00">
-                2017-03-07
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-22T16:35:06+08:00">
+                2018-12-22
               </time>
             
 
@@ -464,8 +467,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/Maven/" itemprop="url" rel="index">
+                    <span itemprop="name">Maven</span>
                   </a>
                 </span>
 
@@ -500,11 +503,12 @@
 
       
         
-          <p>本节继续学习异常处理。</p>
-<h3 id="实现athrow指令"><a href="#实现athrow指令" class="headerlink" title="实现athrow指令"></a>实现athrow指令</h3><p>athrow属于引用类指令，在/instructions/references包下创建athrow.go文件，在其中定义athrow指令：</p>
+          <p> 本节来学习下Maven的pom文件。</p>
+<h3 id="什么是POM文件"><a href="#什么是POM文件" class="headerlink" title="什么是POM文件"></a>什么是POM文件</h3><p>项目对象模型或POM是Maven中的基本工作单元。它是一个XML文件，包含Maven用于构建项目的项目信息和配置细节。它包含大多数项目的默认值。例如构建目录，<code>target</code>目录，源代码目录<code>src/main/java</code>，测试源代码目录<code>src/test/java</code>等。在执行任务或目标时，Maven在当前目录中查找pom文件。读取pom，获取需要的配置信息，然后执行目标。</p>
+<p>在pom中可以指定的信息有项目依赖项、执行的插件或目标、构建配置文件等。还可以指定项目版本、描述、开发人员、邮件列表等其他信息。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/03/07/自己动手写JVM三十三【异常处理（二）】/#more" rel="contents">
+            <a class="btn" href="/2018/12/22/Maven学习笔记三【POM文件】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -545,7 +549,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/06/自己动手写JVM三十二【异常处理（一）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/21/Maven学习笔记二【构建生命周期】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -570,8 +574,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/06/自己动手写JVM三十二【异常处理（一）】/" itemprop="url">
-                  自己动手写JVM三十二【异常处理（一）】
+                <a class="post-title-link" href="/2018/12/21/Maven学习笔记二【构建生命周期】/" itemprop="url">
+                  Maven学习笔记二【构建生命周期】
                 </a>
               
             
@@ -585,8 +589,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-06T19:36:49+08:00">
-                2017-03-06
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-21T16:37:47+08:00">
+                2018-12-21
               </time>
             
 
@@ -604,8 +608,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/Maven/" itemprop="url" rel="index">
+                    <span itemprop="name">Maven</span>
                   </a>
                 </span>
 
@@ -640,11 +644,21 @@
 
       
         
-          <p>异常处理是Java语言非常重要的一个语法，本章从Java虚拟机的角度来讨论异常是如何被抛出和处理的。</p>
-<h3 id="异常处理概述"><a href="#异常处理概述" class="headerlink" title="异常处理概述"></a>异常处理概述</h3><p>在Java语言中，异常可以分为两类：Checked异常和Unchecked异常。Unchecked异常包括java.lang.RuntimeException、java.lang.Error以及它们的子类，其他异常都是Checked异常。所有异常都继承自java.lang.Throwable。如果一个方法有可能导致Checked异常抛出，则该方法要么需要捕获该异常并妥善处理，要么必须把该异常列咋自己的Throws子句中，否则无法通过编译。Unchecked异常没有这个限制。不过，Java虚拟机并没有这个规定，这只是Java语言的语法规则。</p>
+          <p>本节来学下Maven的构建生命周期。</p>
+<h3 id="构建生命周期基础"><a href="#构建生命周期基础" class="headerlink" title="构建生命周期基础"></a>构建生命周期基础</h3><p>Maven是以构建生命周期为核心的概念的。这意味着构建和发布特定项目的过程是明确定义的。有三个内建的构建生命周期：default、clean和site。default生命周期处理项目部署，clean生命周期处理项目清理，而site生命周期处理项目站点文档的创建。</p>
+<h4 id="构建生命周期的阶段"><a href="#构建生命周期的阶段" class="headerlink" title="构建生命周期的阶段"></a>构建生命周期的阶段</h4><p>每个构建生命周期都由不同的构建阶段列表定义，其中构建阶段表示生命周期中的一个阶段。例如，<code>default</code>生命周期包括以下阶段：</p>
+<ul>
+<li><code>validate</code> - 验证项目是否正确，并提供所有必要的信息</li>
+<li><code>compile</code> - 编译项目源代码</li>
+<li><code>test</code> - 使用合适的单元测试框架测试编译后的源代码。这些测试不需要打包或部署代码</li>
+<li><code>package</code> - 将编译后的代码以其可分发的格式打包，例如JAR</li>
+<li><code>verify</code> - 对集成测试的结果进行检查，以确保满足质量标准</li>
+<li><code>install</code> -将包安装到本地存储库中，作为本地其他项目中的依赖项使用</li>
+<li><code>deploy</code> - 在集成或发布环境中操作，将最终包复制到远程存储库，以便与其他开发人员和项目共享</li>
+</ul>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/03/06/自己动手写JVM三十二【异常处理（一）】/#more" rel="contents">
+            <a class="btn" href="/2018/12/21/Maven学习笔记二【构建生命周期】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -685,7 +699,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/06/自己动手写JVM三十一【本地方法调用（三）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/19/Maven学习笔记一【Quick Start】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -710,8 +724,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/06/自己动手写JVM三十一【本地方法调用（三）】/" itemprop="url">
-                  自己动手写JVM三十一【本地方法调用（三）】
+                <a class="post-title-link" href="/2018/12/19/Maven学习笔记一【Quick Start】/" itemprop="url">
+                  Maven学习笔记一【Quick Start】
                 </a>
               
             
@@ -725,8 +739,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-06T18:00:09+08:00">
-                2017-03-06
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-19T16:08:37+08:00">
+                2018-12-19
               </time>
             
 
@@ -744,8 +758,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/Maven/" itemprop="url" rel="index">
+                    <span itemprop="name">Maven</span>
                   </a>
                 </span>
 
@@ -780,12 +794,12 @@
 
       
         
-          <p>本节继续实现一些本地方法。</p>
-<h3 id="字符串拼接和String-intern-方法"><a href="#字符串拼接和String-intern-方法" class="headerlink" title="字符串拼接和String.intern()方法"></a>字符串拼接和String.intern()方法</h3><p>在Java语言中，通过加号来拼接字符串。作为优化，javac编译器会把字符串拼接操作转换成StringBuilder，比如说下面这段代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">String hello = <span class="string">"hello,"</span>;</div><div class="line">String world = <span class="string">"world!"</span>;</div><div class="line">String str = hello + world;</div><div class="line">System.out.println(str);</div></pre></td></tr></table></figure></p>
-<p>很可能会被javac优化成下面这样：</p>
+          <p>从业开始Maven就一直在用，但没有系统地去学习，这两天搜了一下关于Maven的书籍，比较少而且时间也比较长了。浏览了下官网，有个<a href="http://maven.apache.org/guides/index.html" target="_blank" rel="external">索引页面</a>写的挺清楚的，所以就将其作为学习教材，采用不完全翻译的方式记录下来。仅作用于个人学习、以及分享，如涉及到版权问题，将立即停止更新。</p>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>关于Maven的安装，参照<a href="http://maven.apache.org/install.html" target="_blank" rel="external">官网</a>。本人当前安装的环境如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">~❯ mvn --version</div><div class="line">Apache Maven 3.6.0 (97c98ec64a1fdfee7767ce5ffb20918da4f719f3; 2018-10-25T02:41:47+08:00)</div><div class="line">Maven home: /usr/local/apache-maven-3.6.0</div><div class="line">Java version: 11.0.1, vendor: Oracle Corporation, runtime: /Library/Java/JavaVirtualMachines/jdk-11.0.1.jdk/Contents/Home</div><div class="line">Default locale: zh_CN_#Hans, platform encoding: UTF-8</div><div class="line">OS name: "mac os x", version: "10.14.1", arch: "x86_64", family: "mac"</div></pre></td></tr></table></figure>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/03/06/自己动手写JVM三十一【本地方法调用（三）】/#more" rel="contents">
+            <a class="btn" href="/2018/12/19/Maven学习笔记一【Quick Start】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -826,7 +840,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/06/自己动手写JVM三十【本地方法调用（二）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/22/跟开涛学架构七【HTTP缓存】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -851,8 +865,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/06/自己动手写JVM三十【本地方法调用（二）】/" itemprop="url">
-                  自己动手写JVM三十【本地方法调用（二）】
+                <a class="post-title-link" href="/2018/01/22/跟开涛学架构七【HTTP缓存】/" itemprop="url">
+                  跟开涛学架构七【HTTP缓存】
                 </a>
               
             
@@ -866,8 +880,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-06T15:12:11+08:00">
-                2017-03-06
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-22T15:16:34+08:00">
+                2018-01-22
               </time>
             
 
@@ -885,8 +899,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/Architecture/" itemprop="url" rel="index">
+                    <span itemprop="name">Architecture</span>
                   </a>
                 </span>
 
@@ -921,11 +935,11 @@
 
       
         
-          <h3 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h3><p>本节继续将反射相关内容</p>
-<h4 id="修改类加载器"><a href="#修改类加载器" class="headerlink" title="修改类加载器"></a>修改类加载器</h4><p>Class和Object结构体准备好了，接下来修改类加载器，让每一个加载到方法区中的类都有一个类对象与之关联。修改/rtdata/heap/class_loader.go文件的NewClassLoader()方法：</p>
+          <p>本章节来学习下Http缓存相关内容，这也是容易被忽略的一部分。我们利用Chrome和real_server_1项目进行测试。我们下面就来看下如何在Java应用层控制浏览器缓存。</p>
+<h3 id="HTTP缓存"><a href="#HTTP缓存" class="headerlink" title="HTTP缓存"></a>HTTP缓存</h3><h4 id="Last-Modified"><a href="#Last-Modified" class="headerlink" title="Last-Modified"></a>Last-Modified</h4><p>直接看real_server_1上实现的代码：<br>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/03/06/自己动手写JVM三十【本地方法调用（二）】/#more" rel="contents">
+            <a class="btn" href="/2018/01/22/跟开涛学架构七【HTTP缓存】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -961,7 +975,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1002,7 +1016,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-count">138</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1010,7 +1024,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1019,7 +1033,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1081,7 +1095,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

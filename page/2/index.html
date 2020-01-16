@@ -266,7 +266,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/14/MybatisGenerator插件开发二【分页】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/10/HeadFirst设计模式十九【蝇量模式】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2019/03/14/MybatisGenerator插件开发二【分页】/" itemprop="url">
-                  MybatisGenerator插件开发二【分页】
+                <a class="post-title-link" href="/2020/01/10/HeadFirst设计模式十九【蝇量模式】/" itemprop="url">
+                  HeadFirst设计模式十九【蝇量模式】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-14T16:56:08+08:00">
-                2019-03-14
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-10T10:58:00+08:00">
+                2020-01-10
               </time>
             
 
@@ -325,8 +325,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/MybatisGenerator/" itemprop="url" rel="index">
-                    <span itemprop="name">MybatisGenerator</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -361,11 +361,11 @@
 
       
         
-          <p>分页查询在小项目的开发中基本是逃不了的，虽然有基于ThreadLocal的PageHelper插件可以直接使用，但还是想从源头解决问题。针对Mysql来说的话，其实只要在生成的Mapper和SqlMap文件中添加limit和offset就可以了。</p>
-<h3 id="添加limit、offset"><a href="#添加limit、offset" class="headerlink" title="添加limit、offset"></a>添加limit、offset</h3><p>直接上代码：</p>
+          <p>蝇量模式也叫享元模式，作用是让某个类的一个实例能用来提供许虚拟示例，也就是说节省内存。</p>
+<h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>假设现在在设计一个景观系统，要想在其中加上一些树做点缀。树有一个XY坐标位置，而且可以根据树的年龄动态地将自己绘制出来。问题是，用户可能要在景观中设计非常非常多的树，有可能会让程序变得运行缓慢。下面看下蝇量模式如何解决这个问题。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2019/03/14/MybatisGenerator插件开发二【分页】/#more" rel="contents">
+            <a class="btn" href="/2020/01/10/HeadFirst设计模式十九【蝇量模式】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -406,7 +406,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/14/MybatisGenerator插件开发一【清除SqlMap文件】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/09/HeadFirst设计模式十八【责任链模式】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -431,8 +431,8 @@
             
               
                 
-                <a class="post-title-link" href="/2019/03/14/MybatisGenerator插件开发一【清除SqlMap文件】/" itemprop="url">
-                  MybatisGenerator插件开发一【清除SqlMap文件】
+                <a class="post-title-link" href="/2020/01/09/HeadFirst设计模式十八【责任链模式】/" itemprop="url">
+                  HeadFirst设计模式十八【责任链模式】
                 </a>
               
             
@@ -446,8 +446,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-14T16:28:55+08:00">
-                2019-03-14
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-09T20:53:09+08:00">
+                2020-01-09
               </time>
             
 
@@ -465,8 +465,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/MybatisGenerator/" itemprop="url" rel="index">
-                    <span itemprop="name">MybatisGenerator</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -501,11 +501,11 @@
 
       
         
-          <h3 id="开篇"><a href="#开篇" class="headerlink" title="开篇"></a>开篇</h3><p>很多项目会考虑使用Mybatis，如果使用了的话<a href="http://www.mybatis.org/generator/" target="_blank" rel="external">MybatisGenerator</a>将会是个很好的选择。它会帮我们自动生成Mapper、Entity、SqlMap文件，在开发中能省很多事。然而MybatisGenerator只生成了为数不多的几个通用方法，没办法满足实际项目中多种多样的业务模型。庆幸的是，它提供自定义插件的功能，这就给我们开启了一扇大门。本人在项目中积累了几个比较常用的插件，本系列文章就一一来分享下。本人近期的项目中使用的都是Mysql，所以，自定义插件生成的SQL方言也都是只针对Mysql的。</p>
-<h3 id="清空SqlMap文件"><a href="#清空SqlMap文件" class="headerlink" title="清空SqlMap文件"></a>清空SqlMap文件</h3>
+          <p>责任练的描述是：当你想要让一个已上的对象有机会能够处理某个请求的时候，就是使用它。这个模式也挺常用的，比如说Netty中处理各种Handler的Pipline。</p>
+<h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>假设现在要实现一个邮件过滤的功能，将收到的邮件发送给各个过滤器依次执行，下面看下责任链模式如何实现。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2019/03/14/MybatisGenerator插件开发一【清除SqlMap文件】/#more" rel="contents">
+            <a class="btn" href="/2020/01/09/HeadFirst设计模式十八【责任链模式】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -546,7 +546,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/14/golang实现文件内容替换/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/09/HeadFirst设计模式十七【建造者模式】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -571,8 +571,8 @@
             
               
                 
-                <a class="post-title-link" href="/2019/03/14/golang实现文件内容替换/" itemprop="url">
-                  golang实现文件内容替换
+                <a class="post-title-link" href="/2020/01/09/HeadFirst设计模式十七【建造者模式】/" itemprop="url">
+                  HeadFirst设计模式十七【建造者模式】
                 </a>
               
             
@@ -586,8 +586,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-14T14:57:13+08:00">
-                2019-03-14
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-09T11:42:56+08:00">
+                2020-01-09
               </time>
             
 
@@ -605,8 +605,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Tools/" itemprop="url" rel="index">
-                    <span itemprop="name">Tools</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -641,10 +641,11 @@
 
       
         
-          <p>前段时间发现博客的图片都失效了，检查了一下，原来是七牛云现在需要绑定一个备案过的域名来使用。一顿操作下来，终于把自己的域名备案好了，并且连通七牛云也测通了。下面最后一步就是需要把原来的域名全部替换掉。本人是用hexo来搭建博客的，所以只要把_posts文件夹下的所有markdown文件替换一遍就好了。当然有很多方便的方式，由于最近在学习golang，现在把用go实现的笨拙的过程记录下来。其实没啥好说的，直接把贴代码吧。如果有更好的实现方式，可以告知本人，在此谢过。</p>
+          <p>建造者模式描述是：封装一个产品的构造过程，并允许按步骤构造，是在创建一个对象时使用的。我觉得这种模式还是挺常用的，比如Lombok插件的@Builder。下面就来学习下这个模式的细节。</p>
+<h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>假设我们现在要创建一个度假计划，客人可以选择宾馆以及各种门票、餐厅定位，甚至可以选择登记参加特殊的活动。我们正常的构造方式很可能像下面一样：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2019/03/14/golang实现文件内容替换/#more" rel="contents">
+            <a class="btn" href="/2020/01/09/HeadFirst设计模式十七【建造者模式】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -685,7 +686,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/26/Maven学习笔记七【可选的依赖项和依赖项排除】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/04/HeadFirst设计模式十六【桥接模式】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -710,8 +711,8 @@
             
               
                 
-                <a class="post-title-link" href="/2019/02/26/Maven学习笔记七【可选的依赖项和依赖项排除】/" itemprop="url">
-                  Maven学习笔记七【可选的依赖项和依赖项排除】
+                <a class="post-title-link" href="/2020/01/04/HeadFirst设计模式十六【桥接模式】/" itemprop="url">
+                  HeadFirst设计模式十六【桥接模式】
                 </a>
               
             
@@ -725,8 +726,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-02-26T17:42:13+08:00">
-                2019-02-26
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-04T17:43:01+08:00">
+                2020-01-04
               </time>
             
 
@@ -744,8 +745,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Maven/" itemprop="url" rel="index">
-                    <span itemprop="name">Maven</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -780,12 +781,11 @@
 
       
         
-          <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>本节可选的依赖项和排除依赖项。将帮助我们了解它们是什么，合适以及如何使用。它还解释了为什么排除是基于每个依赖项而不是POM级别。</p>
-<h3 id="可选依赖项"><a href="#可选依赖项" class="headerlink" title="可选依赖项"></a>可选依赖项</h3><p>可选的依赖项用于无法(无论出于何种原因)将项目分割为子模块的情况。其思想是，一些依赖项仅用于项目中的某些特性，如果不使用该特性，则不需要这些依赖项。理想情况下，这样的特性应该被分割成依赖于核心功能项目的子模块。这个新的子项目将只有非可选的依赖项，因为如果决定使用子项目的功能，将需要所有这些依赖项。</p>
-<p>然而，由于项目不能分割(同样，出于某种原因)，这些依赖项声明为可选的。如果用户希望使用与可选依赖项相关的功能，他们必须在自己的项目中重新声明该可选依赖项。这不是处理这种情况的最清晰的方法，但是可选的依赖项和排除依赖项都是权宜之计。</p>
+          <p>从这个模式开始，都出现在书的附录中，属于不常用的模式。虽然这样，但是我们还是要学习下，哪怕简单地过一下，最起码要知道每个模式的作用是什么。桥接模式的定义是不只改变你的实现，也改变你的抽象。光从定义，不太能够直观地看出这个模式像干啥。下面还是从场景开始分析，慢慢带入进去。</p>
+<h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>假设现在需要制造电视机的遥控器，每个遥控器都有相同的接口，但是每个电视机的实现各不相同。这个场景很简单，使用继承就能很好的解决问题，下面就按照最简单的方式来实现下。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2019/02/26/Maven学习笔记七【可选的依赖项和依赖项排除】/#more" rel="contents">
+            <a class="btn" href="/2020/01/04/HeadFirst设计模式十六【桥接模式】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -826,7 +826,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/27/Maven学习笔记六【依赖机制】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/30/HeadFirst设计模式十五【复合模式之MVC模式】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -851,8 +851,8 @@
             
               
                 
-                <a class="post-title-link" href="/2018/12/27/Maven学习笔记六【依赖机制】/" itemprop="url">
-                  Maven学习笔记六【依赖机制】
+                <a class="post-title-link" href="/2019/12/30/HeadFirst设计模式十五【复合模式之MVC模式】/" itemprop="url">
+                  HeadFirst设计模式十五【复合模式之MVC模式】
                 </a>
               
             
@@ -866,8 +866,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-27T14:07:27+08:00">
-                2018-12-27
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-12-30T10:50:35+08:00">
+                2019-12-30
               </time>
             
 
@@ -885,8 +885,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Maven/" itemprop="url" rel="index">
-                    <span itemprop="name">Maven</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -921,15 +921,11 @@
 
       
         
-          <p>本节来学习Maven地依赖机制。</p>
-<p>依赖关系管理是Maven的一个核心特性。管理单个项目的依赖关系很容易。管理由数百个模块组成的项目的依赖关系是可能的。Maven在定义、创建和维护具有良好定义地类路径和库版本的可重复构建方面帮助很大。</p>
-<h3 id="传递依赖"><a href="#传递依赖" class="headerlink" title="传递依赖"></a>传递依赖</h3><p>Maven通过自动包含传递依赖项，来避免查找和指定自己的依赖项所需要的库。</p>
-<p>通过从指定的远程存储库中读取依赖项的项目文件，可以简化该特性。通常，这些项目的所有依赖项都在项目中使用，项目从其父项目继承的依赖项或从其依赖项继承的依赖项也是如此。</p>
-<p>可以从依赖项收集的几部数量没有限制，只有在发现循环依赖关系时才会出现问题。</p>
-<p>通过传递依赖关系，所包含库地图可以快速增长到相当大。由于这个原因，还有一些附加特性限制了所包含的依赖关系：</p>
+          <p>本章节我们将来学习复合模式的典范：MVC模式，也就是我们一直在用的视图、模型、控制器。将剖析其内部运作细节，从而进一步了解到复合模式的好处。</p>
+<h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>书中描述了一个MP3播放器的场景，比如说iTune。可以用它的界面加入新的歌曲、管理播放清单、将歌曲改名。播放器有一个小型数据库，记录所有的歌曲合相关的名字合数据。播放器也可以播歌，而播歌时用户界面会显示当时的歌曲标题、运行时间等信息。MVC模式的流程大致如下：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2018/12/27/Maven学习笔记六【依赖机制】/#more" rel="contents">
+            <a class="btn" href="/2019/12/30/HeadFirst设计模式十五【复合模式之MVC模式】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -965,7 +961,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1006,7 +1002,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-count">138</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1014,7 +1010,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1023,7 +1019,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1085,7 +1081,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

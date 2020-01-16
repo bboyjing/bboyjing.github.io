@@ -1,0 +1,813 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.proxy.ustclug.org/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,设计模式," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="书上给代理模式的定义是：控制和管理访问。具体是要控制和管理什么，我们本章就来学习下。 场景描述继续沿用上一章糖果机的例子，假如现在希望能够更好的监控糖果机，要生成一份库存以及机器状态的报告。拷贝上一章最终版的代码，稍做修改即可。">
+<meta name="keywords" content="Java,设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HeadFirst设计模式十三【代理模式】">
+<meta property="og:url" content="http://yoursite.com/2019/11/27/HeadFirst设计模式十三【代理模式】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="书上给代理模式的定义是：控制和管理访问。具体是要控制和管理什么，我们本章就来学习下。 场景描述继续沿用上一章糖果机的例子，假如现在希望能够更好的监控糖果机，要生成一份库存以及机器状态的报告。拷贝上一章最终版的代码，稍做修改即可。">
+<meta property="og:updated_time" content="2019-12-07T06:01:33.415Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HeadFirst设计模式十三【代理模式】">
+<meta name="twitter:description" content="书上给代理模式的定义是：控制和管理访问。具体是要控制和管理什么，我们本章就来学习下。 场景描述继续沿用上一章糖果机的例子，假如现在希望能够更好的监控糖果机，要生成一份库存以及机器状态的报告。拷贝上一章最终版的代码，稍做修改即可。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/11/27/HeadFirst设计模式十三【代理模式】/"/>
+
+
+
+
+
+  <title> HeadFirst设计模式十三【代理模式】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/27/HeadFirst设计模式十三【代理模式】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                HeadFirst设计模式十三【代理模式】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-11-27T16:33:48+08:00">
+                2019-11-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>书上给代理模式的定义是：控制和管理访问。具体是要控制和管理什么，我们本章就来学习下。</p>
+<h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>继续沿用上一章糖果机的例子，假如现在希望能够更好的监控糖果机，要生成一份库存以及机器状态的报告。拷贝上一章最终版的代码，稍做修改即可。</p>
+<a id="more"></a>
+<ol>
+<li><p>修改糖果机，添加<code>location</code>信息</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GumballMachine</span> </span>&#123;</div><div class="line">    ......</div><div class="line">    String location;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">GumballMachine</span><span class="params">(<span class="keyword">int</span> numberGumballs, String location)</span> </span>&#123;</div><div class="line">        ......</div><div class="line">        <span class="keyword">this</span>.location = location;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getLocation</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> location;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">public</span> State <span class="title">getState</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> state;</div><div class="line">    &#125;</div><div class="line">    ......</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>添加糖果监视器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GumballMonitor</span> </span>&#123;</div><div class="line">    GumballMachine gumballMachine;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">GumballMonitor</span><span class="params">(GumballMachine gumballMachine)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.gumballMachine = gumballMachine;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">report</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"Gumball machine: "</span> + gumballMachine.getLocation());</div><div class="line">        System.out.println(<span class="string">"Current inventory: "</span> + gumballMachine.getCount() + <span class="string">" gumballs"</span>);</div><div class="line">        System.out.println(<span class="string">"Current state: "</span> + gumballMachine.getState());</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>测试</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        GumballMachine gumballMachine = <span class="keyword">new</span> GumballMachine(<span class="number">5</span>, <span class="string">"Gumball--1"</span>);</div><div class="line">        GumballMonitor gumballMonitor = <span class="keyword">new</span> GumballMonitor(gumballMachine);</div><div class="line">        gumballMonitor.report();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>上面实现了最简单的监视器，但这还远远不够，而真正的需求是远程监控。目前监视器和糖果机再同一个JVM下运行没，如果想在远程桌面上看到监控信息，该怎么办呢。远程代理(Remote Proxy)可以帮助我们处理这样的场景。</p>
+<h3 id="通过远程代理实现远程监控"><a href="#通过远程代理实现远程监控" class="headerlink" title="通过远程代理实现远程监控"></a>通过远程代理实现远程监控</h3><p>所谓远程代理，其实就是要创建一个代理，知道如何调用在另一个JVM中的对象的方法。Java已经内置了远程调用功能，其缩写就叫RMI(Remote Method Invocation )，从名字就已经很清楚它的作用了。下面先来了解下RMI，然后再改造糖果机。</p>
+<h4 id="RMI"><a href="#RMI" class="headerlink" title="RMI"></a>RMI</h4><p>实现RMI需要五个步骤，下面逐一看下：</p>
+<ol>
+<li><p>制作远程接口，该接口定义出可以让客户远程调用的方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * 扩展Remote接口，该接口没有方法，具有特别的意义</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">MyRemote</span> <span class="keyword">extends</span> <span class="title">Remote</span> </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 申明抛出RemoteException异常</div><div class="line">     * 确保参数、返回值可序列化</div><div class="line">     *</div><div class="line">     * <span class="doctag">@return</span></div><div class="line">     * <span class="doctag">@throws</span> RemoteException</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">sayHello</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>制作远程实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * 实现MyRemote接口</div><div class="line"> * 扩展UnicastRemoteObject来称为远程服务对象</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyRemoteImpl</span> <span class="keyword">extends</span> <span class="title">UnicastRemoteObject</span> <span class="keyword">implements</span> <span class="title">MyRemote</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 声明默认构造函数，抛出RemoteException，因为超类的构造函数中抛出该异常</div><div class="line">     *</div><div class="line">     * <span class="doctag">@throws</span> RemoteException</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyRemoteImpl</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException </span>&#123;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">sayHello</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Server says, Hey"</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 实例化MyRemoteImpl服务，注册到RMI Registry中</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> args</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            MyRemote service = <span class="keyword">new</span> MyRemoteImpl();</div><div class="line">            Naming.rebind(<span class="string">"RemoteHello"</span>, service);</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>产生Stub和Skeleton，Stub是客户辅助对象，Skeleton是服务辅助对象。这两个类是通过JDK提供的一个工具rmic生成的。最新的Java会出现警告，提示不再需要通过rmic生成Stub和Skeleto。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 假设标准的maven项目，cd到上面两个类所在的文件夹</div><div class="line">❯ cd src/main/java/cn/didadu/sample/headFirstPatterns/proxy/rmi</div><div class="line"><span class="meta">#</span> 编译java文件</div><div class="line">❯ javac -d . *.java</div><div class="line"><span class="meta">#</span> 使用rmic生成辅助对象</div><div class="line">❯ rmic -d . cn.didadu.sample.headFirstPatterns.proxy.rmi.MyRemoteImpl</div></pre></td></tr></table></figure>
+</li>
+<li><p>执行remiregistry，开启一个终端，启动remiregistry</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">❯ cd src/main/java/cn/didadu/sample/headFirstPatterns/proxy/rmi</div><div class="line">❯ rmiregistry</div></pre></td></tr></table></figure>
+</li>
+<li><p>启动服务，重新开启一个终端，运行MyRemoteImpl的mian方法</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">❯ cd src/main/java/cn/didadu/sample/headFirstPatterns/proxy/rmi</div><div class="line">❯ java cn.didadu.sample.headFirstPatterns.proxy.rmi.MyRemoteImpl</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>服务提供实现完了，下面看下调用方如何实现：</p>
+<ol>
+<li><p>实现调用逻辑</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyRemoteClient</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="comment">// 通过注册名称到RMI Registry中寻找服务</span></div><div class="line">            MyRemote service = (MyRemote) Naming.lookup(<span class="string">"rmi://127.0.0.1/RemoteHello"</span>);</div><div class="line">            <span class="comment">// 调用Stub对象的方法</span></div><div class="line">            String s = service.sayHello();</div><div class="line">            System.out.println(s);</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>编译、运行，这里要保证所有的class文件都在同一个地方</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">❯ cd src/main/java/cn/didadu/sample/headFirstPatterns/proxy/rmi</div><div class="line">❯ javac -d . MyRemoteClient.java</div><div class="line">❯ java cn.didadu.sample.headFirstPatterns.proxy.rmi.MyRemoteClient </div><div class="line">Server says, Hey</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>至此，我们打下了RMI的基础，下面可以着手来实现糖果机的远程监控了。</p>
+<h4 id="通过RMI实现糖果机的远程代理"><a href="#通过RMI实现糖果机的远程代理" class="headerlink" title="通过RMI实现糖果机的远程代理"></a>通过RMI实现糖果机的远程代理</h4><p>我们已经有了RMI的基础，现在可以i用RMI实现糖果机的远程代理了。我们来看看糖果机时如何套用RMI框架的：</p>
+<ol>
+<li><p>拷贝上面场景描述中糖果监视器的全部代码，我们再此基础上进行修改</p>
+</li>
+<li><p>创建远程接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">GumballMachineRemote</span> <span class="keyword">extends</span> <span class="title">Remote</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getCount</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getLocation</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> State <span class="title">getState</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>State扩展序列化接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * 只要扩展Serializable接口，所有的子类就可以自爱网络上传送了</div><div class="line"> */</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">State</span> <span class="keyword">extends</span> <span class="title">Serializable</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insertQuarter</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ejectQuarter</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">turnCrank</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">dispense</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>在每个状态的GumballMachine成员变量前添加transient，因为我们不希望整个糖果机都被序列化并随着State对象一起传送，我们挑一个展示下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WinnerState</span> <span class="keyword">implements</span> <span class="title">State</span> </span>&#123;</div><div class="line">    <span class="keyword">transient</span>  GumballMachine gumballMachine;</div><div class="line">    ......</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>修改糖果机，将其变成远程接口，并添加启动main函数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GumballMachine</span> <span class="keyword">extends</span> <span class="title">UnicastRemoteObject</span> <span class="keyword">implements</span> <span class="title">GumballMachineRemote</span> </span>&#123;</div><div class="line">    ......</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">GumballMachine</span><span class="params">(<span class="keyword">int</span> numberGumballs, String location)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</div><div class="line">        ......</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getCount</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> count;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getLocation</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> location;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> State <span class="title">getState</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> state;</div><div class="line">    &#125;</div><div class="line">  </div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            GumballMachine gumballMachine = <span class="keyword">new</span> GumballMachine(<span class="number">100</span>, <span class="string">"Gumball--1"</span>);</div><div class="line">            Naming.rebind(<span class="string">"GumballMachineRemote"</span>, gumballMachine);</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>添加客户端调用测试</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GumballMachineClient</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            GumballMachineRemote gumballMachine = (GumballMachineRemote) Naming.lookup(<span class="string">"GumballMachineRemote"</span>);</div><div class="line">            System.out.println(<span class="string">"Gumball machine: "</span> + gumballMachine.getLocation());</div><div class="line">            System.out.println(<span class="string">"Current inventory: "</span> + gumballMachine.getCount() + <span class="string">" gumballs"</span>);</div><div class="line">            System.out.println(<span class="string">"Current state: "</span> + gumballMachine.getState());</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>测试</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span> 1、进入代码所在的目录，当做工作空间</div><div class="line">❯ cd src/main/java/cn/didadu/sample/headFirstPatterns/proxy/gumballremote</div><div class="line"><span class="meta">#</span> 2、编译java文件</div><div class="line">❯ javac -d . *.java</div><div class="line"><span class="meta">#</span> 3、新开一个终端，在工作空间启动rmiregistry</div><div class="line">❯ rmiregistry</div><div class="line"><span class="meta">#</span> 4、新开一个终端，在工作空间运行GumballMachine</div><div class="line">❯ java cn.didadu.sample.headFirstPatterns.proxy.gumballremote.GumballMachine</div><div class="line"><span class="meta">#</span> 5、新开一个终端，在工作空间运行GumballMachineClient</div><div class="line">❯ java cn.didadu.sample.headFirstPatterns.proxy.gumballremote.GumballMachineClient</div><div class="line">Gumball machine: Gumball--1</div><div class="line">Current inventory: 100 gumballs</div><div class="line">Current state: cn.didadu.sample.headFirstPatterns.proxy.gumballremote.NoQuarterState@439f5b3d</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>远程监控版的糖果机实现完了，这个模式给人的感觉是没有什么太多的技巧，基本上就是在使用Java提供的RMI功能。但整个章节并未到此，远程代理只是代理模式的一种，下面看看代理模式还有其他哪些用法。</p>
+<h3 id="虚拟代理-Virtual-Proxy"><a href="#虚拟代理-Virtual-Proxy" class="headerlink" title="虚拟代理(Virtual Proxy)"></a>虚拟代理(Virtual Proxy)</h3><p>虚拟代理作为创建大的开销对象的代表，经常知道我们真正需要一个对象的时候才创建它。当对象在创建前和创建中时，由虚拟代理来扮演对象的替身。对象创建后，代理就会将请求直接委托给对象。</p>
+<p>这里打算建立一个应用程序，用来展示最喜欢的CD封面。我们建立一个CD标题菜单，然后从amazon.com等网站中取得CD封面图。可以创建一个Icon接口从网络上加载图像唯一的问题是，限于连接带宽和网络负载，下载可能需要一些时间，所以在等待图像加载的时候，应该显示一些东西，比如：CD封面加载中，请稍候……。想做到这样，简单的方式就是利用虚拟代理，代理Icon，管理背景的加载，一旦加载完成，代理就把显示的职责委托给Icon。</p>
+<p>我们使用ImageProxy类来作为虚拟代理类，其工作流程如下：</p>
+<ol>
+<li>ImageProxy首先创建一个ImageIcon，然后开始从网络URL上加载图像</li>
+<li>在加载的过程中，ImageProxy显示CD封面加载中，请稍候……</li>
+<li>当图像加载完毕，ImageProxy把所有方法调用委托给真正的ImageIcon，这些方法包括paintIcon()、getWidth()、getHeight()。</li>
+<li>如果用户请求新的图像，我们就创建新的代理，重复这样的过程</li>
+</ol>
+<p>下面来实现代码：</p>
+<ol>
+<li><p>实现ImageProxy</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ImageProxy</span> <span class="keyword">implements</span> <span class="title">Icon</span> </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line">  * 希望在加载后显示出来的真正图像</div><div class="line">     */</div><div class="line">    ImageIcon imageIcon;</div><div class="line">    URL imageURL;</div><div class="line">    Thread retrievalThread;</div><div class="line">    <span class="keyword">boolean</span> retrieving = <span class="keyword">false</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ImageProxy</span><span class="params">(URL imageURL)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.imageURL = imageURL;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 在屏幕上绘制图像</div><div class="line">     */</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">paintIcon</span><span class="params">(Component c, Graphics g, <span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (imageIcon != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="comment">// 如果已经有icon，就告诉它画出自己</span></div><div class="line">            imageIcon.paintIcon(c, g, x, y);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="comment">// 否则就显示加载中......</span></div><div class="line">            g.drawString(<span class="string">"Logading CD cover, please wait..."</span>, x + <span class="number">300</span>, y + <span class="number">190</span>);</div><div class="line">            <span class="keyword">if</span> (!retrieving) &#123;</div><div class="line">                retrieving = <span class="keyword">true</span>;</div><div class="line">                retrievalThread = <span class="keyword">new</span> Thread(() -&gt; &#123;</div><div class="line">                    <span class="keyword">try</span> &#123;</div><div class="line">                        imageIcon = <span class="keyword">new</span> ImageIcon(imageURL, <span class="string">"CD Cover"</span>);</div><div class="line">                        c.repaint();</div><div class="line">                    &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">                        e.printStackTrace();</div><div class="line">                    &#125;</div><div class="line">                &#125;);</div><div class="line">                retrievalThread.start();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getIconWidth</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (imageIcon != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">return</span> imageIcon.getIconWidth();</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="keyword">return</span> <span class="number">800</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getIconHeight</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (imageIcon != <span class="keyword">null</span>) &#123;</div><div class="line">            <span class="keyword">return</span> imageIcon.getIconHeight();</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="keyword">return</span> <span class="number">800</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<ol>
+<li><p>创建Image组件，这个是属于Swing范畴，不深究了，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ImageComponent</span> <span class="keyword">extends</span> <span class="title">JComponent</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1L</span>;</div><div class="line">    <span class="keyword">private</span> Icon icon;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ImageComponent</span><span class="params">(Icon icon)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.icon = icon;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setIcon</span><span class="params">(Icon icon)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.icon = icon;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">paintComponent</span><span class="params">(Graphics g)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>.paintComponent(g);</div><div class="line">        <span class="keyword">int</span> w = icon.getIconWidth();</div><div class="line">        <span class="keyword">int</span> h = icon.getIconHeight();</div><div class="line">        <span class="keyword">int</span> x = (<span class="number">800</span> - w) / <span class="number">2</span>;</div><div class="line">        <span class="keyword">int</span> y = (<span class="number">600</span> - h) / <span class="number">2</span>;</div><div class="line">        icon.paintIcon(<span class="keyword">this</span>, g, x, y);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>测试</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</div><div class="line">    ImageComponent imageComponent;</div><div class="line">    JFrame frame = <span class="keyword">new</span> JFrame(<span class="string">"CD Cover Viewer"</span>);</div><div class="line">    JMenuBar menuBar;</div><div class="line">    JMenu menu;</div><div class="line">    Hashtable&lt;String, String&gt; cds = <span class="keyword">new</span> Hashtable&lt;String, String&gt;();</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Test</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        cds.put(<span class="string">"Buddha Bar"</span>, <span class="string">"http://images.amazon.com/images/P/B00009XBYK.01.LZZZZZZZ.jpg"</span>);</div><div class="line">        cds.put(<span class="string">"Ima"</span>, <span class="string">"http://images.amazon.com/images/P/B000005IRM.01.LZZZZZZZ.jpg"</span>);</div><div class="line">        cds.put(<span class="string">"Karma"</span>, <span class="string">"http://images.amazon.com/images/P/B000005DCB.01.LZZZZZZZ.gif"</span>);</div><div class="line">        cds.put(<span class="string">"MCMXC A.D."</span>, <span class="string">"http://images.amazon.com/images/P/B000002URV.01.LZZZZZZZ.jpg"</span>);</div><div class="line">        cds.put(<span class="string">"Northern Exposure"</span>, <span class="string">"http://images.amazon.com/images/P/B000003SFN.01.LZZZZZZZ.jpg"</span>);</div><div class="line">        cds.put(<span class="string">"Selected Ambient Works, Vol. 2"</span>, <span class="string">"http://images.amazon.com/images/P/B000002MNZ.01.LZZZZZZZ.jpg"</span>);</div><div class="line"></div><div class="line">        URL initialURL = <span class="keyword">new</span> URL((String) cds.get(<span class="string">"Selected Ambient Works, Vol. 2"</span>));</div><div class="line">        menuBar = <span class="keyword">new</span> JMenuBar();</div><div class="line">        menu = <span class="keyword">new</span> JMenu(<span class="string">"Favorite CDs"</span>);</div><div class="line">        menuBar.add(menu);</div><div class="line">        frame.setJMenuBar(menuBar);</div><div class="line"></div><div class="line">        <span class="keyword">for</span> (Enumeration&lt;String&gt; e = cds.keys(); e.hasMoreElements(); ) &#123;</div><div class="line">            String name = (String) e.nextElement();</div><div class="line">            JMenuItem menuItem = <span class="keyword">new</span> JMenuItem(name);</div><div class="line">            menu.add(menuItem);</div><div class="line">            menuItem.addActionListener(event -&gt; &#123;</div><div class="line">                imageComponent.setIcon(<span class="keyword">new</span> ImageProxy(getCDUrl(event.getActionCommand())));</div><div class="line">                frame.repaint();</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        Icon icon = <span class="keyword">new</span> ImageProxy(initialURL);</div><div class="line">        imageComponent = <span class="keyword">new</span> ImageComponent(icon);</div><div class="line">        frame.getContentPane().add(imageComponent);</div><div class="line">        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</div><div class="line">        frame.setSize(<span class="number">800</span>, <span class="number">600</span>);</div><div class="line">        frame.setVisible(<span class="keyword">true</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function">URL <span class="title">getCDUrl</span><span class="params">(String name)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">new</span> URL((String) cds.get(name));</div><div class="line">        &#125; <span class="keyword">catch</span> (MalformedURLException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        Test testDrive = <span class="keyword">new</span> Test();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这个模式是用ImageProxy代理了ImageIcon，没有什么太花哨的技巧，但是很实用。</p>
+</li>
+</ol>
+<h3 id="保护代理"><a href="#保护代理" class="headerlink" title="保护代理"></a>保护代理</h3><p>这一小节我们将利用Java API的动态代理来创建下一个代理实现：保护代理。我们虚构一个约会服务系统，在服务中假如Hot和Not评鉴，Hot表示喜欢对方，Not表示不喜欢。下面就来实现：</p>
+<ol>
+<li><p>创建一个Person bean，允许设置或取得一个人的信息</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">PersonBean</span> </span>&#123;</div><div class="line">    <span class="function">String <span class="title">getName</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="function">String <span class="title">getGender</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="function">String <span class="title">getInterests</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getHotOrNotRating</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span></span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setGender</span><span class="params">(String gender)</span></span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setInterests</span><span class="params">(String interests)</span></span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setHotOrNotRating</span><span class="params">(<span class="keyword">int</span> rating)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>实现Person bean</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PersonBeanImpl</span> <span class="keyword">implements</span> <span class="title">PersonBean</span> </span>&#123;</div><div class="line">    String name;</div><div class="line">    String gender;</div><div class="line">    String interests;</div><div class="line">    <span class="keyword">int</span> rating;</div><div class="line">    <span class="keyword">int</span> ratingCount = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> name;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getGender</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> gender;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getInterests</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> interests;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getHotOrNotRating</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (rating == <span class="number">0</span>) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> rating / ratingCount;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.name = name;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setGender</span><span class="params">(String gender)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.gender = gender;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setInterests</span><span class="params">(String interests)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.interests = interests;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setHotOrNotRating</span><span class="params">(<span class="keyword">int</span> rating)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.rating += rating;</div><div class="line">        ratingCount++;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>在这个例子中，我们希望用户可以设置自己的信息，同时又放置他人更改这些信息。而HotOrNot评分则相反，不能更改自己的评分，但是他人可以设置自己的评分。在PersonBean中所有的方法都是公开的，任何用户都可以调用。现在要将这个问题修正。用户不可以改变自己的HotOrNot评分，也不可以改变其他用户的个人信息。需要创建两个代理：一个访问自己的PersonBean对象，另一个访问另一个用户的PersonBean对象。这样，代理就可以控制在每一种情况下允许哪一种请求。下面使用Java API的动态代理来实现：</p>
+<ol>
+<li><p>创建两个InvocatonHandler，该类实现了代理的行为，是真正跑业务逻辑的地方</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OwnerInvocationHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</div><div class="line">    PersonBean personBean;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">OwnerInvocationHandler</span><span class="params">(PersonBean personBean)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.personBean = personBean;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">if</span> (method.getName().startsWith(<span class="string">"get"</span>)) &#123;</div><div class="line">                <span class="keyword">return</span> method.invoke(personBean, args);</div><div class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.getName().equals(<span class="string">"setHotOrNotRating"</span>)) &#123;</div><div class="line">                <span class="comment">// 禁止调用自己的setHotOrNotRating()方法</span></div><div class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> IllegalAccessException();</div><div class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.getName().startsWith(<span class="string">"set"</span>)) &#123;</div><div class="line">                <span class="keyword">return</span> method.invoke(personBean, args);</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">catch</span> (InvocationTargetException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NonOwnerInvocationHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</div><div class="line">    PersonBean personBean;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NonOwnerInvocationHandler</span><span class="params">(PersonBean personBean)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.personBean = personBean;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">if</span> (method.getName().startsWith(<span class="string">"get"</span>)) &#123;</div><div class="line">                <span class="keyword">return</span> method.invoke(personBean, args);</div><div class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.getName().equals(<span class="string">"setHotOrNotRating"</span>)) &#123;</div><div class="line">                <span class="keyword">return</span> method.invoke(personBean, args);</div><div class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (method.getName().startsWith(<span class="string">"set"</span>)) &#123;</div><div class="line">                <span class="comment">// 禁止调用其他set方法</span></div><div class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> IllegalAccessException();</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">catch</span> (InvocationTargetException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>测试</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</div><div class="line">    HashMap&lt;String, PersonBean&gt; datingDB = <span class="keyword">new</span> HashMap&lt;String, PersonBean&gt;();</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Test</span><span class="params">()</span> </span>&#123;</div><div class="line">        initializeDatabase();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        Test test = <span class="keyword">new</span> Test();</div><div class="line">        test.drive();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">drive</span><span class="params">()</span> </span>&#123;</div><div class="line">        PersonBean joe = getPersonFromDatabase(<span class="string">"Joe Javabean"</span>);</div><div class="line">        PersonBean ownerProxy = getOwnerProxy(joe);</div><div class="line">        System.out.println(<span class="string">"Name is "</span> + ownerProxy.getName());</div><div class="line">        ownerProxy.setInterests(<span class="string">"bowling, Go"</span>);</div><div class="line">        System.out.println(<span class="string">"Interests set from owner proxy"</span>);</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            ownerProxy.setHotOrNotRating(<span class="number">10</span>);</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            System.out.println(<span class="string">"Can't set rating from owner proxy"</span>);</div><div class="line">        &#125;</div><div class="line">        System.out.println(<span class="string">"Rating is "</span> + ownerProxy.getHotOrNotRating());</div><div class="line"></div><div class="line">        PersonBean noOwnerProxy = getNonOwnerProxy(joe);</div><div class="line">        System.out.println(<span class="string">"Name is "</span> + noOwnerProxy.getName());</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            noOwnerProxy.setInterests(<span class="string">"bowling, Go"</span>);</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            System.out.println(<span class="string">"Can't set interests from non owner proxy"</span>);</div><div class="line">        &#125;</div><div class="line">        noOwnerProxy.setHotOrNotRating(<span class="number">3</span>);</div><div class="line">        System.out.println(<span class="string">"Rating set from non owner proxy"</span>);</div><div class="line">        System.out.println(<span class="string">"Rating is "</span> + noOwnerProxy.getHotOrNotRating());</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 初始化数据</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">initializeDatabase</span><span class="params">()</span> </span>&#123;</div><div class="line">        PersonBean joe = <span class="keyword">new</span> PersonBeanImpl();</div><div class="line">        joe.setName(<span class="string">"Joe Javabean"</span>);</div><div class="line">        joe.setInterests(<span class="string">"cars, computers, music"</span>);</div><div class="line">        joe.setHotOrNotRating(<span class="number">7</span>);</div><div class="line">        datingDB.put(joe.getName(), joe);</div><div class="line"></div><div class="line">        PersonBean kelly = <span class="keyword">new</span> PersonBeanImpl();</div><div class="line">        kelly.setName(<span class="string">"Kelly Klosure"</span>);</div><div class="line">        kelly.setInterests(<span class="string">"ebay, movies, music"</span>);</div><div class="line">        kelly.setHotOrNotRating(<span class="number">6</span>);</div><div class="line">        datingDB.put(kelly.getName(), kelly);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function">PersonBean <span class="title">getPersonFromDatabase</span><span class="params">(String name)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> (PersonBean) datingDB.get(name);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function">PersonBean <span class="title">getOwnerProxy</span><span class="params">(PersonBean person)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> (PersonBean) Proxy.newProxyInstance(</div><div class="line">                person.getClass().getClassLoader(),</div><div class="line">                person.getClass().getInterfaces(),</div><div class="line">                <span class="keyword">new</span> OwnerInvocationHandler(person));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function">PersonBean <span class="title">getNonOwnerProxy</span><span class="params">(PersonBean person)</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> (PersonBean) Proxy.newProxyInstance(</div><div class="line">                person.getClass().getClassLoader(),</div><div class="line">                person.getClass().getInterfaces(),</div><div class="line">                <span class="keyword">new</span> NonOwnerInvocationHandler(person)</div><div class="line">        );</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>Java动态代理之前接触的比较多的是在被代理的行为前后插入额外的动作，比如记录日志啊之类的。这一小节看到，在权限控制方便也起到不错的效果，以后写框架的时候可以借鉴。</p>
+<p>最后再回顾之前学习的几种容易混淆的设计模式的描述：</p>
+<ul>
+<li>装饰者：包装另一个对象，并提供额外的行为</li>
+<li>外观：包装许多对象以简化它们的接口</li>
+<li>代理：包装另一个对象，并控制对他们的访问</li>
+<li>适配器：包装另一个对象，并提供不同的接口</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/设计模式/" rel="tag"># 设计模式</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/25/HeadFirst设计模式十二【状态模式】/" rel="next" title="HeadFirst设计模式十二【状态模式】">
+                <i class="fa fa-chevron-left"></i> HeadFirst设计模式十二【状态模式】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/07/HeadFirst设计模式十四【复合模式】/" rel="prev" title="HeadFirst设计模式十四【复合模式】">
+                HeadFirst设计模式十四【复合模式】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">138</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://mokaikai.github.io/" title="500" target="_blank">500</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.lamborryan.com/" title="追风的蓝宝" target="_blank">追风的蓝宝</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#场景描述"><span class="nav-number">1.</span> <span class="nav-text">场景描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过远程代理实现远程监控"><span class="nav-number">2.</span> <span class="nav-text">通过远程代理实现远程监控</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#RMI"><span class="nav-number">2.1.</span> <span class="nav-text">RMI</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#通过RMI实现糖果机的远程代理"><span class="nav-number">2.2.</span> <span class="nav-text">通过RMI实现糖果机的远程代理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#虚拟代理-Virtual-Proxy"><span class="nav-number">3.</span> <span class="nav-text">虚拟代理(Virtual Proxy)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#保护代理"><span class="nav-number">4.</span> <span class="nav-text">保护代理</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

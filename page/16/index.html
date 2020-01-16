@@ -266,7 +266,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/12/Redis学习笔记十一【使用Redis构建支持程序】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/08/自己动手写JVM十八【类和对象（一）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/12/12/Redis学习笔记十一【使用Redis构建支持程序】/" itemprop="url">
-                  Redis学习笔记十一【使用Redis构建支持程序】
+                <a class="post-title-link" href="/2017/02/08/自己动手写JVM十八【类和对象（一）】/" itemprop="url">
+                  自己动手写JVM十八【类和对象（一）】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-12T14:10:22+08:00">
-                2016-12-12
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-08T10:15:09+08:00">
+                2017-02-08
               </time>
             
 
@@ -325,8 +325,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis/" itemprop="url" rel="index">
-                    <span itemprop="name">Redis</span>
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
                   </a>
                 </span>
 
@@ -361,11 +361,12 @@
 
       
         
-          <p>之前学习了如何将Redis用作整个系统的一部分，这一章将来学习写如何使用Redis来构建辅助程序。代码示例位于<a href="https://github.com/bboyjing/redis-sample" target="_blank" rel="external">redis-sample项目</a>的support模块中。</p>
-<h3 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h3><p>使用列表存储最新的日志记录：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">logRecent</span><span class="params">(String name, String message, String severity)</span> </span>&#123;</div><div class="line">    <span class="keyword">final</span> <span class="keyword">byte</span>[] destination = stringRedisTemplate</div><div class="line">            .getStringSerializer()</div><div class="line">            .serialize(<span class="string">"recent_"</span> + name + <span class="string">"_"</span> + severity);</div><div class="line">    RedisCallback&lt;Object&gt; pipelineCallback = redisConnection -&gt; &#123;</div><div class="line">        redisConnection.lPush(destination,</div><div class="line">                (TIMESTAMP.format(<span class="keyword">new</span> Date()) + <span class="string">' '</span> + message).getBytes());</div><div class="line">        redisConnection.lTrim(destination, <span class="number">0</span>, <span class="number">99</span>);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    &#125;;</div><div class="line">    stringRedisTemplate.executePipelined(pipelineCallback);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+          <p>本章将实现线程共享的运行时数据区，包括方法去和运行时常量池。将进一步处理ClassFile结构体，把它加以转换，放进方法去以后供后续使用。还会初步讨论类和对象的设计，实现一个简单的类加载器，并且实现类和对象相关的部分指令。本章实现代码位于/rtdata/heap包下，先将之间定义的object.go文件移到heap包下，注意修改包名，以及使用到Object结构体的文件(slot.go、local_vars.go、operand_stack.go)。</p>
+<h3 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h3><p>方法区是运行时数据区的一块逻辑区域，由多个线程共享。方法区主要存放从class文件获取的类信息，此外，类变量也存放在方法区中。当Java虚拟机第一次使用某个类时，它会搜索类路径，找到相应的class文件，然后读取并解析class文件，把相关信息放进方法区。至于方法区到底位于何处，是固定大小还是动态调整，是否参与垃圾回收，以及如何在方法区内存放类数据等，Java虚拟机规范并没有明确规定。下面先来看看有哪些信息需要放进方法区。</p>
+<!--原作者把本章代码放到/rtdata/heap包下，虽然Java虚拟机规范把方法区描述为堆的一个逻辑部分，但是它却有一个别名叫作Non-heap(非堆)，目的应该是与Java堆区分开。所以我们把方法区这部分实现放到/rtdata/nonheap包下，-->
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/12/12/Redis学习笔记十一【使用Redis构建支持程序】/#more" rel="contents">
+            <a class="btn" href="/2017/02/08/自己动手写JVM十八【类和对象（一）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -406,7 +407,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/08/Redis学习笔记十【Redis事物】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/07/自己动手写JVM十七【指令集和解释器（五）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -431,8 +432,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/12/08/Redis学习笔记十【Redis事物】/" itemprop="url">
-                  Redis学习笔记十【Redis事物】
+                <a class="post-title-link" href="/2017/02/07/自己动手写JVM十七【指令集和解释器（五）】/" itemprop="url">
+                  自己动手写JVM十七【指令集和解释器（五）】
                 </a>
               
             
@@ -446,8 +447,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-08T19:24:54+08:00">
-                2016-12-08
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-07T13:34:02+08:00">
+                2017-02-07
               </time>
             
 
@@ -465,8 +466,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis/" itemprop="url" rel="index">
-                    <span itemprop="name">Redis</span>
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
                   </a>
                 </span>
 
@@ -501,11 +502,11 @@
 
       
         
-          <p>前面章节已经涉及过基本的Redis事物，知晓了Redis的事物和传统的关系型数据库的事物并不相同。Redis虽然有简单的方法可以处理一连串相互一致的读操作和写操作，但是没有办法根据读取到的数据为依据来进行相关操作，这种无法以一致性的形式读取数据的行为将导致某一类型的问题变得难以解决。</p>
-<h3 id="模拟场景演示Redis事物"><a href="#模拟场景演示Redis事物" class="headerlink" title="模拟场景演示Redis事物"></a>模拟场景演示Redis事物</h3><p>下面以一个商品买卖市场为场景，来演示Redis事物的使用，在该场景下，人们可以在市场里自由销售和购买商品。</p>
+          <h3 id="解释器"><a href="#解释器" class="headerlink" title="解释器"></a>解释器</h3><p>指令集已经实现得差不多了，本节将编写一个简单的解释器。这个解释器目前只能执行一个Java方法，后面的章节中会不断完善。解释器实现代码位于/instructions/interpreter.go文件中。</p>
+<p>要实现解释器，还有些额外的代码需要完善：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/12/08/Redis学习笔记十【Redis事物】/#more" rel="contents">
+            <a class="btn" href="/2017/02/07/自己动手写JVM十七【指令集和解释器（五）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -546,7 +547,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/08/Redis学习笔记九【处理系统故障】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/06/自己动手写JVM十六【指令集和解释器（四）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -571,8 +572,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/12/08/Redis学习笔记九【处理系统故障】/" itemprop="url">
-                  Redis学习笔记九【处理系统故障】
+                <a class="post-title-link" href="/2017/02/06/自己动手写JVM十六【指令集和解释器（四）】/" itemprop="url">
+                  自己动手写JVM十六【指令集和解释器（四）】
                 </a>
               
             
@@ -586,8 +587,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-08T16:07:52+08:00">
-                2016-12-08
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-06T13:27:44+08:00">
+                2017-02-06
               </time>
             
 
@@ -605,8 +606,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis/" itemprop="url" rel="index">
-                    <span itemprop="name">Redis</span>
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
                   </a>
                 </span>
 
@@ -641,10 +642,12 @@
 
       
         
-          <p>如果决定要将Redis用作应用程序唯一的数据存储手段的话，那么就必须确保Redis不会丢失任何数据。根提供了ACID保证的传统关系数据库不同，在使用Redis为后端构建应用程序的时候，我们需要多做一些工作才能保证数据的一致性。</p>
+          <p>本章节继续学习指令集和解释器。</p>
+<h3 id="控制指令"><a href="#控制指令" class="headerlink" title="控制指令"></a>控制指令</h3><p>控制指令共有11条，本节实现其中的3条指令：goto、tableswitch和lookupswitch。该系列指令代码位于/instructions/control包下。</p>
+<h4 id="goto指令"><a href="#goto指令" class="headerlink" title="goto指令"></a>goto指令</h4><p>goto指令实现代码位于goto.go文件中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// goto指令结构体</span></div><div class="line"><span class="keyword">type</span> GOTO <span class="keyword">struct</span>&#123; base.BranchInstruction &#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *GOTO)</span> <span class="title">Execute</span><span class="params">(frame *rtdata.Frame)</span></span> &#123;</div><div class="line">	<span class="comment">// 无条件跳转</span></div><div class="line">	base.Branch(frame, self.Offset)</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/12/08/Redis学习笔记九【处理系统故障】/#more" rel="contents">
+            <a class="btn" href="/2017/02/06/自己动手写JVM十六【指令集和解释器（四）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -685,7 +688,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/08/Redis学习笔记八【Redis主从复制】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/06/自己动手写JVM十五【指令集和解释器（三）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -710,8 +713,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/12/08/Redis学习笔记八【Redis主从复制】/" itemprop="url">
-                  Redis学习笔记八【Redis主从复制】
+                <a class="post-title-link" href="/2017/02/06/自己动手写JVM十五【指令集和解释器（三）】/" itemprop="url">
+                  自己动手写JVM十五【指令集和解释器（三）】
                 </a>
               
             
@@ -725,8 +728,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-08T15:31:49+08:00">
-                2016-12-08
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-06T10:07:09+08:00">
+                2017-02-06
               </time>
             
 
@@ -744,8 +747,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis/" itemprop="url" rel="index">
-                    <span itemprop="name">Redis</span>
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
                   </a>
                 </span>
 
@@ -780,10 +783,11 @@
 
       
         
-          <p>对于高负载应用来说，复制(replication)是不可或缺的一个特性，复制可以让其他服务器拥有一个不断地更新的数据副本，从而使得拥有副本数据的服务器可以用于处理客户端发送的读请求。关系型数据库通常会使用一个主服务器(master)向多个从服务器(slave)发送更行，并使用从服务器来处理所有读请求。Redis也采用了同样的方法来实现自己的复制特性，并将其用作扩展性能的一种手段。</p>
+          <p>本章节继续学习指令集和解释器。</p>
+<h3 id="类型转换指令"><a href="#类型转换指令" class="headerlink" title="类型转换指令"></a>类型转换指令</h3><p>类型转换指令大致对应Java语言中的基本类型强制转换操作。按照被转换变量的类型，类型转换指令可以分为4种：i2x系列指令把int变量强制转换成其他类型；l2x系列指令把long变量强制转换成其他类型；f2x系列指令把float变量强制转换成其他类型；d2x系列指令把double变量强制转换成其他类型。该指令实现代码位于/instructions/conversions包下，下面以d2x系类指令为例来学习下，其代码位于d2x.go文件中：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/12/08/Redis学习笔记八【Redis主从复制】/#more" rel="contents">
+            <a class="btn" href="/2017/02/06/自己动手写JVM十五【指令集和解释器（三）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -824,7 +828,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/07/Redis学习笔记七【Redis持久化】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/31/自己动手写JVM十四【指令集和解释器（二）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -849,8 +853,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/12/07/Redis学习笔记七【Redis持久化】/" itemprop="url">
-                  Redis学习笔记七【Redis持久化】
+                <a class="post-title-link" href="/2017/01/31/自己动手写JVM十四【指令集和解释器（二）】/" itemprop="url">
+                  自己动手写JVM十四【指令集和解释器（二）】
                 </a>
               
             
@@ -864,8 +868,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-07T11:41:29+08:00">
-                2016-12-07
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-31T14:36:22+08:00">
+                2017-01-31
               </time>
             
 
@@ -883,8 +887,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis/" itemprop="url" rel="index">
-                    <span itemprop="name">Redis</span>
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
                   </a>
                 </span>
 
@@ -919,10 +923,11 @@
 
       
         
-          <p>本章节我们来看看Redis时如何就爱那个数据存储到硬盘里面，是的数据在Redis重启之后仍然存在的。Redis提供了两种不同的持久化方法来将数据存储到硬盘里面。一种方法叫快照(snapshotting)，它可以将存在于某一时刻的所有数据都写入硬盘里；另一种方法教只追加文件(append-only file, AOF)，它会在执行的写命令复制到硬盘里。这两种方法可以自由搭配使用，具体如何选择，需要根据用书的数据以及应用来决定。下面在Redis安装目录的redis.conf文件中查看下Redis默认的持久化配置：</p>
+          <p>本章节继续学习指令集和解释器。</p>
+<h3 id="存储指令"><a href="#存储指令" class="headerlink" title="存储指令"></a>存储指令</h3><p>和加载指令刚好相反，存储指令把变量从操作数栈顶弹出，然后存入局部变量表。和加载指令一样，存储指令也可以分为6类。存储指令相关代码位于/instructions/stores包下。下面以lstore系列指令为例来学习下，其实现代码位于lstore.go文件中：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/12/07/Redis学习笔记七【Redis持久化】/#more" rel="contents">
+            <a class="btn" href="/2017/01/31/自己动手写JVM十四【指令集和解释器（二）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -958,7 +963,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/15/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/17/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/15/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/17/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -999,7 +1004,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-count">138</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1007,7 +1012,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1016,7 +1021,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1078,7 +1083,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

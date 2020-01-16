@@ -266,7 +266,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/06/Redis学习笔记六【Redis命令-三-】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/24/自己动手写JVM十三【指令集和解释器（一）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/12/06/Redis学习笔记六【Redis命令-三-】/" itemprop="url">
-                  Redis学习笔记六【Redis命令(三)】
+                <a class="post-title-link" href="/2017/01/24/自己动手写JVM十三【指令集和解释器（一）】/" itemprop="url">
+                  自己动手写JVM十三【指令集和解释器（一）】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-06T16:46:59+08:00">
-                2016-12-06
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-24T11:56:18+08:00">
+                2017-01-24
               </time>
             
 
@@ -325,8 +325,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis/" itemprop="url" rel="index">
-                    <span itemprop="name">Redis</span>
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
                   </a>
                 </span>
 
@@ -361,24 +361,11 @@
 
       
         
-          <p>本章节学习一些和数据结构本身没有关系的其他命令</p>
-<h3 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h3><table>
-<thead>
-<tr>
-<th style="text-align:left">命令</th>
-<th style="text-align:center">描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">SORT</td>
-<td style="text-align:center">根据给定的选项，对输入的列表、集合或者有序集合进行排序，返回结果</td>
-</tr>
-</tbody>
-</table>
+          <p>本章节将在前面讲的基础上编写一个简单的解释器，并且实现一些具有代表性的指令，本章涉及到的go代码位于instructions包下。</p>
+<h3 id="字节码和指令集"><a href="#字节码和指令集" class="headerlink" title="字节码和指令集"></a>字节码和指令集</h3><p>Java虚拟机顾名思义，就是一台虚拟的机器，而字节码就是运行在这台虚拟机器上的机器码。字节码中存放编码后的Java虚拟机指令，每条指令都以一个单字节的操作码开头，这就是字节码名称的由来。看到这里才知道，之前的理解有些误区，只有Java方法(非抽象方法和本地方法)的代码才会编译成字节码，所以不能说整个class文件就是字节码，它只是包含字节码。由于只使用一个字节表示操作码，显而易见，Java虚拟机最多只能支持256条指令。到第八版为止，Java虚拟机规范已经定义了205条指令，操作码分别是0x00到0xCA、OxFE和0xFF。这205条指令构成了Java虚拟机的指令集。和汇编语言雷系，为了便于记忆，Java虚拟机规范给每个操作码都指定了一个助记符。比如操作码是0x00这条指令，因为它什么都不做，所以它的助记符是nop(no operation)。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/12/06/Redis学习笔记六【Redis命令-三-】/#more" rel="contents">
+            <a class="btn" href="/2017/01/24/自己动手写JVM十三【指令集和解释器（一）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -419,7 +406,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/11/30/Redis学习笔记五【Redis命令-二-】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/23/自己动手写JVM十二【运行时数据区（二）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -444,8 +431,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/11/30/Redis学习笔记五【Redis命令-二-】/" itemprop="url">
-                  Redis学习笔记五【Redis命令(二)】
+                <a class="post-title-link" href="/2017/01/23/自己动手写JVM十二【运行时数据区（二）】/" itemprop="url">
+                  自己动手写JVM十二【运行时数据区（二）】
                 </a>
               
             
@@ -459,8 +446,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-30T23:31:49+08:00">
-                2016-11-30
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-23T11:47:29+08:00">
+                2017-01-23
               </time>
             
 
@@ -478,8 +465,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis/" itemprop="url" rel="index">
-                    <span itemprop="name">Redis</span>
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
                   </a>
                 </span>
 
@@ -514,36 +501,11 @@
 
       
         
-          <h3 id="散列-HASH"><a href="#散列-HASH" class="headerlink" title="散列(HASH)"></a>散列(HASH)</h3><p>常用命令：</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">命令</th>
-<th style="text-align:center">描述</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">HMGET</td>
-<td style="text-align:center">从散列中获取一个或多个值</td>
-</tr>
-<tr>
-<td style="text-align:left">HMSET</td>
-<td style="text-align:center">为散列中的一个或多个键设值</td>
-</tr>
-<tr>
-<td style="text-align:left">HDEL</td>
-<td style="text-align:center">删除散列中一个或多个值，返回成功删除的键值对数量</td>
-</tr>
-<tr>
-<td style="text-align:left">HLEN</td>
-<td style="text-align:center">返回散列包含的键值对数量</td>
-</tr>
-</tbody>
-</table>
+          <p>本章我们来重点分析下局部变量表和操作数栈，并测试本章代码。</p>
+<h3 id="局部变量表和操作数栈实例详解"><a href="#局部变量表和操作数栈实例详解" class="headerlink" title="局部变量表和操作数栈实例详解"></a>局部变量表和操作数栈实例详解</h3><p>下面以圆形的周长为例进行分析，首先简单的Java代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Math</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        System.out.println(circumference(<span class="number">1.6f</span>));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">float</span> <span class="title">circumference</span><span class="params">(<span class="keyword">float</span> r)</span> </span>&#123;</div><div class="line">        <span class="keyword">float</span> pi = <span class="number">3.14f</span>;</div><div class="line">        <span class="keyword">float</span> c = <span class="number">2</span> * pi * r;</div><div class="line">        <span class="keyword">return</span> c;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/11/30/Redis学习笔记五【Redis命令-二-】/#more" rel="contents">
+            <a class="btn" href="/2017/01/23/自己动手写JVM十二【运行时数据区（二）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -584,7 +546,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/11/22/Redis学习笔记四【Redis命令-一-】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/22/自己动手写JVM十一【运行时数据区（一）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -609,8 +571,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/11/22/Redis学习笔记四【Redis命令-一-】/" itemprop="url">
-                  Redis学习笔记四【Redis命令(一)】
+                <a class="post-title-link" href="/2017/01/22/自己动手写JVM十一【运行时数据区（一）】/" itemprop="url">
+                  自己动手写JVM十一【运行时数据区（一）】
                 </a>
               
             
@@ -624,8 +586,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-22T23:42:37+08:00">
-                2016-11-22
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-22T15:45:36+08:00">
+                2017-01-22
               </time>
             
 
@@ -643,8 +605,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis/" itemprop="url" rel="index">
-                    <span itemprop="name">Redis</span>
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
                   </a>
                 </span>
 
@@ -679,16 +641,11 @@
 
       
         
-          <p>本章以及下面几章将介绍一些第一章没有出现过的常用命令，学习这些命令有助于构建更为复杂的应用。</p>
-<h3 id="字符串-STRING"><a href="#字符串-STRING" class="headerlink" title="字符串(STRING)"></a>字符串(STRING)</h3><p>在Redis中字符串可以存储以下三种类型的值：</p>
-<ul>
-<li>字节串(byte string)</li>
-<li>整数</li>
-<li>浮点数</li>
-</ul>
+          <p>到目前为止，已经实现了搜索、解析class文件，本章节就来讨论下如何初步实现运行时数据区。</p>
+<h3 id="运行时数据区概述"><a href="#运行时数据区概述" class="headerlink" title="运行时数据区概述"></a>运行时数据区概述</h3><p>在运行Java程序时，Java虚拟机需要使用内存在存放各式各样的数据。Java虚拟机规范把这些内存区域叫作运行时数据区。运行时数据区可以分成两类：一类是多线程共享的，另一类则是线程私有的。多线程共享的运行时数据去需要在Java虚拟机启动时创建浩，在Java虚拟机退出时销毁。线程私有的运行时数据区则是在线程创建时才创建，线程退出时销毁。<br>线程私有的运行时数据区用于辅助执行Java字节码。每个线程有自己的pc寄存器和Java虚拟机栈。Java虚拟机栈又由栈帧构成，栈帧中保存方法执行的状态，包括局部变量表和操作数栈等。本章节将开始学习如何初步实现线程私有的运行时数据区。<br>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/11/22/Redis学习笔记四【Redis命令-一-】/#more" rel="contents">
+            <a class="btn" href="/2017/01/22/自己动手写JVM十一【运行时数据区（一）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -729,7 +686,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/11/03/Redis学习笔记三【使用Redis构建Web应用】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/16/Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -754,8 +711,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/11/03/Redis学习笔记三【使用Redis构建Web应用】/" itemprop="url">
-                  Redis学习笔记三【使用Redis构建Web应用】
+                <a class="post-title-link" href="/2017/01/16/Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】/" itemprop="url">
+                  Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】
                 </a>
               
             
@@ -769,8 +726,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-03T19:30:57+08:00">
-                2016-11-03
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-16T17:07:25+08:00">
+                2017-01-16
               </time>
             
 
@@ -824,16 +781,10 @@
 
       
         
-          <p>本章将使用Redis构建一个简单的、完整的Web应用，整个包含如下内容：</p>
-<ul>
-<li>登录cookie</li>
-<li>购物车cookie</li>
-<li>缓存生成的网页</li>
-<li>缓存数据库行</li>
-</ul>
+          <p>Redis还特别适用于解决基于搜索的问题，这类问题通常需要使用集合以及有序集合的交集、并集、和差集操作查找符合指定要求的元素。本章就来学习下，如何使用Redis进行搜索。假设一个对文档搜索的场景，如何使用Redis更快地进行搜索。基于搜索的应用程序相关代码位于<a href="https://github.com/bboyjing/redis-sample" target="_blank" rel="external">项目</a>的search模块中。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/11/03/Redis学习笔记三【使用Redis构建Web应用】/#more" rel="contents">
+            <a class="btn" href="/2017/01/16/Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -874,7 +825,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/10/23/Redis学习笔记二【Redis数据结构实践】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/16/自己动手写JVM十【解析class文件（八）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -899,8 +850,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/10/23/Redis学习笔记二【Redis数据结构实践】/" itemprop="url">
-                  Redis学习笔记二【Redis数据结构实践】
+                <a class="post-title-link" href="/2017/01/16/自己动手写JVM十【解析class文件（八）】/" itemprop="url">
+                  自己动手写JVM十【解析class文件（八）】
                 </a>
               
             
@@ -914,8 +865,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-10-23T22:50:20+08:00">
-                2016-10-23
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-16T10:12:06+08:00">
+                2017-01-16
               </time>
             
 
@@ -933,8 +884,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Redis/" itemprop="url" rel="index">
-                    <span itemprop="name">Redis</span>
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
                   </a>
                 </span>
 
@@ -969,10 +920,11 @@
 
       
         
-          <p>上一章对Redis的5种数据结构有了基本的了解之后，下面来学习下怎样使用这些结构来解决实际问题。下面用Redis构建一个简单的文章投票网站的后端来演示，代码示例依然使用Springboot，给出<a href="https://github.com/bboyjing/redis-sample" target="_blank" rel="external">GitHub地址</a></p>
+          <p>本章节继续学习属性相关信息</p>
+<h3 id="解析属性表"><a href="#解析属性表" class="headerlink" title="解析属性表"></a>解析属性表</h3><h4 id="Code属性"><a href="#Code属性" class="headerlink" title="Code属性"></a>Code属性</h4><p>Code时变长属性，只存在于method_info结构中。Code属性中存放字节码等方法相关信息，其结构定义如下：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/10/23/Redis学习笔记二【Redis数据结构实践】/#more" rel="contents">
+            <a class="btn" href="/2017/01/16/自己动手写JVM十【解析class文件（八）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1008,7 +960,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/16/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><span class="page-number current">17</span><a class="page-number" href="/page/18/">18</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/18/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/16/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><span class="page-number current">17</span><a class="page-number" href="/page/18/">18</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/18/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1049,7 +1001,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-count">138</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1057,7 +1009,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1066,7 +1018,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1128,7 +1080,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

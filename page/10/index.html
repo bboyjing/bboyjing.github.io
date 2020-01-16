@@ -266,7 +266,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/21/自己动手写JVM二十四【方法调用和返回（二）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/27/跟开涛学架构一【Nginx负载均衡】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/02/21/自己动手写JVM二十四【方法调用和返回（二）】/" itemprop="url">
-                  自己动手写JVM二十四【方法调用和返回（二）】
+                <a class="post-title-link" href="/2017/08/27/跟开涛学架构一【Nginx负载均衡】/" itemprop="url">
+                  跟开涛学架构一【Nginx负载均衡】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-21T20:31:02+08:00">
-                2017-02-21
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-27T17:04:08+08:00">
+                2017-08-27
               </time>
             
 
@@ -325,8 +325,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/Architecture/" itemprop="url" rel="index">
+                    <span itemprop="name">Architecture</span>
                   </a>
                 </span>
 
@@ -361,11 +361,11 @@
 
       
         
-          <p>本节继续实现方法调用和返回。</p>
-<h3 id="返回指令"><a href="#返回指令" class="headerlink" title="返回指令"></a>返回指令</h3><p>方法执行完毕之后，需要把结果返回给调用方，这一工作由返回指令完成。返回指令属于控制指令，一共6条。其中return指令用于没有返回值的情况，areturn、ireturn、lreturn、和dreturn分别用于返回引用、int、long、float和double类型的值。该系列指令实现代码位于/instructions/control/return.go文件中：</p>
+          <p>最近在张开涛所著的《亿级流量网站架构核心技术》，粗粗浏览了下，核心思想是围绕着Nginx在转。如果平时没有一些运维实际经验的话，可能整本书看下来效果不是很好。要想吸收更多的知识，光看是没用的，还是得亲自动手操作。书中有不少代码片段，我会尝试尽量把案例都实现，组成可以跑通的完整测试项目，以达到学习的目的。本系列学习笔记的内容大多来自这本书，如果涉及到版权问题，请及时联系本人。下面就进入正题了。</p>
+<h3 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h3><p>目前需要的环境是Java运行环境和Nginx。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/02/21/自己动手写JVM二十四【方法调用和返回（二）】/#more" rel="contents">
+            <a class="btn" href="/2017/08/27/跟开涛学架构一【Nginx负载均衡】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -406,7 +406,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/21/自己动手写JVM二十三【方法调用和返回（一）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/21/RocketMQ源码分析之【rocketmq-namesrv】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -431,8 +431,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/02/21/自己动手写JVM二十三【方法调用和返回（一）】/" itemprop="url">
-                  自己动手写JVM二十三【方法调用和返回（一）】
+                <a class="post-title-link" href="/2017/04/21/RocketMQ源码分析之【rocketmq-namesrv】/" itemprop="url">
+                  RocketMQ源码分析之【rocketmq-namesrv】
                 </a>
               
             
@@ -446,8 +446,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-21T17:04:21+08:00">
-                2017-02-21
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-21T14:04:19+08:00">
+                2017-04-21
               </time>
             
 
@@ -465,8 +465,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/RocketMQ/" itemprop="url" rel="index">
+                    <span itemprop="name">RocketMQ</span>
                   </a>
                 </span>
 
@@ -501,11 +501,14 @@
 
       
         
-          <p>本章开始将实现方法调用和返回，在此基础上，还会讨论类和对象的初始化。</p>
-<h3 id="方法调用概述"><a href="#方法调用概述" class="headerlink" title="方法调用概述"></a>方法调用概述</h3><p>从调用角度来看，方法可以分为两类：静态方法和实例方法。静态方法通过类来调用，实例方法则通过对象引用来调用。静态方法时静态绑定的，也就是说，最终调用的时哪个方法在编译期就已经确定了。实例方法则支持动态绑定，最终要调用哪个方法可能要推迟到运行期才知道。<br>在Java7之前，Java虚拟机规范一共提供了4条方法调用指令。其中invokestatic指令来调用静态方法。invokespecial指令用来调用无需动态绑定的实例方法，包括构造函数、私有方法和通过supper关键字调用超类方法。剩下的情况则属于动态绑定。如果是针对接口类型的引用调用方法，就使用invokeinterfase指令，否则使用invokevirtual指令。本章将实现这四条指令，为了更好地支持动态类语言，Java7增加了一条方法调用指令invokedynamic，本章不讨论该指令。在深入讨论各条方法调用指令的细节之前，先简单了解下Java虚拟机是如何调用方法的。</p>
+          <p>本章节将对Name Server进行分析。</p>
+<h3 id="Name-Server作用"><a href="#Name-Server作用" class="headerlink" title="Name Server作用"></a>Name Server作用</h3><p>官方文档对Name Server有一个概括：</p>
+<blockquote>
+<p>Name Server是一个几乎无状态节点，可集群部署，节点之间无任何信息同步。</p>
+</blockquote>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/02/21/自己动手写JVM二十三【方法调用和返回（一）】/#more" rel="contents">
+            <a class="btn" href="/2017/04/21/RocketMQ源码分析之【rocketmq-namesrv】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -546,7 +549,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/16/自己动手写JVM二十二【类和对象（五）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/18/RocketMQ源码分析之【rocketmq-srvutil】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -571,8 +574,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/02/16/自己动手写JVM二十二【类和对象（五）】/" itemprop="url">
-                  自己动手写JVM二十二【类和对象（五）】
+                <a class="post-title-link" href="/2017/04/18/RocketMQ源码分析之【rocketmq-srvutil】/" itemprop="url">
+                  RocketMQ源码分析之【rocketmq-srvutil】
                 </a>
               
             
@@ -586,8 +589,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-16T18:09:50+08:00">
-                2017-02-16
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-18T15:48:12+08:00">
+                2017-04-18
               </time>
             
 
@@ -605,8 +608,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/RocketMQ/" itemprop="url" rel="index">
+                    <span itemprop="name">RocketMQ</span>
                   </a>
                 </span>
 
@@ -641,11 +644,21 @@
 
       
         
-          <h3 id="类和对象相关指令"><a href="#类和对象相关指令" class="headerlink" title="类和对象相关指令"></a>类和对象相关指令</h3><p>本节继续来学习类和对象剩下的ldc指令，和测试。</p>
-<h4 id="ldc指令"><a href="#ldc指令" class="headerlink" title="ldc指令"></a>ldc指令</h4><p>ldc系列指令从运行时常量池中加载常量值，并把它推入操作数栈。ldc系列指令属于常量类指令，共3条。其中ldc和ldc_w指令用于加载int、float和字符串常量，java.lang.Class实例或者MethodType和MethodHandle实例。ldc2_w指令用于加载long和double常量。ldc和ldc_w指令的区别仅在于操作数的宽度。本节先处理int、float、long和double常量，部分其余的后面再学。<br>ldc系列指令位于/instructions/constants/ldc.go文件中：</p>
+          <p>从这一章开始，着手来试着分析RocketMQ的源码。本人fork了源码，准备将读过的代码都加上注释，附上<a href="https://github.com/bboyjing/incubator-rocketmq" target="_blank" rel="external">项目地址</a>。首先看下源码结构，RocketMQ共包含9个核心模块：</p>
+<ul>
+<li>rocketmq-broker</li>
+<li>rocketmq-client</li>
+<li>rocketmq-common</li>
+<li>rocketmq-filtersrv</li>
+<li>rocketmq-namesrv</li>
+<li>rocketmq-remoting</li>
+<li>rocketmq-srvutil</li>
+<li>rocketmq-store</li>
+<li>rocketmq-tools</li>
+</ul>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/02/16/自己动手写JVM二十二【类和对象（五）】/#more" rel="contents">
+            <a class="btn" href="/2017/04/18/RocketMQ源码分析之【rocketmq-srvutil】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -686,7 +699,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/16/自己动手写JVM二十一【类和对象（四）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/11/RocketMQ学习笔记二【了解RocketMQ概念】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -711,8 +724,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/02/16/自己动手写JVM二十一【类和对象（四）】/" itemprop="url">
-                  自己动手写JVM二十一【类和对象（四）】
+                <a class="post-title-link" href="/2017/04/11/RocketMQ学习笔记二【了解RocketMQ概念】/" itemprop="url">
+                  RocketMQ学习笔记二【了解RocketMQ概念】
                 </a>
               
             
@@ -726,8 +739,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-16T10:51:34+08:00">
-                2017-02-16
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-11T16:43:50+08:00">
+                2017-04-11
               </time>
             
 
@@ -745,8 +758,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/RocketMQ/" itemprop="url" rel="index">
+                    <span itemprop="name">RocketMQ</span>
                   </a>
                 </span>
 
@@ -781,11 +794,10 @@
 
       
         
-          <h3 id="类和对象相关指令"><a href="#类和对象相关指令" class="headerlink" title="类和对象相关指令"></a>类和对象相关指令</h3><p>本节继续来学习类和对象相关指令</p>
-<h4 id="putstatic和getstatic指令"><a href="#putstatic和getstatic指令" class="headerlink" title="putstatic和getstatic指令"></a>putstatic和getstatic指令</h4><p>putstatic指令给类的某个静态变量赋值，它需要两个操作数，第一个操作数是uint16索引，来自字节码。通过这个索引可以从当前类的运行时常量池中找到一个字段符号引用，解析这个字段符号引用就可以知道给类的哪个静态变量赋值。第二个操作数是要赋给静态变量的值，从操作数栈中弹出。该指令实现代码位于putstatic.go文件中：</p>
+          <p>在上一章中，我们跑通了Quick Start，也对RocketMQ有了一个大致的了解。先看下一张简单的RocketMQ部署图，有个全局的感官：<br><img src="http://qiniu.didadu.cn/rocketmq_1.png" alt="rocketmq_1"><br>本章节的目的就是了解RocketMQ涉及到的概念以及整体架构介绍。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/02/16/自己动手写JVM二十一【类和对象（四）】/#more" rel="contents">
+            <a class="btn" href="/2017/04/11/RocketMQ学习笔记二【了解RocketMQ概念】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -826,7 +838,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/09/自己动手写JVM二十【类和对象（三）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/06/RocketMQ学习笔记一【Hello-MQ】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -851,8 +863,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/02/09/自己动手写JVM二十【类和对象（三）】/" itemprop="url">
-                  自己动手写JVM二十【类和对象（三）】
+                <a class="post-title-link" href="/2017/04/06/RocketMQ学习笔记一【Hello-MQ】/" itemprop="url">
+                  RocketMQ学习笔记一【Hello MQ】
                 </a>
               
             
@@ -866,8 +878,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-09T16:50:41+08:00">
-                2017-02-09
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-06T14:25:23+08:00">
+                2017-04-06
               </time>
             
 
@@ -885,8 +897,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/RocketMQ/" itemprop="url" rel="index">
+                    <span itemprop="name">RocketMQ</span>
                   </a>
                 </span>
 
@@ -921,10 +933,11 @@
 
       
         
-          <h3 id="类和字段符号引用解析"><a href="#类和字段符号引用解析" class="headerlink" title="类和字段符号引用解析"></a>类和字段符号引用解析</h3><h4 id="类符号引用解析"><a href="#类符号引用解析" class="headerlink" title="类符号引用解析"></a>类符号引用解析</h4><p>先修改class.go文件，添加判断是否能访问其他类的函数：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// self class是否能被other class访问</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Class)</span> <span class="title">isAccessibleTo</span><span class="params">(other *Class)</span> <span class="title">bool</span></span> &#123;</div><div class="line">	<span class="comment">/*</span></div><div class="line">		若self class访问标识为public或者两个类在同一个包下，则可以访问</div><div class="line">		暂时简单地按照包名来检查类是否属于同一个包</div><div class="line">	 */</div><div class="line">	<span class="keyword">return</span> self.IsPublic() ||</div><div class="line">		self.getPackageName() == other.getPackageName()</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 获取包名</span></div><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *Class)</span> <span class="title">getPackageName</span><span class="params">()</span> <span class="title">string</span></span> &#123;</div><div class="line">	<span class="keyword">if</span> i := strings.LastIndex(self.name, <span class="string">"/"</span>); i &gt;= <span class="number">0</span> &#123;</div><div class="line">		<span class="keyword">return</span> self.name[:i]</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> <span class="string">""</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+          <p>最近项目需要使用RocketMQ，之前没有使用过，现在花点时间来学习下，顺便记录下学习过程。目前没有去找其他资源，先参照下<a href="https://rocketmq.incubator.apache.org/docs/quick-start/" target="_blank" rel="external">官网</a>文档学学看。</p>
+<h3 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h3><p>基本上都是这套路，先照着Quick Start画个瓢。这里，Quick Start的目的是让使用者在本机快速地搭建RocketMQ系统，并且能够收发消息。对于系统以及软件的要求，官网说的很明确，下面列一下我本机的环境:</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/02/09/自己动手写JVM二十【类和对象（三）】/#more" rel="contents">
+            <a class="btn" href="/2017/04/06/RocketMQ学习笔记一【Hello-MQ】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -960,7 +973,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1001,7 +1014,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-count">138</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1009,7 +1022,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1018,7 +1031,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1080,7 +1093,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

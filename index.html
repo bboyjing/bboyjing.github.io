@@ -266,7 +266,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/19/栈空间和大、小端/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/15/HeadFirst设计模式二十四【访问者模式】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2019/03/19/栈空间和大、小端/" itemprop="url">
-                  栈空间和大、小端
+                <a class="post-title-link" href="/2020/01/15/HeadFirst设计模式二十四【访问者模式】/" itemprop="url">
+                  HeadFirst设计模式二十四【访问者模式】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-19T10:49:34+08:00">
-                2019-03-19
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-15T18:04:40+08:00">
+                2020-01-15
               </time>
             
 
@@ -325,8 +325,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/基础/" itemprop="url" rel="index">
-                    <span itemprop="name">基础</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -361,12 +361,11 @@
 
       
         
-          <p>我们在学习程序是如何执行的时候，不免会涉及到栈空间的相关知识，有些地方会通俗地说分配栈空间时，栈是向下增长的，那么这句话到底是什么意思，下面我们就以X86架构为例来看一下。</p>
-<h3 id="向下增长"><a href="#向下增长" class="headerlink" title="向下增长"></a>向下增长</h3><p>我们先来看一下向下增长的理解是什么样的，假设给执行一个方法分配的地址空间为10000~10007，栈空间如下图：</p>
-<p><img src="http://qiniu.didadu.cn/stack_down.jpg" alt="stack_down"></p>
+          <p>访问者模式的目的是封装一些施加于某种数据结构元素之上的操作。一旦这些操作需要修改的话，接受这个操作的数据结构则可以保持不变。上面的术语不是很好理解，我们来看看下面的场景，就会觉得很熟悉了。</p>
+<h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>假设有下面现在需要建造一辆汽车，简单的实现方式如下：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2019/03/19/栈空间和大、小端/#more" rel="contents">
+            <a class="btn" href="/2020/01/15/HeadFirst设计模式二十四【访问者模式】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -407,7 +406,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/15/MybatisGenerator插件开发六【逻辑删除】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/15/HeadFirst设计模式二十三【原型模式】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -432,8 +431,8 @@
             
               
                 
-                <a class="post-title-link" href="/2019/03/15/MybatisGenerator插件开发六【逻辑删除】/" itemprop="url">
-                  MybatisGenerator插件开发六【逻辑删除】
+                <a class="post-title-link" href="/2020/01/15/HeadFirst设计模式二十三【原型模式】/" itemprop="url">
+                  HeadFirst设计模式二十三【原型模式】
                 </a>
               
             
@@ -447,8 +446,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-15T01:08:52+08:00">
-                2019-03-15
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-15T11:42:40+08:00">
+                2020-01-15
               </time>
             
 
@@ -466,8 +465,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/MybatisGenerator/" itemprop="url" rel="index">
-                    <span itemprop="name">MybatisGenerator</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -502,10 +501,11 @@
 
       
         
-          <p>逻辑删除在项目中也是很常见的，比较常见的方式是添加一个<code>deleted</code>的标记位，当然也有其他的实现方式。本章节的插件针对的是添加标记位的方式来实现逻辑删除的。如果说没有和<code>deleted</code>标记位一起的唯一联合索引，那是很容易实现的，标志位只要两个值：0、1，然后通过<code>updateByExampleSelective</code>修改就可以了。但是往往我们表中会有唯一索引在，比如说名字不能重复之类的。这个时候我们采取的简单的处理方式是<code>set deleted = deleted + 1</code>来避免无法删除已经删除过的数据的问题。索性这个插件就提供了两个方法：<code>logicDelete</code>和<code>logicDeleteWithUIndex</code>。</p>
+          <p>当创建给定类的实例的过程很昂贵或很复杂时，可以使用原型模式。原型模式的核心是复制，Java原生就是支持。因为所有的JavaBean都继承自Object，而Object类提供一个clone()方法，可以讲一个JavaBean对象复制一份。但是，这个JavaBean必须实现一个Cloneable接口，表明这个JavaBean支持复制。 </p>
+<h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>有一个场景可以很好地来理解这个模式，就是西游记里的孙悟空，拔毛一吹瞬间变出数百个一模一样的分身。或者火影忍者中鸣人地影分身也有异曲同工之妙。下面用孙悟空地例子来看下如何实现原型模式。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2019/03/15/MybatisGenerator插件开发六【逻辑删除】/#more" rel="contents">
+            <a class="btn" href="/2020/01/15/HeadFirst设计模式二十三【原型模式】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -546,7 +546,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/15/MybatisGenerator插件开发五【更新指定条数】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/15/HeadFirst设计模式二十二【备忘录模式】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -571,8 +571,8 @@
             
               
                 
-                <a class="post-title-link" href="/2019/03/15/MybatisGenerator插件开发五【更新指定条数】/" itemprop="url">
-                  MybatisGenerator插件开发五【更新指定条数】
+                <a class="post-title-link" href="/2020/01/15/HeadFirst设计模式二十二【备忘录模式】/" itemprop="url">
+                  HeadFirst设计模式二十二【备忘录模式】
                 </a>
               
             
@@ -586,8 +586,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-15T00:53:49+08:00">
-                2019-03-15
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-15T09:49:24+08:00">
+                2020-01-15
               </time>
             
 
@@ -605,8 +605,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/MybatisGenerator/" itemprop="url" rel="index">
-                    <span itemprop="name">MybatisGenerator</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -641,11 +641,11 @@
 
       
         
-          <p>在实际项目中，遇到了这样一个需求，就是只需要更新匹配到的第一条或者前几条数据。不想手动写相关mapper，于是就想着通过插件来实现。想了一下，得益于之前在Example中添加的limit成员变量，只要稍微修改下<code>updateByExampleSelective</code>的SqlMapper实现就可以了。</p>
-<h3 id="修改SqlMap文件"><a href="#修改SqlMap文件" class="headerlink" title="修改SqlMap文件"></a>修改SqlMap文件</h3>
+          <p>当需要有也要让对象返回之前的状态时，例如用户请求撤销操作，就可以使用备忘录模式。</p>
+<h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>玩游戏时的存档就是一个很好的例子，比如游戏角色死掉后，恢复到存档时的状态。下面就来简单实现下。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2019/03/15/MybatisGenerator插件开发五【更新指定条数】/#more" rel="contents">
+            <a class="btn" href="/2020/01/15/HeadFirst设计模式二十二【备忘录模式】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -686,7 +686,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/14/MybatisGenerator插件开发四【批量插入】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/14/HeadFirst设计模式二十一【中介者模式】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -711,8 +711,8 @@
             
               
                 
-                <a class="post-title-link" href="/2019/03/14/MybatisGenerator插件开发四【批量插入】/" itemprop="url">
-                  MybatisGenerator插件开发四【批量插入】
+                <a class="post-title-link" href="/2020/01/14/HeadFirst设计模式二十一【中介者模式】/" itemprop="url">
+                  HeadFirst设计模式二十一【中介者模式】
                 </a>
               
             
@@ -726,8 +726,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-14T17:58:58+08:00">
-                2019-03-14
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-14T20:08:25+08:00">
+                2020-01-14
               </time>
             
 
@@ -745,8 +745,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/MybatisGenerator/" itemprop="url" rel="index">
-                    <span itemprop="name">MybatisGenerator</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -781,12 +781,17 @@
 
       
         
-          <p>批量插入和分页查询一样，在项目中基本也是不可少的。这里我们要给Mapper添加两个方法：<code>batchInsert</code>和<code>batchInsertSelective</code>，区别是前者全字段插入，后者只插入给定的字段。原来的单条<code>insertSelective</code>是通过对象的值是不是Null来实现的，我们也可以取插入记录的第0条来实现<code>batchInsertSelective</code>。但是，始终感觉有点不对，所以采取了另一种方式，显式地传递要插入地字段来实现。这里就会用到了上一章节写入到Model中的表字段枚举了。</p>
-<p>下面直接上代码。</p>
-<h3 id="修改Mapper接口和SqlMap文件"><a href="#修改Mapper接口和SqlMap文件" class="headerlink" title="修改Mapper接口和SqlMap文件"></a>修改Mapper接口和SqlMap文件</h3>
+          <p>使用中介者模式，又叫调停者模式，是用来集中相关对象之间复杂的沟通和控制方式的，使对象之间可以较松散地耦合。比如说WTO组织，各个贸易地区（国家）加入WTO组织之前，贸易状态可能是各个国家之间直接沟通，贸易关系是一张网。WTO是一个协调组织，各个贸易地区可以经由WTO组织进行协调。WTO扮演的正是中介者模式中的中介者角色，它取代了原本由各个贸易地区自行进行的相互协商和谈判的强耦合关系。加入WTO之后，贸易关系都指向了WTO，不再错综复杂。</p>
+<p>中介者模式包括一下几种角色：</p>
+<ul>
+<li>抽象中介者角色：定义出同事对象到中介者对象的接口，其中主要的方法是一个或多个事件方法。</li>
+<li>具体中介者角色：从抽象中介者继承而来，实现了抽象超类所声明的事件方法。具体中介者知晓所有的具体同事类，它从具体同事对象接收消息、向具体同事对象发出命令。可以理解为就是上面说的WTO组织。</li>
+<li>抽象同事类角色：定义出中介者到同事对象的接口，同事对象只知道中介者而不知道其余同事对象。</li>
+<li>具体同事类角色：所有的巨头同事类均从抽象同事类继承而来。每一个具体同事类都很清楚它自己在小范围内的行为，而不知道它在大范围内的目的。可以理解为就是上面说的每一个贸易地区（国家）。</li>
+</ul>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2019/03/14/MybatisGenerator插件开发四【批量插入】/#more" rel="contents">
+            <a class="btn" href="/2020/01/14/HeadFirst设计模式二十一【中介者模式】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -827,7 +832,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/14/MybatisGenerator插件开发三【Lombok】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/10/HeadFirst设计模式二十【解释器模式】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -852,8 +857,8 @@
             
               
                 
-                <a class="post-title-link" href="/2019/03/14/MybatisGenerator插件开发三【Lombok】/" itemprop="url">
-                  MybatisGenerator插件开发三【Lombok】
+                <a class="post-title-link" href="/2020/01/10/HeadFirst设计模式二十【解释器模式】/" itemprop="url">
+                  HeadFirst设计模式二十【解释器模式】
                 </a>
               
             
@@ -867,8 +872,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-14T17:40:53+08:00">
-                2019-03-14
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-01-10T14:55:16+08:00">
+                2020-01-10
               </time>
             
 
@@ -886,8 +891,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/MybatisGenerator/" itemprop="url" rel="index">
-                    <span itemprop="name">MybatisGenerator</span>
+                  <a href="/categories/设计模式/" itemprop="url" rel="index">
+                    <span itemprop="name">设计模式</span>
                   </a>
                 </span>
 
@@ -922,11 +927,13 @@
 
       
         
-          <p>如果我们项目中使用了Lombok，那通过自定义插件也能讲其作用于生成的与数据库表映射的Model类上。在这里，我们会同时把表的字段以枚举的形式写到该类中，具体作何使用的话，下一章节会讲到。</p>
-<h3 id="修改Model类"><a href="#修改Model类" class="headerlink" title="修改Model类"></a>修改Model类</h3><p>直接上代码：</p>
+          <p>解释器模式可以用来为语言创建解释器，也就是说可以再创造出一门语言。</p>
+<h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>为了说明解释器模式的实现方式，给出一个最简单的文法和对应的解释器模式的实现，就是模拟Java语言中对布尔表达式进行操作和求值。比如说，给定一个表达式：<code>(true AND x) OR (y AND (NOT x))</code>，求该表达式的值是<code>true</code>还是<code>false</code>。这个语言简单的文法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">Expression := Constant | Variable | Or | And | Not</div><div class="line">And := Expression &apos;And&apos; Expression</div><div class="line">Or := Expression &apos;Or&apos; Expression</div><div class="line">Not := Expression &apos;Not&apos; Expression</div><div class="line">Variable := 任何标识符</div><div class="line">Constant := &apos;true&apos; | &apos;false&apos;</div></pre></td></tr></table></figure>
+<p>文法种设计到的名词，在代码实现部分均会有对应的类，下面就来看一下如何实现。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2019/03/14/MybatisGenerator插件开发三【Lombok】/#more" rel="contents">
+            <a class="btn" href="/2020/01/10/HeadFirst设计模式二十【解释器模式】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -962,7 +969,7 @@
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1003,7 +1010,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">114</span>
+              <span class="site-state-item-count">138</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1011,7 +1018,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">15</span>
+                <span class="site-state-item-count">16</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1020,7 +1027,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1082,7 +1089,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2019</span>
+  <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
