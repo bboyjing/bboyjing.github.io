@@ -91,7 +91,7 @@
 <meta property="og:url" content="http://yoursite.com/2019/10/22/HeadFirst设计模式四【工厂模式】/index.html">
 <meta property="og:site_name" content="bboyjing&#39;s blog">
 <meta property="og:description" content="本章将学习如何使用工厂模式来解放new操作符，如何从复杂的依赖关系中脱困。 场景描述书中描述了一个订购披萨的场景，披萨有很多种，但是每一种的制作过程都一样。用户在披萨商店下单，商店根据种类来制作各种披萨。工厂模式的实现使得构造各种类型披萨变得灵活。工厂方法又细分成了三种，分别是：简单工厂、抽象工厂和工厂方法。下面就逐个来看下。">
-<meta property="og:updated_time" content="2019-10-30T02:10:17.989Z">
+<meta property="og:updated_time" content="2020-04-08T16:07:34.087Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="HeadFirst设计模式四【工厂模式】">
 <meta name="twitter:description" content="本章将学习如何使用工厂模式来解放new操作符，如何从复杂的依赖关系中脱困。 场景描述书中描述了一个订购披萨的场景，披萨有很多种，但是每一种的制作过程都一样。用户在披萨商店下单，商店根据种类来制作各种披萨。工厂模式的实现使得构造各种类型披萨变得灵活。工厂方法又细分成了三种，分别是：简单工厂、抽象工厂和工厂方法。下面就逐个来看下。">
@@ -363,7 +363,7 @@
         <p>本章将学习如何使用工厂模式来解放new操作符，如何从复杂的依赖关系中脱困。</p>
 <h3 id="场景描述"><a href="#场景描述" class="headerlink" title="场景描述"></a>场景描述</h3><p>书中描述了一个订购披萨的场景，披萨有很多种，但是每一种的制作过程都一样。用户在披萨商店下单，商店根据种类来制作各种披萨。工厂模式的实现使得构造各种类型披萨变得灵活。工厂方法又细分成了三种，分别是：简单工厂、抽象工厂和工厂方法。下面就逐个来看下。</p>
 <a id="more"></a>
-<h4 id="简单工厂"><a href="#简单工厂" class="headerlink" title="简单工厂"></a>简单工厂</h4><p>先学下简单工厂，看代码。</p>
+<h3 id="简单工厂"><a href="#简单工厂" class="headerlink" title="简单工厂"></a>简单工厂</h3><p>先学下简单工厂，看代码。</p>
 <h4 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h4><ol>
 <li><p>定义披萨抽象类。为了简单，只给Pizza定义一个名称的成员变量，几个方法就是制作过程。在简化的场景下，每一种披萨的制作过是相同的，不同的是披萨的名称。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Pizza</span> </span>&#123;</div><div class="line">    String name;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">prepare</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"Preparing "</span> + name);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bake</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"Baking "</span> + name);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">cut</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"Cutting "</span> + name);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">box</span><span class="params">()</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"Boxing "</span> + name);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -541,7 +541,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">138</span>
+              <span class="site-state-item-count">140</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -607,7 +607,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#场景描述"><span class="nav-number">1.</span> <span class="nav-text">场景描述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#简单工厂"><span class="nav-number">1.1.</span> <span class="nav-text">简单工厂</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码示例"><span class="nav-number">1.2.</span> <span class="nav-text">代码示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#工厂方法"><span class="nav-number">2.</span> <span class="nav-text">工厂方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#代码示例-1"><span class="nav-number">2.1.</span> <span class="nav-text">代码示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#抽象工厂"><span class="nav-number">3.</span> <span class="nav-text">抽象工厂</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#代码示例-2"><span class="nav-number">3.1.</span> <span class="nav-text">代码示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#场景描述"><span class="nav-number">1.</span> <span class="nav-text">场景描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简单工厂"><span class="nav-number">2.</span> <span class="nav-text">简单工厂</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#代码示例"><span class="nav-number">2.1.</span> <span class="nav-text">代码示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#工厂方法"><span class="nav-number">3.</span> <span class="nav-text">工厂方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#代码示例-1"><span class="nav-number">3.1.</span> <span class="nav-text">代码示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#抽象工厂"><span class="nav-number">4.</span> <span class="nav-text">抽象工厂</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#代码示例-2"><span class="nav-number">4.1.</span> <span class="nav-text">代码示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
