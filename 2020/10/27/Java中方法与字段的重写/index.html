@@ -1,0 +1,721 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.proxy.ustclug.org/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="原创," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="&amp;emsp;&amp;emsp;本章我们来看一下，Java中字段和方法是如何参与重载的。 字段的重写&amp;emsp;&amp;emsp;首先，需要明确一点，Java的字段永远不参与多态，当子类声明了与父类同名的字段时，虽然在子类的内存中两个字段都会存在，但是子类的字段会屏蔽父类的同名字段。我们来看一个简单地例子，该例子来自于《深入理解Java虚拟机》： 12345678910111213141516171819202">
+<meta name="keywords" content="原创">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java中方法与字段的重写">
+<meta property="og:url" content="http://yoursite.com/2020/10/27/Java中方法与字段的重写/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="&amp;emsp;&amp;emsp;本章我们来看一下，Java中字段和方法是如何参与重载的。 字段的重写&amp;emsp;&amp;emsp;首先，需要明确一点，Java的字段永远不参与多态，当子类声明了与父类同名的字段时，虽然在子类的内存中两个字段都会存在，但是子类的字段会屏蔽父类的同名字段。我们来看一个简单地例子，该例子来自于《深入理解Java虚拟机》： 12345678910111213141516171819202">
+<meta property="og:updated_time" content="2020-10-26T17:33:59.993Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java中方法与字段的重写">
+<meta name="twitter:description" content="&amp;emsp;&amp;emsp;本章我们来看一下，Java中字段和方法是如何参与重载的。 字段的重写&amp;emsp;&amp;emsp;首先，需要明确一点，Java的字段永远不参与多态，当子类声明了与父类同名的字段时，虽然在子类的内存中两个字段都会存在，但是子类的字段会屏蔽父类的同名字段。我们来看一个简单地例子，该例子来自于《深入理解Java虚拟机》： 12345678910111213141516171819202">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/10/27/Java中方法与字段的重写/"/>
+
+
+
+
+
+  <title> Java中方法与字段的重写 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/10/27/Java中方法与字段的重写/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Java中方法与字段的重写
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Дата создания записи" itemprop="dateCreated datePublished" datetime="2020-10-27T00:22:47+08:00">
+                2020-10-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>&emsp;&emsp;本章我们来看一下，Java中字段和方法是如何参与重载的。</p>
+<h3 id="字段的重写"><a href="#字段的重写" class="headerlink" title="字段的重写"></a>字段的重写</h3><p>&emsp;&emsp;首先，需要明确一点，Java的字段永远不参与多态，当子类声明了与父类同名的字段时，虽然在子类的内存中两个字段都会存在，但是子类的字段会屏蔽父类的同名字段。我们来看一个简单地例子，该例子来自于《深入理解Java虚拟机》：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line">public class FieldHashNoPolymorphic &#123;</div><div class="line">    static class Father &#123;</div><div class="line">        public int money = 1;</div><div class="line"></div><div class="line">        public Father() &#123;</div><div class="line">            money = 2;</div><div class="line">            showMeTheMoney();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public void showMeTheMoney() &#123;</div><div class="line">            System.out.println("I am Father, I have $" + money);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    static class Son extends Father &#123;</div><div class="line">        public int money = 3;</div><div class="line"></div><div class="line">        public Son() &#123;</div><div class="line">            money = 4;</div><div class="line">            showMeTheMoney();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        @Override</div><div class="line">        public void showMeTheMoney() &#123;</div><div class="line">            System.out.println("I am Son, I have $" + money);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        Father guy = new Son();</div><div class="line">        // 通过静态类型访问到了父类中的money，输出2</div><div class="line">        System.out.println("This guy has $" + guy.money);</div><div class="line">        // 将静态类型强转成Son，访问的就是子类中的money，输出4</div><div class="line">        System.out.println("This guy has $" + ((Son) guy).money);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"># 输出如下</div><div class="line">I am Son, I have $0</div><div class="line">I am Son, I have $4</div><div class="line">This guy has $2</div><div class="line">This guy has $4</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>&emsp;&emsp;输出“This guy has $2”，可见调用的是Father的money字段，因为它是通过静态类型访问到的，我们把代码<code>Father guy = new Son();</code>的“Father”称为变量的“静态类型（Static Type）”，或者叫“外观类型（Apparent Type）”，后面的“Son”则称为变量的“实际类型（Actual Type）”。后面通过代码<code>(Son) guy)</code>把guy强转成Son类型，此时的静态类型就是Son，所以自然调用的就是Son的money字段了，输出4。所以，可以确认，Java的字段确实是不参与多态的。</p>
+<p>&emsp;&emsp;再来看下最初的两行输出是因为何，首先两个类的构造函数中都有showMeTheMoney()函数，Son类在创建的时候，首先隐式调用Father的构造函数（跟主调调用<code>super()</code>行为一样），而Father构造函数中对showMeTheMoney()的调用因为是虚方法调用，实际执行的版本是Son::showMeTheMoney()方法，所以输出都是“I am Son”。第一次输出是0，是因为当时子类Son的构造函数还没执行，它的money字段还是int类型的初始值0。</p>
+<p>&emsp;&emsp;下面就来看下之前提到的虚方法调用，以及实际执行的版本是怎么回事。</p>
+<h3 id="方法的重写"><a href="#方法的重写" class="headerlink" title="方法的重写"></a>方法的重写</h3><p>先看一个小例子，同样来自于《深入理解Java虚拟机》：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DynamicDispatch</span> </span>&#123;</div><div class="line">    <span class="keyword">static</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Human</span> </span>&#123;</div><div class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span></span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Man</span> <span class="keyword">extends</span> <span class="title">Human</span> </span>&#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span> </span>&#123;</div><div class="line">            System.out.println(<span class="string">"man say hello"</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Woman</span> <span class="keyword">extends</span> <span class="title">Human</span> </span>&#123;</div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">sayHello</span><span class="params">()</span> </span>&#123;</div><div class="line">            System.out.println(<span class="string">"woman say hello"</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        Human man = <span class="keyword">new</span> Man();</div><div class="line">        Human woman = <span class="keyword">new</span> Woman();</div><div class="line">        man.sayHello();</div><div class="line">        woman.sayHello();</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// out put</span></div><div class="line">man say hello</div><div class="line">woman say hello</div></pre></td></tr></table></figure>
+<p>&emsp;&emsp;这段代码很简单，就是Java语言的多态特性。那在JVM层到底是如何实现的呢，我们看一下截取的部分字节码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">16: aload_1</div><div class="line">17: invokevirtual #6                  // Method cn/didadu/sample/jvm/methodInvoke/DynamicDispatch$Human.sayHello:()V</div><div class="line">20: aload_2</div><div class="line">21: invokevirtual #6                  // Method cn/didadu/sample/jvm/methodInvoke/DynamicDispatch$Human.sayHello:()V</div></pre></td></tr></table></figure>
+<p>16和20行的aload指令分别把之前创建的两个对象的引用压到栈顶，这两个对象是将要执行的sayHello()方法的所有者，称为接收者（Receiver）；17和21行是方法调用指令，这两条指令单从字节码角度看，无论是指令还是参数都完全一样，但是这两句指令最终执行的目标方法并不相同。那就得来看下invokevirtual指令的执行流程了：</p>
+<ol>
+<li>找到操作数栈顶的第一个元素所指的对象的实际类型，记作C。</li>
+<li>如果在类型C中找到与常量池中的描述符和简单名称都相符的方法，则进行访问权限校验，如果通过则返回这个方法的直接引用，查找过程结束；不通过则返回java.lang.IllegalAccessError异常。</li>
+<li>否则，按照继承关系从下往上一次对C的各个父类进行第二步的搜索和验证过程。</li>
+<li>如果始终没有找到合适的方法，则抛出java.lang.AbstractMethodError异常。</li>
+</ol>
+<p>正是因为invokevirtual指令执行的第一步就是在运行期确定接收者的实际类型，所以两次调用中的invokevirtual指令并不是把常量池中方法的符号引用解析到直接引用上就结束了，还会根据方法接收者的实际类型来选择方法版本，这个过程就是Java语言中方法重写的本质。</p>
+<p>&emsp;&emsp;至此我们知道了方法重写的本质，再来看一个复杂点的例子：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">public class Father &#123;</div><div class="line">    public void say1() &#123;</div><div class="line">        System.out.println("this is father say1");</div><div class="line">        // 这里的this获取的是真正的调用方，main方法里声明的Son对象</div><div class="line">        System.out.println("this -&gt; " + this.getClass().getName());</div><div class="line">        say2();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void say2() &#123;</div><div class="line">        System.out.println("this is father say2");</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void say3() &#123;</div><div class="line">        System.out.println("this is father say3");</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public class Son extends Father &#123;</div><div class="line">    @Override</div><div class="line">    public void say2() &#123;</div><div class="line">        System.out.println("this is son say2");</div><div class="line">        System.out.println("this -&gt; " + this.getClass().getName());</div><div class="line">        // super对象的引用是Son，并不是Father</div><div class="line">        System.out.println("super -&gt; " + super.getClass().getName());</div><div class="line">        // 但是这里调用的却是Father的say方法</div><div class="line">        super.say3();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public void say3() &#123;</div><div class="line">        System.out.println("this is son say3");</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">public class Test &#123;</div><div class="line">    /**</div><div class="line">     * 运行的时候影响虚拟机选择的因素只有该方法的接受者的实际类型是Father还是Son，因为只有一个宗量作为选择依据，所以Java语言的动态分派属于单分派类型。</div><div class="line">     *</div><div class="line">     * @param args</div><div class="line">     */</div><div class="line">    public static void main(String[] args) &#123;</div><div class="line">        Father father = new Son();</div><div class="line">        father.say1();</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"># 输出</div><div class="line">this is father say1</div><div class="line">this -&gt; cn.didadu.sample.jvm.methodInvoke.thisinFather.Son</div><div class="line">this is son say2</div><div class="line">this -&gt; cn.didadu.sample.jvm.methodInvoke.thisinFather.Son</div><div class="line">super -&gt; cn.didadu.sample.jvm.methodInvoke.thisinFather.Son</div><div class="line">this is father say3</div></pre></td></tr></table></figure>
+<p>在这个例子中，Son重写了Father的say2()方法，然后经过一系列方法的调用，其中还有对this、super关键字的调用，有些行为看起来会让人疑惑。下面对照输出的顺序，结合字节码，我们来详细了解一下整个调用过程。</p>
+<ol>
+<li><p>首先基于之前重写的分析，理应调用Son::say1()方法，但是Son并没有重写say1()方法，按照继承关系往上找到Father::say1()，所以此时调用的正是Fathe的say1()方法，输出“this is father say1”。</p>
+</li>
+<li><p>在Father::say1()中执行了代码<code>this.getClass().getName()</code>，意在输出this指向的对象。在这里有一个关于this的知识点：如果执行的是实例方法（没有被static修饰的方法），那么局部变量表中第0位索引的变量槽默认是用于传递方法所属对象实例的引用，在方法中可以通过关键字“this”来访问到这个隐含的参数。也就是说当调用<code>father.say1();</code>的时候，默认传递了方法所属对象的实际类型Son的对象。所以说此时运行环境中Father::say1()方法中的this，指向的是main函数中声明的Son对象。所以输出“this -&gt; cn.didadu.sample.jvm.methodInvoke.thisinFather.Son”。看下Father::say1()方法中的部分字节码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">11: aload_0</div><div class="line">12: invokevirtual #5                  // Method java/lang/Object.getClass:()Ljava/lang/Class;</div><div class="line">15: invokevirtual #6                  // Method java/lang/Class.getName:()Ljava/lang/String;</div></pre></td></tr></table></figure>
+<p>第11行，表示把第0位局部变量表的内容推入操作数栈顶，也就是是把this引用推入操作数栈顶，接着invokevirtual指令调用操作数栈顶指向对象的getClass()方法，第15行再调用其getName()方法，就是对应代码<code>this.getClass().getName()</code></p>
+</li>
+<li><p>接着调用say2()方法，其实这里省略了this引用，完整的调用写法应该是<code>this.say2()</code>，上面已经清楚地解释了当前this指向的是Son类型的对象，同时Son对象重写了say2()方法，所以调用栈进入了Son::say2()，从如下部分字节码也可以看出来：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">26: aload_0</div><div class="line">27: invokevirtual #8                  // Method say2:()V</div></pre></td></tr></table></figure>
+<p>同样是把第0位局部变量表的内容推入操作数栈顶，也就是是把this引用推入操作数栈顶，接着调用栈顶对象的say2()方法，自然输出“”this is son say2””。</p>
+</li>
+<li><p>接着输出“this -&gt; cn.didadu.sample.jvm.methodInvoke.thisinFather.Son”，很好理解，因为此时的this一直是当初那个Son对象。</p>
+</li>
+<li><p>下面两行代码<code>super.getClass().getName()</code>和<code>super.say3();</code>，从输出来看，super指向的是Son对象，但调用的确实Father::say3()，这两个输出为什么是矛盾的。我们来看下字节码：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">29: aload_0</div><div class="line">30: invokespecial #5                  // Method java/lang/Object.getClass:()Ljava/lang/Class;</div><div class="line">33: invokevirtual #6                  // Method java/lang/Class.getName:()Ljava/lang/String;</div><div class="line"></div><div class="line">44: aload_0</div><div class="line">45: invokespecial #9                  // Method cn/didadu/sample/jvm/methodInvoke/thisinFather/Father.say3:()V</div></pre></td></tr></table></figure>
+<p>这里使用了invokespecial指令，是在编译时就确定了方法调用的版本。<code>super.getClass()</code>在编译期确定了调用Object.getClass()方法，看一下Object.getClass()方法的注释：Returns the runtime class of this {@code Object}。也就是说，返回的是运行时对象的类型。这里很明显，运行时对象还是那个Son实例。所以输出“super -&gt; cn.didadu.sample.jvm.methodInvoke.thisinFather.Son”。<code>super.say3()</code>在编译期确定了调用Father::say3()方法，所以输出“this is father say3”。</p>
+</li>
+</ol>
+<p>至此，算是理清了字段和方法的重写。尤其是方法重写的过程，这也是模板方法模式得以运行的根本所在吧。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/原创/" rel="tag"># 原创</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/10/26/Java中方法与字段的重载/" rel="next" title="Java中方法与字段的重载">
+                <i class="fa fa-chevron-left"></i> Java中方法与字段的重载
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">142</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#字段的重写"><span class="nav-number">1.</span> <span class="nav-text">字段的重写</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法的重写"><span class="nav-number">2.</span> <span class="nav-text">方法的重写</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
