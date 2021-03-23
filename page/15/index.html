@@ -266,7 +266,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/01/自己动手写JVM二十七【数组和字符串（二）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/06/自己动手写JVM三十二【异常处理（一）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/03/01/自己动手写JVM二十七【数组和字符串（二）】/" itemprop="url">
-                  自己动手写JVM二十七【数组和字符串（二）】
+                <a class="post-title-link" href="/2017/03/06/自己动手写JVM三十二【异常处理（一）】/" itemprop="url">
+                  自己动手写JVM三十二【异常处理（一）】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-01T23:36:48+08:00">
-                2017-03-01
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-06T19:36:49+08:00">
+                2017-03-06
               </time>
             
 
@@ -361,11 +361,11 @@
 
       
         
-          <p>本节继续来学习数组相关指令。</p>
-<h3 id="数组相关指令"><a href="#数组相关指令" class="headerlink" title="数组相关指令"></a>数组相关指令</h3><h4 id="lt-t-gt-aload指令"><a href="#lt-t-gt-aload指令" class="headerlink" title="&lt;t&gt;aload指令"></a>&lt;t&gt;aload指令</h4><p>&lt;t&gt;aload系列指令按索引取元素的值，然后推入操作数栈，其实现代码位于/instructions/loads/xaload.go文件中，其中一共有8条指令，代码基本相似，下面以aaload指令来详细看下：</p>
+          <p>异常处理是Java语言非常重要的一个语法，本章从Java虚拟机的角度来讨论异常是如何被抛出和处理的。</p>
+<h3 id="异常处理概述"><a href="#异常处理概述" class="headerlink" title="异常处理概述"></a>异常处理概述</h3><p>在Java语言中，异常可以分为两类：Checked异常和Unchecked异常。Unchecked异常包括java.lang.RuntimeException、java.lang.Error以及它们的子类，其他异常都是Checked异常。所有异常都继承自java.lang.Throwable。如果一个方法有可能导致Checked异常抛出，则该方法要么需要捕获该异常并妥善处理，要么必须把该异常列咋自己的Throws子句中，否则无法通过编译。Unchecked异常没有这个限制。不过，Java虚拟机并没有这个规定，这只是Java语言的语法规则。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/03/01/自己动手写JVM二十七【数组和字符串（二）】/#more" rel="contents">
+            <a class="btn" href="/2017/03/06/自己动手写JVM三十二【异常处理（一）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -406,7 +406,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/23/自己动手写JVM二十六【数组和字符串（一）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/06/自己动手写JVM三十一【本地方法调用（三）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -431,8 +431,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/02/23/自己动手写JVM二十六【数组和字符串（一）】/" itemprop="url">
-                  自己动手写JVM二十六【数组和字符串（一）】
+                <a class="post-title-link" href="/2017/03/06/自己动手写JVM三十一【本地方法调用（三）】/" itemprop="url">
+                  自己动手写JVM三十一【本地方法调用（三）】
                 </a>
               
             
@@ -446,8 +446,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-23T12:06:48+08:00">
-                2017-02-23
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-06T18:00:09+08:00">
+                2017-03-06
               </time>
             
 
@@ -501,11 +501,12 @@
 
       
         
-          <p>在大部分编程语言中，数组和字符串都是最基本的数据类型。Java虚拟机直接支持数组，对字符串的支持则由java.lang.String和相关的类提供。本章就来学习数组和字符串相关指令。</p>
-<h3 id="数组概述"><a href="#数组概述" class="headerlink" title="数组概述"></a>数组概述</h3><p>数组在Java虚拟机中是个比较特殊的概念。为什么这么说呢，有下面几个原因：</p>
+          <p>本节继续实现一些本地方法。</p>
+<h3 id="字符串拼接和String-intern-方法"><a href="#字符串拼接和String-intern-方法" class="headerlink" title="字符串拼接和String.intern()方法"></a>字符串拼接和String.intern()方法</h3><p>在Java语言中，通过加号来拼接字符串。作为优化，javac编译器会把字符串拼接操作转换成StringBuilder，比如说下面这段代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">String hello = <span class="string">"hello,"</span>;</div><div class="line">String world = <span class="string">"world!"</span>;</div><div class="line">String str = hello + world;</div><div class="line">System.out.println(str);</div></pre></td></tr></table></figure></p>
+<p>很可能会被javac优化成下面这样：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/02/23/自己动手写JVM二十六【数组和字符串（一）】/#more" rel="contents">
+            <a class="btn" href="/2017/03/06/自己动手写JVM三十一【本地方法调用（三）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -546,7 +547,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/22/自己动手写JVM二十五【方法调用和返回（三）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/06/自己动手写JVM三十【本地方法调用（二）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -571,8 +572,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/02/22/自己动手写JVM二十五【方法调用和返回（三）】/" itemprop="url">
-                  自己动手写JVM二十五【方法调用和返回（三）】
+                <a class="post-title-link" href="/2017/03/06/自己动手写JVM三十【本地方法调用（二）】/" itemprop="url">
+                  自己动手写JVM三十【本地方法调用（二）】
                 </a>
               
             
@@ -586,8 +587,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-22T16:54:46+08:00">
-                2017-02-22
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-06T15:12:11+08:00">
+                2017-03-06
               </time>
             
 
@@ -641,11 +642,11 @@
 
       
         
-          <p>本节继续实现方法调用和返回。</p>
-<h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><p>首先要改造命令行工具，增加两个选项。java命令提供-verbose:class选项，可以控制是否把类加载信息输出到控制台。另外参照这个选项增加一个-verbose:inst选项，用来控制是否把指令执行信息输出到控制台，下面是测试步骤：</p>
+          <h3 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h3><p>本节继续将反射相关内容</p>
+<h4 id="修改类加载器"><a href="#修改类加载器" class="headerlink" title="修改类加载器"></a>修改类加载器</h4><p>Class和Object结构体准备好了，接下来修改类加载器，让每一个加载到方法区中的类都有一个类对象与之关联。修改/rtdata/heap/class_loader.go文件的NewClassLoader()方法：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/02/22/自己动手写JVM二十五【方法调用和返回（三）】/#more" rel="contents">
+            <a class="btn" href="/2017/03/06/自己动手写JVM三十【本地方法调用（二）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -686,7 +687,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/21/自己动手写JVM二十四【方法调用和返回（二）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/06/自己动手写JVM二十九【本地方法调用（一）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -711,8 +712,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/02/21/自己动手写JVM二十四【方法调用和返回（二）】/" itemprop="url">
-                  自己动手写JVM二十四【方法调用和返回（二）】
+                <a class="post-title-link" href="/2017/03/06/自己动手写JVM二十九【本地方法调用（一）】/" itemprop="url">
+                  自己动手写JVM二十九【本地方法调用（一）】
                 </a>
               
             
@@ -726,8 +727,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-21T20:31:02+08:00">
-                2017-02-21
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-06T10:50:09+08:00">
+                2017-03-06
               </time>
             
 
@@ -781,11 +782,10 @@
 
       
         
-          <p>本节继续实现方法调用和返回。</p>
-<h3 id="返回指令"><a href="#返回指令" class="headerlink" title="返回指令"></a>返回指令</h3><p>方法执行完毕之后，需要把结果返回给调用方，这一工作由返回指令完成。返回指令属于控制指令，一共6条。其中return指令用于没有返回值的情况，areturn、ireturn、lreturn、和dreturn分别用于返回引用、int、long、float和double类型的值。该系列指令实现代码位于/instructions/control/return.go文件中：</p>
+          <p>我们已经知道，要想运行Java程序，除了Java虚拟机之外，还需要Java类库的配合。Java虚拟机和Java类库的配合。Java虚拟机和Java类库一起构成了Java运行环境。Java类库主要用Java语言编写，一些无法用Java语言实现的方法则使用本地语言编写，这些方法叫做本地方法。从本章开始将陆续实现一些Java类中的本地方法。为了不陷入JNI规范的细节之中，我们将使用Go语言来实现。本章的所有代码位于/native包下。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/02/21/自己动手写JVM二十四【方法调用和返回（二）】/#more" rel="contents">
+            <a class="btn" href="/2017/03/06/自己动手写JVM二十九【本地方法调用（一）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -826,7 +826,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/21/自己动手写JVM二十三【方法调用和返回（一）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/05/自己动手写JVM二十八【数组和字符串（三）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -851,8 +851,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/02/21/自己动手写JVM二十三【方法调用和返回（一）】/" itemprop="url">
-                  自己动手写JVM二十三【方法调用和返回（一）】
+                <a class="post-title-link" href="/2017/03/05/自己动手写JVM二十八【数组和字符串（三）】/" itemprop="url">
+                  自己动手写JVM二十八【数组和字符串（三）】
                 </a>
               
             
@@ -866,8 +866,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-21T17:04:21+08:00">
-                2017-02-21
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-05T19:57:12+08:00">
+                2017-03-05
               </time>
             
 
@@ -921,11 +921,10 @@
 
       
         
-          <p>本章开始将实现方法调用和返回，在此基础上，还会讨论类和对象的初始化。</p>
-<h3 id="方法调用概述"><a href="#方法调用概述" class="headerlink" title="方法调用概述"></a>方法调用概述</h3><p>从调用角度来看，方法可以分为两类：静态方法和实例方法。静态方法通过类来调用，实例方法则通过对象引用来调用。静态方法时静态绑定的，也就是说，最终调用的时哪个方法在编译期就已经确定了。实例方法则支持动态绑定，最终要调用哪个方法可能要推迟到运行期才知道。<br>在Java7之前，Java虚拟机规范一共提供了4条方法调用指令。其中invokestatic指令来调用静态方法。invokespecial指令用来调用无需动态绑定的实例方法，包括构造函数、私有方法和通过supper关键字调用超类方法。剩下的情况则属于动态绑定。如果是针对接口类型的引用调用方法，就使用invokeinterfase指令，否则使用invokevirtual指令。本章将实现这四条指令，为了更好地支持动态类语言，Java7增加了一条方法调用指令invokedynamic，本章不讨论该指令。在深入讨论各条方法调用指令的细节之前，先简单了解下Java虚拟机是如何调用方法的。</p>
+          <h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><p>在class文件中，字符串是以MUTF8格式保存的，这一点之前了解过了。在Java虚拟机运行期间，字符串以java.lang.String对象的形式存在，而在String对象内部，字符串又是以UTF16格式保存。字符串相关功能大部分都是由String(和StringBuilder类等)类提供的，本节我们只学习一些辅助功能即可。<br>String类有两个实例变量，其中一个是value，类型是字符数组，用于存放UTF16编码后的字符序列。另一个是hash，缓存字符串的哈希码。有兴趣可以再看下Java中String类的实现。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/02/21/自己动手写JVM二十三【方法调用和返回（一）】/#more" rel="contents">
+            <a class="btn" href="/2017/03/05/自己动手写JVM二十八【数组和字符串（三）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -961,7 +960,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/14/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><span class="page-number current">15</span><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/29/">29</a><a class="extend next" rel="next" href="/page/16/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/14/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><span class="page-number current">15</span><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/30/">30</a><a class="extend next" rel="next" href="/page/16/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1002,7 +1001,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">142</span>
+              <span class="site-state-item-count">147</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1010,7 +1009,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1019,7 +1018,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1073,7 +1072,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

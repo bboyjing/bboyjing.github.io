@@ -266,7 +266,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/27/Mysql分库分表之Mycat学习笔记二【配置初探】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/08/12/Mysql分库分表之Mycat学习笔记六【分片规则-全局表】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/07/27/Mysql分库分表之Mycat学习笔记二【配置初探】/" itemprop="url">
-                  Mysql分库分表之Mycat学习笔记二【配置初探】
+                <a class="post-title-link" href="/2016/08/12/Mysql分库分表之Mycat学习笔记六【分片规则-全局表】/" itemprop="url">
+                  Mysql分库分表之Mycat学习笔记六【分片规则--全局表】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-27T00:27:36+08:00">
-                2016-07-27
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-12T14:16:26+08:00">
+                2016-08-12
               </time>
             
 
@@ -361,19 +361,11 @@
 
       
         
-          <p>本章节先了解下Mycat比较重要的部分，即配置文件，就是上一章节中说到的conf目录下的相关内容。</p>
-<h3 id="先看一下Mycat里几个重要的概念"><a href="#先看一下Mycat里几个重要的概念" class="headerlink" title="先看一下Mycat里几个重要的概念"></a>先看一下Mycat里几个重要的概念</h3><ol>
-<li>用户</li>
-<li>逻辑库（schema）</li>
-<li>逻辑表（table）</li>
-<li>分片节点（dataNode）</li>
-<li>分片规则（rule）</li>
-<li>全局序列号（sequence）</li>
-</ol>
-<p>下面就逐个来讲讲，想一个场景，然后把配置都配好，最终要完整的运行起来。</p>
+          <p>业务中基本上都会有字典表，就上我们建立的order表的status字段，字典表一般改动不大，而且所有分片都要用到，这种表适合于Mycat全局表，无需对数据进行切分，只要在所有分片上保存一份数据即可，这样就可以避免跨库join。</p>
+<h3 id="修改schema-xml配置"><a href="#修改schema-xml配置" class="headerlink" title="修改schema.xml配置"></a>修改schema.xml配置</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">table</span> <span class="attr">name</span>=<span class="string">"order_status"</span> <span class="attr">primaryKey</span>=<span class="string">"id"</span> <span class="attr">type</span>=<span class="string">"global"</span> <span class="attr">dataNode</span>=<span class="string">"dn1,dn2"</span>/&gt;</span></div></pre></td></tr></table></figure>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/07/27/Mysql分库分表之Mycat学习笔记二【配置初探】/#more" rel="contents">
+            <a class="btn" href="/2016/08/12/Mysql分库分表之Mycat学习笔记六【分片规则-全局表】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -414,7 +406,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/26/Mysql分库分表之Mycat学习笔记一【序】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/08/11/Mysql分库分表之Mycat学习笔记五【分片规则-取模】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -439,8 +431,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/07/26/Mysql分库分表之Mycat学习笔记一【序】/" itemprop="url">
-                  Mysql分库分表之Mycat学习笔记一【序】
+                <a class="post-title-link" href="/2016/08/11/Mysql分库分表之Mycat学习笔记五【分片规则-取模】/" itemprop="url">
+                  Mysql分库分表之Mycat学习笔记五【分片规则--取模】
                 </a>
               
             
@@ -454,8 +446,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-26T16:23:59+08:00">
-                2016-07-26
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-11T22:12:26+08:00">
+                2016-08-11
               </time>
             
 
@@ -509,18 +501,11 @@
 
       
         
-          <p>一直对Mysql分库分表有点兴趣，但是也一直停留在有兴趣的阶段，没有遇到能应用的场景。人生苦短，与其等一个机会，不如自己创造吧。稍微调研了下，选择使用<a href="http://www.mycat.org.cn" target="_blank" rel="external">Mycat</a>这样一款开源产品。没有什么特别的理由，也不去讨论挖掘机哪家强，只是为了学习。</p>
-<h3 id="本机环境"><a href="#本机环境" class="headerlink" title="本机环境"></a>本机环境</h3><ul>
-<li>电脑环境：Ubuntu 16.04</li>
-<li>JDK：1.8</li>
-<li>Docker version 1.11.2</li>
-<li>Mysql 5.7.13</li>
-<li>Mycat 1.5-RELEASE</li>
-<li>Navicat for Mysql</li>
-</ul>
+          <p>分片规则是这一类数据库中间件比较重要的部分了，Mycat提供了一些常用的分片规则，正常情况下应该是够用了。没法全部涉及到，我们挑一些学学，这一章来看一下最简单ID取模，具体的配置在第二章已经讲了，这里就不再贴出来了，测试项目上一章也已经建好，直接撸代码吧。</p>
+<h3 id="OrderMapper中添加方法"><a href="#OrderMapper中添加方法" class="headerlink" title="OrderMapper中添加方法"></a>OrderMapper中添加方法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Insert</span>(<span class="string">"&lt;script&gt;"</span>+</div><div class="line">        <span class="string">"insert into `order`(id, status, price, create_time) "</span></div><div class="line">        + <span class="string">"values "</span></div><div class="line">        + <span class="string">"(next value for MYCATSEQ_ORDER,#&#123;order.status&#125;,#&#123;order.price&#125;,NOW()) "</span></div><div class="line">        + <span class="string">"&lt;/script&gt;"</span>)</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">insertOrder</span><span class="params">(@Param(<span class="string">"order"</span>)</span> Order order)</span>;</div></pre></td></tr></table></figure>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/07/26/Mysql分库分表之Mycat学习笔记一【序】/#more" rel="contents">
+            <a class="btn" href="/2016/08/11/Mysql分库分表之Mycat学习笔记五【分片规则-取模】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -561,7 +546,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/20/Neo4j学习笔记十【Spring-Data-Neo4j-Embedded-Driver】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/08/10/Mysql分库分表之Mycat学习笔记四【新建Java测试项目】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -586,8 +571,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/07/20/Neo4j学习笔记十【Spring-Data-Neo4j-Embedded-Driver】/" itemprop="url">
-                  Neo4j学习笔记十【Spring Data Neo4j--Embedded Driver】
+                <a class="post-title-link" href="/2016/08/10/Mysql分库分表之Mycat学习笔记四【新建Java测试项目】/" itemprop="url">
+                  Mysql分库分表之Mycat学习笔记四【新建Java测试项目】
                 </a>
               
             
@@ -601,8 +586,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-20T11:59:35+08:00">
-                2016-07-20
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-10T17:08:34+08:00">
+                2016-08-10
               </time>
             
 
@@ -620,8 +605,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Neo4j/" itemprop="url" rel="index">
-                    <span itemprop="name">Neo4j</span>
+                  <a href="/categories/Mycat/" itemprop="url" rel="index">
+                    <span itemprop="name">Mycat</span>
                   </a>
                 </span>
 
@@ -656,11 +641,11 @@
 
       
         
-          <p>前面一章我们使用Spring Data以Http的形式访问Neo4j，但是发现用不了内置的强大Api。在SDN官方文档中发现有embedded-driver。下面我们尝试着使用下该驱动。</p>
-<h3 id="搭建环境（基于上一章的项目）"><a href="#搭建环境（基于上一章的项目）" class="headerlink" title="搭建环境（基于上一章的项目）"></a>搭建环境（基于上一章的项目）</h3><h4 id="1、添加embedded-driver依赖"><a href="#1、添加embedded-driver依赖" class="headerlink" title="1、添加embedded-driver依赖"></a>1、添加embedded-driver依赖</h4>
+          <p>之前已经把Mycat环境准备完毕，现在我们新建个Java项目，用于后面的测试。项目使用SpringBoot和Mybatis，SpringBot搭一下很容易，但是官方没有提供mybatis starter，不过maven仓库有，下面就贴一下核心配置。</p>
+<h2 id="Mybatis在SpringBoot中的配置"><a href="#Mybatis在SpringBoot中的配置" class="headerlink" title="Mybatis在SpringBoot中的配置"></a>Mybatis在SpringBoot中的配置</h2>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/07/20/Neo4j学习笔记十【Spring-Data-Neo4j-Embedded-Driver】/#more" rel="contents">
+            <a class="btn" href="/2016/08/10/Mysql分库分表之Mycat学习笔记四【新建Java测试项目】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -701,7 +686,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/15/Neo4j学习笔记九【Spring-Data-Neo4j】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/08/09/SpringBoot自定义参数验证/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -726,8 +711,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/07/15/Neo4j学习笔记九【Spring-Data-Neo4j】/" itemprop="url">
-                  Neo4j学习笔记九【Spring Data Neo4j】
+                <a class="post-title-link" href="/2016/08/09/SpringBoot自定义参数验证/" itemprop="url">
+                  SpringBoot自定义参数验证
                 </a>
               
             
@@ -741,8 +726,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-15T11:07:59+08:00">
-                2016-07-15
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-09T21:26:51+08:00">
+                2016-08-09
               </time>
             
 
@@ -760,8 +745,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Neo4j/" itemprop="url" rel="index">
-                    <span itemprop="name">Neo4j</span>
+                  <a href="/categories/SpringBoot/" itemprop="url" rel="index">
+                    <span itemprop="name">SpringBoot</span>
                   </a>
                 </span>
 
@@ -796,11 +781,10 @@
 
       
         
-          <p>到目前为止，我们一直在直接使用Neo4j提供的核心Api爱来访问数据库，尽管这种方法的功能强大且极其灵活，但是底层Neo4j Api的操作有时非常繁琐。下面我们学习下Spring Data Neo4j(SDN)，这是一个以更简单、更熟悉为目标的基于Spring开发模型的Spring Data项目中的子项目。</p>
-<h3 id="SDN适合做什么以及不适合做什么"><a href="#SDN适合做什么以及不适合做什么" class="headerlink" title="SDN适合做什么以及不适合做什么"></a>SDN适合做什么以及不适合做什么</h3><p>SDN从本质上给需要或期待操作基于POJO的域实体的开发者提供了一种方便的使用代码或库函数的方法。如果是早已使用Spring，或早已经在使用丰富领域模型并想映射到一个图形数据库，SDN正适合做这样的工作。<br>SDN不适合一次处理任意类型的大量数据场景。要加载或存储的任何逻辑在一次操作中超过10000个单元对SDN来说不是一个好的选择。另外，通过提供一个间接层，SDN会比仅仅使用核心Api慢，因此，如果速度和性能时考虑的最重要因素的话，最好还是使用其本身的Api。SDN提供了访问底层GraphDatabaseService实例的代码，可以使用底层核心Api来获得最佳的性能和最大的灵活性。
+          <p>项目中需要进行参数验证是件很平常的事儿，Validation框架也已经帮我们做的很好了。但是，为了更贴近业务需求又或者不想为了验证而去写个Bean，所以还是想自己实现个简单的验证功能。项目基于SpringBoot，具体怎么搭建没啥好说的了，下面挑涉及到的几个点，截取项目中的部分代码来展示下是如何实现的。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/07/15/Neo4j学习笔记九【Spring-Data-Neo4j】/#more" rel="contents">
+            <a class="btn" href="/2016/08/09/SpringBoot自定义参数验证/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -841,7 +825,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/07/13/Neo4j学习笔记八【深度遍历（二）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/08/04/Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -866,8 +850,8 @@
             
               
                 
-                <a class="post-title-link" href="/2016/07/13/Neo4j学习笔记八【深度遍历（二）】/" itemprop="url">
-                  Neo4j学习笔记八【深度遍历（二）】
+                <a class="post-title-link" href="/2016/08/04/Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】/" itemprop="url">
+                  Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】
                 </a>
               
             
@@ -881,8 +865,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-13T18:08:55+08:00">
-                2016-07-13
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-08-04T10:20:01+08:00">
+                2016-08-04
               </time>
             
 
@@ -900,8 +884,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Neo4j/" itemprop="url" rel="index">
-                    <span itemprop="name">Neo4j</span>
+                  <a href="/categories/Mycat/" itemprop="url" rel="index">
+                    <span itemprop="name">Mycat</span>
                   </a>
                 </span>
 
@@ -936,10 +920,11 @@
 
       
         
-          <h3 id="管理唯一性"><a href="#管理唯一性" class="headerlink" title="管理唯一性"></a>管理唯一性</h3><p>遍历的唯一性问题决定在遍历期间能访问一个节点多少次。在Neo4j的遍历Api中有几个不同的唯一性设置，它们能作用于遍历中，这个问题之前已经稍微探讨过，这一节来详细了解下。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">//首先构造数据</div><div class="line">create(jane:HUMAN&#123;name : &apos;1.Jane&apos;&#125;),</div><div class="line">      (john:HUMAN&#123;name : &apos;2.John&apos;&#125;),</div><div class="line">      (kate:HUMAN&#123;name : &apos;3.Kate&apos;&#125;),</div><div class="line">      (jack:HUMAN&#123;name : &apos;4.Jack&apos;&#125;),</div><div class="line">      (leeo:HUMAN&#123;name : &apos;5.Leeo&apos;&#125;),</div><div class="line">      (emma:HUMAN&#123;name : &apos;6.Emma&apos;&#125;),</div><div class="line">      (jane)-[:KNOWS]-&gt;(john),</div><div class="line">      (jane)-[:KNOWS]-&gt;(kate),</div><div class="line">      (john)-[:KNOWS]-&gt;(kate),</div><div class="line">      (john)-[:KNOWS]-&gt;(jack),</div><div class="line">      (john)-[:KNOWS]-&gt;(leeo),</div><div class="line">      (kate)-[:KNOWS]-&gt;(emma);</div></pre></td></tr></table></figure></p>
+          <p>上一章我们对Mycat配置有了个初步的了解，现在我们就基于之前的配置，并且模拟一个简单的订单场景，来跑通Mycat。假设我们构建2000万条订单数据，需要以id mod运算之后存储到两台Mysql中，下面我们就一步一步的来实现。</p>
+<h3 id="启动Docker中的两台Mysql容器"><a href="#启动Docker中的两台Mysql容器" class="headerlink" title="启动Docker中的两台Mysql容器"></a>启动Docker中的两台Mysql容器</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#</span>因为之前已经启动过容器，如果没有主动删除过，先查看下其状态</div><div class="line">sudo docker ps -a</div><div class="line"><span class="meta"></span></div><div class="line">#若容器处于Exited状态下，将其启动即可(示例是本人自己的CONTAINER ID)</div><div class="line">sudo docker start d1f418414648</div><div class="line">sudo docker start 9d9674cc4fa7</div></pre></td></tr></table></figure>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2016/07/13/Neo4j学习笔记八【深度遍历（二）】/#more" rel="contents">
+            <a class="btn" href="/2016/08/04/Mysql分库分表之Mycat学习笔记三【模拟场景、运行Mycat】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -975,7 +960,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/26/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><span class="page-number current">27</span><a class="page-number" href="/page/28/">28</a><a class="page-number" href="/page/29/">29</a><a class="extend next" rel="next" href="/page/28/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/26/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><span class="page-number current">27</span><a class="page-number" href="/page/28/">28</a><span class="space">&hellip;</span><a class="page-number" href="/page/30/">30</a><a class="extend next" rel="next" href="/page/28/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1016,7 +1001,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">142</span>
+              <span class="site-state-item-count">147</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1024,7 +1009,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1033,7 +1018,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1087,7 +1072,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

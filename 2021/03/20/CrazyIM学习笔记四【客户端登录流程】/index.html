@@ -1,0 +1,755 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.proxy.ustclug.org/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Java,Netty," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="&amp;emsp;&amp;emsp;这一章节将实现客户端登录的相关逻辑，客户端所涉及的模块大致如下：  ClientCommand模块：控制台命令模块，程序是通过控制台来触发的，根据用户输入的命令来调用响应的Command实现类。 ProtoBufBuilder模块：主要用来组装ProtoBuf消息。 Sender模块：数据包发送模块。 Handler：处理器模块，主要是服务端响应处理器。">
+<meta name="keywords" content="Java,Netty">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CrazyIM学习笔记四【客户端登录流程】">
+<meta property="og:url" content="http://yoursite.com/2021/03/20/CrazyIM学习笔记四【客户端登录流程】/index.html">
+<meta property="og:site_name" content="bboyjing&#39;s blog">
+<meta property="og:description" content="&amp;emsp;&amp;emsp;这一章节将实现客户端登录的相关逻辑，客户端所涉及的模块大致如下：  ClientCommand模块：控制台命令模块，程序是通过控制台来触发的，根据用户输入的命令来调用响应的Command实现类。 ProtoBufBuilder模块：主要用来组装ProtoBuf消息。 Sender模块：数据包发送模块。 Handler：处理器模块，主要是服务端响应处理器。">
+<meta property="og:updated_time" content="2021-03-22T09:54:25.948Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CrazyIM学习笔记四【客户端登录流程】">
+<meta name="twitter:description" content="&amp;emsp;&amp;emsp;这一章节将实现客户端登录的相关逻辑，客户端所涉及的模块大致如下：  ClientCommand模块：控制台命令模块，程序是通过控制台来触发的，根据用户输入的命令来调用响应的Command实现类。 ProtoBufBuilder模块：主要用来组装ProtoBuf消息。 Sender模块：数据包发送模块。 Handler：处理器模块，主要是服务端响应处理器。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2021/03/20/CrazyIM学习笔记四【客户端登录流程】/"/>
+
+
+
+
+
+  <title> CrazyIM学习笔记四【客户端登录流程】 | bboyjing's blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bboyjing's blog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404.html" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/20/CrazyIM学习笔记四【客户端登录流程】/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="bboyjing">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="http://qiniu.didadu.cn/zhangjing.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bboyjing's blog">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bboyjing's blog" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                CrazyIM学习笔记四【客户端登录流程】
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-03-20T16:54:37+08:00">
+                2021-03-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Netty/" itemprop="url" rel="index">
+                    <span itemprop="name">Netty</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>&emsp;&emsp;这一章节将实现客户端登录的相关逻辑，客户端所涉及的模块大致如下：</p>
+<ul>
+<li>ClientCommand模块：控制台命令模块，程序是通过控制台来触发的，根据用户输入的命令来调用响应的Command实现类。</li>
+<li>ProtoBufBuilder模块：主要用来组装ProtoBuf消息。</li>
+<li>Sender模块：数据包发送模块。</li>
+<li><p>Handler：处理器模块，主要是服务端响应处理器。</p>
+<a id="more"></a>
+</li>
+</ul>
+<p>首先创建chatclient模块，客户端的代码大多在该模块中实现。</p>
+<h3 id="ClientCommand模块"><a href="#ClientCommand模块" class="headerlink" title="ClientCommand模块"></a>ClientCommand模块</h3><p>&emsp;&emsp;这里我们将要实现4个基础的命令，这几个命令的作用主要是用来收集用户的输入：</p>
+<ol>
+<li>菜单命令类（ClientCommandMenu）：主要用于列出支持的命令菜单，以及响应用户输入的命令类型</li>
+<li>登录命令（LoginConsoleCommand）</li>
+</ol>
+<p>这些Command类都会实现一个BaseCommand：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BaseCommand</span> </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 命令的执行</div><div class="line">     * <span class="doctag">@param</span> scanner</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">exec</span><span class="params">(Scanner scanner)</span></span>;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 用于识别每个命令的key</div><div class="line">     * <span class="doctag">@return</span></div><div class="line">     */</div><div class="line">    <span class="function">String <span class="title">getKey</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 命令的提示信息</div><div class="line">     * <span class="doctag">@return</span></div><div class="line">     */</div><div class="line">    <span class="function">String <span class="title">getTip</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="ClientCommandMenu"><a href="#ClientCommandMenu" class="headerlink" title="ClientCommandMenu"></a>ClientCommandMenu</h4><p>&emsp;&emsp;该命令的作用主要用于列出支持的命令菜单，以及响应用户输入的命令类型。首先添加<code>spring-boot-starter</code>、chatocommon模块以及lombok的依赖：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>chatcommon<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>cn.didadu<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.0-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.projectlombok<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>lombok<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">scope</span>&gt;</span>provided<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>实现ClientCommandMenu类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Service</span></div><div class="line"><span class="meta">@Data</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClientCommandMenu</span> <span class="keyword">implements</span> <span class="title">BaseCommand</span></span>&#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String KEY = <span class="string">"0"</span>;</div><div class="line">    <span class="keyword">private</span> String allCommandsShow;</div><div class="line">    <span class="keyword">private</span> String commandInput;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exec</span><span class="params">(Scanner scanner)</span> </span>&#123;</div><div class="line">        <span class="comment">// 使用err，立即输出</span></div><div class="line">        System.err.println(<span class="string">"请输入某个操作指令："</span>);</div><div class="line">        System.err.println(allCommandsShow);</div><div class="line">        <span class="comment">// 获取第一个指令（next读取到空白符就结束了）</span></div><div class="line">        commandInput = scanner.next();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getKey</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> KEY;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getTip</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"show 所有命令"</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这里没有给allCommandsShow赋值，后面再看。</p>
+<h4 id="LoginConsoleCommand"><a href="#LoginConsoleCommand" class="headerlink" title="LoginConsoleCommand"></a>LoginConsoleCommand</h4><p>&emsp;&emsp;该命令负责从Scanner控制台实例收集客户端登录的用户ID和密码，实现如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Service</span></div><div class="line"><span class="meta">@Data</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LoginConsoleCommand</span> <span class="keyword">implements</span> <span class="title">BaseCommand</span></span>&#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String KEY = <span class="string">"1"</span>;</div><div class="line">    <span class="keyword">private</span> String userName;</div><div class="line">    <span class="keyword">private</span> String password;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exec</span><span class="params">(Scanner scanner)</span> </span>&#123;</div><div class="line">        System.out.println(<span class="string">"请输入用户信息(id:password)  "</span>);</div><div class="line">        String[] info = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</div><div class="line">            String input = scanner.next();</div><div class="line">            info = input.split(<span class="string">":"</span>);</div><div class="line">            <span class="keyword">if</span> (info.length != <span class="number">2</span>) &#123;</div><div class="line">                System.out.println(<span class="string">"请按照格式输入(id:password):"</span>);</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                <span class="keyword">break</span>;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        userName = info[<span class="number">0</span>];</div><div class="line">        password = info[<span class="number">1</span>];</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getKey</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> KEY;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getTip</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"登录"</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="ProtoBufBuilder模块"><a href="#ProtoBufBuilder模块" class="headerlink" title="ProtoBufBuilder模块"></a>ProtoBufBuilder模块</h3><p>&emsp;&emsp;该模块存放的就是各种消息Bean，没有什么实际的逻辑。</p>
+<h4 id="BaseBuilder"><a href="#BaseBuilder" class="headerlink" title="BaseBuilder"></a>BaseBuilder</h4><p>&emsp;&emsp;Builder消息都存储在chatClient模块的protoBuilder包下，它们继承自BaseBuilder：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseBuilder</span> </span>&#123;</div><div class="line">    <span class="keyword">protected</span> ProtoMsg.HeadType type;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">long</span> seqId;</div><div class="line">    <span class="keyword">private</span> ClientSession session;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BaseBuilder</span><span class="params">(ProtoMsg.HeadType type, ClientSession session)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.type = type;</div><div class="line">        <span class="keyword">this</span>.session = session;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 构建消息 基础部分</div><div class="line">     */</div><div class="line">    <span class="keyword">public</span> ProtoMsg.<span class="function">Message <span class="title">buildCommon</span><span class="params">(<span class="keyword">long</span> seqId)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.seqId = seqId;</div><div class="line">        ProtoMsg.Message.Builder mb =</div><div class="line">                ProtoMsg.Message</div><div class="line">                        .newBuilder()</div><div class="line">                        .setType(type)</div><div class="line">                        .setSessionId(session.getSessionId())</div><div class="line">                        .setSequence(seqId);</div><div class="line">        <span class="keyword">return</span> mb.buildPartial();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中用到了ClientSession，该类在chatClient模块的client包下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Data</span></div><div class="line"><span class="meta">@Slf</span>4j</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClientSession</span> </span>&#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> AttributeKey&lt;ClientSession&gt; SESSION_KEY = AttributeKey.valueOf(<span class="string">"SESSION_KEY"</span>);</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 用户实现客户端会话管理的核心</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> Channel channel;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 用户信息</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> User user;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 保存登录后的服务端sessionId</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> String sessionId;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 是否已建立连接</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> connected = <span class="keyword">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 是否已登录</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> login = <span class="keyword">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * session中存储的session 变量属性值</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> Map&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap&lt;String, Object&gt;();</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 绑定通道</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> channel</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ClientSession</span><span class="params">(Channel channel)</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.channel = channel;</div><div class="line">        <span class="keyword">this</span>.sessionId = String.valueOf(-<span class="number">1</span>);</div><div class="line">        channel.attr(ClientSession.SESSION_KEY).set(<span class="keyword">this</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="LoginMsgBuilder"><a href="#LoginMsgBuilder" class="headerlink" title="LoginMsgBuilder"></a>LoginMsgBuilder</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LoginMsgBuilder</span> <span class="keyword">extends</span> <span class="title">BaseBuilder</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> User user;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LoginMsgBuilder</span><span class="params">(User user, ClientSession session)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(ProtoMsg.HeadType.LOGIN_REQUEST, session);</div><div class="line">        <span class="keyword">this</span>.user = user;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> ProtoMsg.<span class="function">Message <span class="title">build</span><span class="params">()</span> </span>&#123;</div><div class="line">        ProtoMsg.Message message = buildCommon(-<span class="number">1</span>);</div><div class="line">        ProtoMsg.LoginRequest.Builder lb =</div><div class="line">                ProtoMsg.LoginRequest.newBuilder()</div><div class="line">                        .setDeviceId(user.getDevId())</div><div class="line">                        .setPlatform(user.getPlatform().getCode())</div><div class="line">                        .setToken(user.getToken())</div><div class="line">                        .setUid(user.getUid());</div><div class="line">        <span class="keyword">return</span> message.toBuilder().setLoginRequest(lb).build();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> ProtoMsg.<span class="function">Message <span class="title">buildLoginMsg</span><span class="params">(</span></span></div><div class="line">            User user, ClientSession session) &#123;</div><div class="line">        LoginMsgBuilder builder = <span class="keyword">new</span> LoginMsgBuilder(user, session);</div><div class="line">        <span class="keyword">return</span> builder.build();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="HeartBeatMsgBuilder"><a href="#HeartBeatMsgBuilder" class="headerlink" title="HeartBeatMsgBuilder"></a>HeartBeatMsgBuilder</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HeartBeatMsgBuilder</span> <span class="keyword">extends</span> <span class="title">BaseBuilder</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">final</span> User user;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">HeartBeatMsgBuilder</span><span class="params">(User user, ClientSession session)</span> </span>&#123;</div><div class="line">        <span class="keyword">super</span>(ProtoMsg.HeadType.KEEPALIVE_REQUEST, session);</div><div class="line">        <span class="keyword">this</span>.user = user;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> ProtoMsg.<span class="function">Message <span class="title">buildMsg</span><span class="params">()</span> </span>&#123;</div><div class="line">        ProtoMsg.Message message = buildCommon(-<span class="number">1</span>);</div><div class="line">        ProtoMsg.MessageHeartBeat.Builder lb = ProtoMsg.MessageHeartBeat.newBuilder()</div><div class="line">                .setSeq(<span class="number">0</span>)</div><div class="line">                .setJson(<span class="string">"&#123;\"from\":\"client\"&#125;"</span>)</div><div class="line">                .setUid(user.getUid());</div><div class="line">        <span class="keyword">return</span> message.toBuilder().setHeartBeat(lb).build();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="Sender模块"><a href="#Sender模块" class="headerlink" title="Sender模块"></a>Sender模块</h3><p>&emsp;&emsp;该模块的作用是用来发送数据包的。</p>
+<h4 id="BaseSender"><a href="#BaseSender" class="headerlink" title="BaseSender"></a>BaseSender</h4><p>&emsp;&emsp;所有Sender的基类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Slf</span>4j</div><div class="line"><span class="meta">@Data</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseSender</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> User user;</div><div class="line">    <span class="keyword">private</span> ClientSession session;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 是否连接中</div><div class="line">     *</div><div class="line">     * <span class="doctag">@return</span></div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isConnected</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> == session) &#123;</div><div class="line">            log.info(<span class="string">"session is null"</span>);</div><div class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> session.isConnected();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 是否登录中</div><div class="line">     *</div><div class="line">     * <span class="doctag">@return</span></div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isLogin</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> == session) &#123;</div><div class="line">            log.info(<span class="string">"session is null"</span>);</div><div class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> session.isLogin();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendMsg</span><span class="params">(ProtoMsg.Message message)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> == getSession() || !isConnected()) &#123;</div><div class="line">            log.info(<span class="string">"连接还没成功"</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        Channel channel = session.getChannel();</div><div class="line">        ChannelFuture f = channel.writeAndFlush(message);</div><div class="line">        <span class="comment">// ChannelFuture有结果了会在addListener中执行operationComplete方法</span></div><div class="line">        f.addListener(<span class="keyword">new</span> GenericFutureListener&lt;Future&lt;? <span class="keyword">super</span> Void&gt;&gt;() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">operationComplete</span><span class="params">(Future&lt;? <span class="keyword">super</span> Void&gt; future)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">                <span class="comment">// 回调</span></div><div class="line">                <span class="keyword">if</span> (f.isSuccess()) &#123;</div><div class="line">                    sendSucced(message);</div><div class="line">                &#125; <span class="keyword">else</span> &#123;</div><div class="line">                    sendfailed(message);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line"></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            f.sync();</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">sendSucced</span><span class="params">(ProtoMsg.Message message)</span> </span>&#123;</div><div class="line">        log.info(<span class="string">"发送成功"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">sendfailed</span><span class="params">(ProtoMsg.Message message)</span> </span>&#123;</div><div class="line">        log.info(<span class="string">"发送失败"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="LoginSender"><a href="#LoginSender" class="headerlink" title="LoginSender"></a>LoginSender</h4><p>&emsp;&emsp;发送登录消息：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Slf</span>4j</div><div class="line"><span class="meta">@Service</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LoginSender</span> <span class="keyword">extends</span> <span class="title">BaseSender</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendLoginMsg</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (!isConnected()) &#123;</div><div class="line">            log.info(<span class="string">"还没有建立连接!"</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        log.info(<span class="string">"构造登录消息"</span>);</div><div class="line">        ProtoMsg.Message message = LoginMsgBuilder.buildLoginMsg(getUser(), getSession());</div><div class="line">        log.info(<span class="string">"发送登录消息"</span>);</div><div class="line">        <span class="keyword">super</span>.sendMsg(message);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="Handler模块"><a href="#Handler模块" class="headerlink" title="Handler模块"></a>Handler模块</h3><p>&emsp;&emsp;处理器模块，主要是服务端响应处理器，都是入站处理器。</p>
+<h4 id="HeartBeatClientHandler"><a href="#HeartBeatClientHandler" class="headerlink" title="HeartBeatClientHandler"></a>HeartBeatClientHandler</h4><p>&emsp;&emsp;用来处理心跳消息，首先在client模块的ClientSession添加获取Sessiont的方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Data</span></div><div class="line"><span class="meta">@Slf</span>4j</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClientSession</span> </span>&#123;</div><div class="line">  	......</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 从Channel中获取ClientSession</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> ctx</div><div class="line">     * <span class="doctag">@return</span></div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ClientSession <span class="title">getSession</span><span class="params">(ChannelHandlerContext ctx)</span> </span>&#123;</div><div class="line">        Channel channel = ctx.channel();</div><div class="line">        <span class="keyword">return</span> channel.attr(ClientSession.SESSION_KEY).get();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>HeartBeatClientHandler实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Slf</span>4j</div><div class="line"><span class="meta">@ChannelHandler</span>.Sharable</div><div class="line"><span class="meta">@Service</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HeartBeatClientHandler</span> <span class="keyword">extends</span> <span class="title">ChannelInboundHandlerAdapter</span> </span>&#123;</div><div class="line">    <span class="comment">// 心跳的时间间隔，单位为s</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> HEARTBEAT_INTERVAL = <span class="number">100</span>;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 在Handler被加入到Pipeline时，开始发送心跳</div><div class="line">     * 然后每100秒递归发送信条消息</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> ctx</div><div class="line">     * <span class="doctag">@throws</span> Exception</div><div class="line">     */</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handlerAdded</span><span class="params">(ChannelHandlerContext ctx)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        ClientSession session = ClientSession.getSession(ctx);</div><div class="line">        User user = session.getUser();</div><div class="line">        HeartBeatMsgBuilder builder = <span class="keyword">new</span> HeartBeatMsgBuilder(user, session);</div><div class="line">        ProtoMsg.Message message = builder.buildMsg();</div><div class="line">        <span class="comment">// 发送心跳</span></div><div class="line">        heartBeat(ctx, message);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span><span class="params">(ChannelHandlerContext ctx, Object msg)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        <span class="comment">// 判断消息实例</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> == msg || !(msg <span class="keyword">instanceof</span> ProtoMsg.Message)) &#123;</div><div class="line">            <span class="keyword">super</span>.channelRead(ctx, msg);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 判断类型</span></div><div class="line">        ProtoMsg.Message pkg = (ProtoMsg.Message) msg;</div><div class="line">        ProtoMsg.HeadType headType = pkg.getType();</div><div class="line">        <span class="keyword">if</span> (headType.equals(ProtoMsg.HeadType.KEEPALIVE_RESPONSE)) &#123;</div><div class="line">            log.info(<span class="string">" 收到回写的 HEART_BEAT  消息 from server"</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="keyword">super</span>.channelRead(ctx, msg);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 使用定时器，发送心跳报文</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> ctx</div><div class="line">     * <span class="doctag">@param</span> heartbeatMsg</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">heartBeat</span><span class="params">(ChannelHandlerContext ctx, ProtoMsg.Message heartbeatMsg)</span> </span>&#123;</div><div class="line">        ctx.executor().schedule(() -&gt; &#123;</div><div class="line">            <span class="keyword">if</span> (ctx.channel().isActive()) &#123;</div><div class="line">                log.info(<span class="string">" 发送 HEART_BEAT  消息 to server"</span>);</div><div class="line">                ctx.writeAndFlush(heartbeatMsg);</div><div class="line">                <span class="comment">// 递归调用，发送下一次的心跳</span></div><div class="line">                heartBeat(ctx, heartbeatMsg);</div><div class="line">            &#125;</div><div class="line">        &#125;, HEARTBEAT_INTERVAL, TimeUnit.SECONDS);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="LoginResponceHandler"><a href="#LoginResponceHandler" class="headerlink" title="LoginResponceHandler"></a>LoginResponceHandler</h4><p>&emsp;&emsp;用来处理登录消息的返回逻辑，首先在common模块中添加常量信息：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProtoInstant</span> </span>&#123;</div><div class="line">    ......</div><div class="line">    <span class="meta">@AllArgsConstructor</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">enum</span> ResultCodeEnum &#123;</div><div class="line">        SUCCESS(<span class="number">0</span>, <span class="string">"登录成功"</span>),</div><div class="line">        AUTH_FAILED(<span class="number">1</span>, <span class="string">"登录失败"</span>),</div><div class="line">        NO_TOKEN(<span class="number">2</span>, <span class="string">"没有授权码"</span>),</div><div class="line">        UNKNOWN_ERROR(<span class="number">3</span>, <span class="string">"未知错误"</span>);</div><div class="line"></div><div class="line">        <span class="meta">@Getter</span></div><div class="line">        <span class="keyword">private</span> Integer code;</div><div class="line">        <span class="meta">@Getter</span></div><div class="line">        <span class="keyword">private</span> String desc;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>client模块的ClientSession添加登录方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Data</span></div><div class="line"><span class="meta">@Slf</span>4j</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClientSession</span> </span>&#123;</div><div class="line">   ......</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 登录成功之后,设置sessionId</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> ctx</div><div class="line">     * <span class="doctag">@param</span> pkg</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">loginSuccess</span><span class="params">(ChannelHandlerContext ctx, ProtoMsg.Message pkg)</span> </span>&#123;</div><div class="line">        Channel channel = ctx.channel();</div><div class="line">        ClientSession session = channel.attr(ClientSession.SESSION_KEY).get();</div><div class="line">        session.setSessionId(pkg.getSessionId());</div><div class="line">        session.setLogin(<span class="keyword">true</span>);</div><div class="line">        log.info(<span class="string">"登录成功"</span>);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>LoginResponseHandler实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Slf</span>4j</div><div class="line"><span class="meta">@ChannelHandler</span>.Sharable</div><div class="line"><span class="meta">@Service</span>()</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LoginResponseHandler</span> <span class="keyword">extends</span> <span class="title">ChannelInboundHandlerAdapter</span> </span>&#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelRead</span><span class="params">(ChannelHandlerContext ctx, Object msg)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        <span class="comment">// 判断消息实例</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> == msg || !(msg <span class="keyword">instanceof</span> ProtoMsg.Message)) &#123;</div><div class="line">            <span class="comment">// 传递消息到下一个Handler</span></div><div class="line">            <span class="keyword">super</span>.channelRead(ctx, msg);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 判断类型</span></div><div class="line">        ProtoMsg.Message pkg = (ProtoMsg.Message) msg;</div><div class="line">        ProtoMsg.HeadType headType = ((ProtoMsg.Message) msg).getType();</div><div class="line">        <span class="keyword">if</span> (!headType.equals(ProtoMsg.HeadType.LOGIN_RESPONSE)) &#123;</div><div class="line">            <span class="comment">// 如果不是LOGIN_RESPONSE，传递到下一个Handler</span></div><div class="line">            <span class="keyword">super</span>.channelRead(ctx, msg);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">//判断返回是否成功</span></div><div class="line">        ProtoMsg.LoginResponse info = pkg.getLoginResponse();</div><div class="line">        ProtoInstant.ResultCodeEnum result = ProtoInstant.ResultCodeEnum.values()[info.getCode()];</div><div class="line">        <span class="keyword">if</span> (!result.equals(ProtoInstant.ResultCodeEnum.SUCCESS)) &#123;</div><div class="line">            <span class="comment">//登录失败</span></div><div class="line">            log.info(result.getDesc());</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="comment">// 登录成功，设置session id</span></div><div class="line">            ClientSession.loginSuccess(ctx, pkg);</div><div class="line">            ChannelPipeline p = ctx.pipeline();</div><div class="line">            <span class="comment">// 移除登录响应处理器（从该连接的pipeline中移除LoginResponseHandler）</span></div><div class="line">            p.remove(<span class="keyword">this</span>);</div><div class="line"></div><div class="line">            <span class="comment">// 在编码器后面，动态插入心跳处理器</span></div><div class="line">            p.addAfter(<span class="string">"encoder"</span>, <span class="string">"heartbeat"</span>, <span class="keyword">new</span> HeartBeatClientHandler());</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="ExceptionHandler"><a href="#ExceptionHandler" class="headerlink" title="ExceptionHandler"></a>ExceptionHandler</h4><p>&emsp;&emsp;用来处理Handler中抛出的异常，首先在ClientSession中添加close方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Data</span></div><div class="line"><span class="meta">@Slf</span>4j</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClientSession</span> </span>&#123;</div><div class="line">    ......</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 关闭通道</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> </span>&#123;</div><div class="line">        connected = <span class="keyword">false</span>;</div><div class="line">        ChannelFuture future = channel.close();</div><div class="line">        future.addListener(<span class="keyword">new</span> ChannelFutureListener() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">operationComplete</span><span class="params">(ChannelFuture future)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">                <span class="keyword">if</span> (future.isSuccess()) &#123;</div><div class="line">                    log.error(<span class="string">"连接顺利断开"</span>);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>ExceptionHandler实现，其中重连操作后面再完善：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Slf</span>4j</div><div class="line"><span class="meta">@ChannelHandler</span>.Sharable</div><div class="line"><span class="meta">@Service</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExceptionHandler</span> <span class="keyword">extends</span> <span class="title">ChannelInboundHandlerAdapter</span> </span>&#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span><span class="params">(ChannelHandlerContext ctx, Throwable cause)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        <span class="keyword">if</span> (cause <span class="keyword">instanceof</span> InvalidFrameException) &#123;</div><div class="line">            <span class="comment">// 协议异常，直接关闭</span></div><div class="line">            log.error(cause.getMessage());</div><div class="line">            ClientSession.getSession(ctx).close();</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="comment">// 其它异常，捕捉异常信息</span></div><div class="line">            log.error(cause.getMessage());</div><div class="line">            ctx.close();</div><div class="line">            <span class="comment">// TODO 重连</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 通道 Read 读取 Complete 完成</div><div class="line">     * 将缓冲区中的数据刷新到对端</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> ctx</div><div class="line">     * <span class="doctag">@throws</span> Exception</div><div class="line">     */</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelReadComplete</span><span class="params">(ChannelHandlerContext ctx)</span> <span class="keyword">throws</span> Exception </span>&#123;</div><div class="line">        ctx.flush();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="Concurrent模块"><a href="#Concurrent模块" class="headerlink" title="Concurrent模块"></a>Concurrent模块</h3><p>&emsp;&emsp;在客户端进程中需要用到多线程，在common模块的cocurrent包中添加工具类。</p>
+<h4 id="ExecuteTask"><a href="#ExecuteTask" class="headerlink" title="ExecuteTask"></a>ExecuteTask</h4><p>&emsp;&emsp;任务接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ExecuteTask</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="FutureTaskScheduler"><a href="#FutureTaskScheduler" class="headerlink" title="FutureTaskScheduler"></a>FutureTaskScheduler</h4><p>&emsp;&emsp;线程任务：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Slf</span>4j</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FutureTaskScheduler</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 任务队列</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> ConcurrentLinkedQueue&lt;ExecuteTask&gt; executeTaskQueue = <span class="keyword">new</span> ConcurrentLinkedQueue&lt;ExecuteTask&gt;();</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 线程休眠时间</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">long</span> sleepTime = <span class="number">200</span>;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 固定10个的线程池</div><div class="line">     * 用来从队列中获取需要执行的CallbackTask</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> ExecutorService pool = Executors.newFixedThreadPool(<span class="number">10</span>);</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> FutureTaskScheduler inst = <span class="keyword">new</span> FutureTaskScheduler();</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 私有构造函数，直接启动线程</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="title">FutureTaskScheduler</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">this</span>.start();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 添加任务</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> executeTask</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(ExecuteTask executeTask)</span> </span>&#123;</div><div class="line">        inst.executeTaskQueue.add(executeTask);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</div><div class="line">            <span class="comment">// 处理任务</span></div><div class="line">            handleTask();</div><div class="line">            <span class="comment">// 休眠</span></div><div class="line">            threadSleep(sleepTime);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 线程休眠</div><div class="line">     *</div><div class="line">     * <span class="doctag">@param</span> time</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">threadSleep</span><span class="params">(<span class="keyword">long</span> time)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            sleep(time);</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">            log.error(e.getLocalizedMessage());</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 处理任务队列，检查其中是否有任务</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">handleTask</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            ExecuteTask executeTask;</div><div class="line">            <span class="keyword">while</span> (executeTaskQueue.peek() != <span class="keyword">null</span>) &#123;</div><div class="line">                executeTask = executeTaskQueue.poll();</div><div class="line">                pool.execute(<span class="keyword">new</span> ExecuteRunnable(executeTask));</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            log.error(e.getLocalizedMessage());</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="class"><span class="keyword">class</span> <span class="title">ExecuteRunnable</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</div><div class="line">        ExecuteTask executeTask;</div><div class="line"></div><div class="line">        ExecuteRunnable(ExecuteTask executeTask) &#123;</div><div class="line">            <span class="keyword">this</span>.executeTask = executeTask;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="meta">@Override</span></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">            executeTask.execute();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="组装各个模块"><a href="#组装各个模块" class="headerlink" title="组装各个模块"></a>组装各个模块</h3><h4 id="NettyClient"><a href="#NettyClient" class="headerlink" title="NettyClient"></a>NettyClient</h4><p>&emsp;&emsp;Netty客户端实现，首先添加配置项：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="attr">server:</span></div><div class="line"><span class="attr">  ip:</span> <span class="string">localhost</span></div><div class="line"><span class="attr">  port:</span> <span class="number">8080</span></div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Slf</span>4j</div><div class="line"><span class="meta">@Service</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NettyClient</span> </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 服务器ip地址</div><div class="line">     */</div><div class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;server.ip&#125;"</span>)</div><div class="line">    <span class="keyword">private</span> String host;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 服务器端口</div><div class="line">     */</div><div class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;server.port&#125;"</span>)</div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> port;</div><div class="line"></div><div class="line">    <span class="meta">@Autowired</span></div><div class="line">    <span class="keyword">private</span> LoginResponseHandler loginResponseHandler;</div><div class="line"></div><div class="line">    <span class="meta">@Autowired</span></div><div class="line">    <span class="keyword">private</span> ExceptionHandler exceptionHandler;</div><div class="line"></div><div class="line">    EventLoopGroup eventLoopGroup;</div><div class="line"></div><div class="line">    <span class="meta">@Setter</span></div><div class="line">    <span class="keyword">private</span> GenericFutureListener&lt;ChannelFuture&gt; connectedListener;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NettyClient</span><span class="params">()</span> </span>&#123;</div><div class="line">        eventLoopGroup = <span class="keyword">new</span> NioEventLoopGroup();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 重连</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doConnect</span><span class="params">()</span> </span>&#123;</div><div class="line">        Bootstrap bootstrap = <span class="keyword">new</span> Bootstrap();</div><div class="line">        EventLoopGroup eventLoopGroup = <span class="keyword">new</span> NioEventLoopGroup();</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            bootstrap.group(eventLoopGroup);</div><div class="line">            bootstrap.channel(NioSocketChannel.class);</div><div class="line">            bootstrap.option(ChannelOption.SO_KEEPALIVE, <span class="keyword">true</span>);</div><div class="line">            bootstrap.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);</div><div class="line">            bootstrap.remoteAddress(host, port);</div><div class="line"></div><div class="line">            <span class="comment">// 设置通道初始化</span></div><div class="line">            bootstrap.handler(</div><div class="line">                    <span class="keyword">new</span> ChannelInitializer&lt;SocketChannel&gt;() &#123;</div><div class="line">                        <span class="meta">@Override</span></div><div class="line">                        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(SocketChannel ch)</span> </span>&#123;</div><div class="line">                            ch.pipeline().addLast(<span class="string">"decoder"</span>, <span class="keyword">new</span> ProtoBufDecoder());</div><div class="line">                            ch.pipeline().addLast(<span class="string">"encoder"</span>, <span class="keyword">new</span> ProtoBufEncoder());</div><div class="line">                            ch.pipeline().addLast(loginResponseHandler);</div><div class="line">                            ch.pipeline().addLast(exceptionHandler);</div><div class="line">                        &#125;</div><div class="line">                    &#125;</div><div class="line">            );</div><div class="line">            log.info(<span class="string">"客户端开始连接 [疯狂创客圈IM]"</span>);</div><div class="line"></div><div class="line">            ChannelFuture f = bootstrap.connect();</div><div class="line">            f.addListener(connectedListener);</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            log.info(<span class="string">"客户端连接失败!"</span> + e.getMessage());</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> </span>&#123;</div><div class="line">        eventLoopGroup.shutdownGracefully();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="CommandController"><a href="#CommandController" class="headerlink" title="CommandController"></a>CommandController</h4><p>&emsp;&emsp;负责收集用户在控制台输入的命令，根据响应的命令类型调用响应的命令处理器合收集相关的信息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Slf</span>4j</div><div class="line"><span class="meta">@Service</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CommandController</span> </span>&#123;</div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 登录命令收集类</div><div class="line">     */</div><div class="line">    <span class="meta">@Autowired</span></div><div class="line">    <span class="keyword">private</span> LoginConsoleCommand loginConsoleCommand;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 菜单命令收集类</div><div class="line">     */</div><div class="line">    <span class="meta">@Autowired</span></div><div class="line">    <span class="keyword">private</span> ClientCommandMenu clientCommandMenu;</div><div class="line"></div><div class="line">    <span class="meta">@Autowired</span></div><div class="line">    <span class="keyword">private</span> NettyClient nettyClient;</div><div class="line"></div><div class="line">    <span class="meta">@Autowired</span></div><div class="line">    <span class="keyword">private</span> LoginSender loginSender;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 与服务端连接的通道</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> Channel channel;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 连接状态标记</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> connectFlag = <span class="keyword">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 客户端会话</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> ClientSession session;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 客户端命令Map</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> Map&lt;String, BaseCommand&gt; commandMap;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 显式在中断的字符串（展示出所有支持的命令行）</div><div class="line">     */</div><div class="line">    <span class="keyword">private</span> String menuString;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> User user;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 初始化命令Map</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initCommandMap</span><span class="params">()</span> </span>&#123;</div><div class="line">        commandMap = <span class="keyword">new</span> HashMap&lt;&gt;();</div><div class="line">        commandMap.put(clientCommandMenu.getKey(), clientCommandMenu);</div><div class="line">        commandMap.put(loginConsoleCommand.getKey(), loginConsoleCommand);</div><div class="line"></div><div class="line">        Set&lt;Map.Entry&lt;String, BaseCommand&gt;&gt; entrys = commandMap.entrySet();</div><div class="line">        Iterator&lt;Map.Entry&lt;String, BaseCommand&gt;&gt; iterator = entrys.iterator();</div><div class="line"></div><div class="line">        StringBuilder menus = <span class="keyword">new</span> StringBuilder();</div><div class="line">        menus.append(<span class="string">"[menu] "</span>);</div><div class="line">        <span class="keyword">while</span> (iterator.hasNext()) &#123;</div><div class="line">            BaseCommand next = iterator.next().getValue();</div><div class="line">            menus.append(next.getKey())</div><div class="line">                    .append(<span class="string">"-&gt;"</span>)</div><div class="line">                    .append(next.getTip())</div><div class="line">                    .append(<span class="string">" | "</span>);</div><div class="line"></div><div class="line">        &#125;</div><div class="line">        menuString = menus.toString();</div><div class="line"></div><div class="line">        <span class="comment">// 在这里设置了ClientCommandMenu.allCommandsShow</span></div><div class="line">        clientCommandMenu.setAllCommandsShow(menuString);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    GenericFutureListener&lt;ChannelFuture&gt; closeListener = (ChannelFuture f) -&gt; &#123;</div><div class="line">        log.info(<span class="keyword">new</span> Date() + <span class="string">": 连接已经断开……"</span>);</div><div class="line">        channel = f.channel();</div><div class="line"></div><div class="line">        <span class="comment">// 创建会话</span></div><div class="line">        ClientSession session = channel.attr(ClientSession.SESSION_KEY).get();</div><div class="line">        session.close();</div><div class="line"></div><div class="line">        <span class="comment">// 唤醒用户线程</span></div><div class="line">        notifyCommandThread();</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 连接通道监听</div><div class="line">     */</div><div class="line">    GenericFutureListener&lt;ChannelFuture&gt; connectedListener = (ChannelFuture f) -&gt; &#123;</div><div class="line">        <span class="keyword">final</span> EventLoop eventLoop = f.channel().eventLoop();</div><div class="line">        <span class="keyword">if</span> (!f.isSuccess()) &#123;</div><div class="line">            log.info(<span class="string">"连接失败!在10s之后准备尝试重连!"</span>);</div><div class="line">            eventLoop.schedule(</div><div class="line">                    () -&gt; nettyClient.doConnect(),</div><div class="line">                    <span class="number">10</span>,</div><div class="line">                    TimeUnit.SECONDS);</div><div class="line">            connectFlag = <span class="keyword">false</span>;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            connectFlag = <span class="keyword">true</span>;</div><div class="line">            log.info(<span class="string">"疯狂创客圈 IM 服务器 连接成功!"</span>);</div><div class="line">            channel = f.channel();</div><div class="line"></div><div class="line">            <span class="comment">// 创建会话</span></div><div class="line">            session = <span class="keyword">new</span> ClientSession(channel);</div><div class="line">            session.setConnected(<span class="keyword">true</span>);</div><div class="line"></div><div class="line">            <span class="comment">// 连接上之后添加通道关闭监听</span></div><div class="line">            channel.closeFuture().addListener(closeListener);</div><div class="line"></div><div class="line">            <span class="comment">// 唤醒用户线程</span></div><div class="line">            notifyCommandThread();</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">notifyCommandThread</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">// 唤醒，命令收集程</span></div><div class="line">        <span class="keyword">this</span>.notify();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">waitCommandThread</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">// 休眠，命令收集线程</span></div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">this</span>.wait();</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 启动连接</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">startConnectServer</span><span class="params">()</span> </span>&#123;</div><div class="line">        FutureTaskScheduler.add(() -&gt; &#123;</div><div class="line">            nettyClient.setConnectedListener(connectedListener);</div><div class="line">            nettyClient.doConnect();</div><div class="line">        &#125;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">/**</span></div><div class="line">     * 启动Command线程</div><div class="line">     *</div><div class="line">     * <span class="doctag">@throws</span> InterruptedException</div><div class="line">     */</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">startCommandThread</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">        Thread.currentThread().setName(<span class="string">"命令线程"</span>);</div><div class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</div><div class="line">            <span class="comment">// 建立连接</span></div><div class="line">            <span class="keyword">while</span> (!connectFlag) &#123;</div><div class="line">                <span class="comment">// 开始连接</span></div><div class="line">                startConnectServer();</div><div class="line">                <span class="comment">// 暂停命令线程</span></div><div class="line">                waitCommandThread();</div><div class="line">            &#125;</div><div class="line">            <span class="comment">// 处理命令</span></div><div class="line">            <span class="keyword">while</span> (<span class="keyword">null</span> != session) &#123;</div><div class="line">                <span class="comment">// 获取命令行输入的命令key，通过key找到命令</span></div><div class="line">                Scanner scanner = <span class="keyword">new</span> Scanner(System.in);</div><div class="line">                clientCommandMenu.exec(scanner);</div><div class="line">                String key = clientCommandMenu.getCommandInput();</div><div class="line">                BaseCommand command = commandMap.get(key);</div><div class="line">                <span class="keyword">if</span> (<span class="keyword">null</span> == command) &#123;</div><div class="line">                    System.err.println(<span class="string">"无法识别["</span> + command + <span class="string">"]指令，请重新输入!"</span>);</div><div class="line">                    <span class="keyword">continue</span>;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                <span class="keyword">switch</span> (key) &#123;</div><div class="line">                    <span class="keyword">case</span> LoginConsoleCommand.KEY:</div><div class="line">                        command.exec(scanner);</div><div class="line">                        startLogin((LoginConsoleCommand) command);</div><div class="line">                        <span class="keyword">break</span>;</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">startLogin</span><span class="params">(LoginConsoleCommand command)</span> </span>&#123;</div><div class="line">        <span class="comment">// 登录</span></div><div class="line">        <span class="keyword">if</span> (!connectFlag) &#123;</div><div class="line">            log.info(<span class="string">"连接异常，请重新建立连接"</span>);</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        User user = User.builder()</div><div class="line">                .uid(command.getUserName())</div><div class="line">                .token(command.getPassword())</div><div class="line">                .platform(User.PlatForm.WEB)</div><div class="line">                .devId(<span class="string">"1111"</span>).build();</div><div class="line">        <span class="keyword">this</span>.user = user;</div><div class="line">        session.setUser(user);</div><div class="line">        loginSender.setUser(user);</div><div class="line">        loginSender.setSession(session);</div><div class="line">        loginSender.sendLoginMsg();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="ClientApplication"><a href="#ClientApplication" class="headerlink" title="ClientApplication"></a>ClientApplication</h4><p>&emsp;&emsp;SpringBoot启动类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@SpringBootApplication</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClientApplication</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        <span class="comment">// 启动并初始化 Spring 环境及其各 Spring 组件</span></div><div class="line">        ApplicationContext context = SpringApplication.run(ClientApplication.class, args);</div><div class="line">        CommandController commandClient = context.getBean(CommandController.class);</div><div class="line">        commandClient.initCommandMap();</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            commandClient.startCommandThread();</div><div class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">            e.printStackTrace();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h3><p>&emsp;&emsp;首先启动好服务端，然后启动客户端，在命令行操作。</p>
+<p>客户端的输出如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">52</span>:<span class="number">51.039</span>  INFO <span class="number">52704</span> --- [           main] cn.didadu.chatclient.ClientApplication   : Started ClientApplication in <span class="number">1.942</span> seconds (JVM running <span class="keyword">for</span> <span class="number">3.334</span>)</div><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">52</span>:<span class="number">51.276</span>  INFO <span class="number">52704</span> --- [pool-<span class="number">1</span>-thread-<span class="number">1</span>] cn.didadu.chatclient.client.NettyClient  : 客户端开始连接 [疯狂创客圈IM]</div><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">52</span>:<span class="number">51.364</span>  INFO <span class="number">52704</span> --- [ntLoopGroup-<span class="number">3</span>-<span class="number">1</span>] c.d.chatclient.client.CommandController  : 疯狂创客圈 IM 服务器 连接成功!</div><div class="line">请输入某个操作指令：</div><div class="line">[menu] <span class="number">0</span>-&gt;show 所有命令 | <span class="number">1</span>-&gt;登录 | </div><div class="line"><span class="number">1</span></div><div class="line">请输入用户信息(id:password)  </div><div class="line">bboyjing:<span class="number">123</span></div><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">53</span>:<span class="number">00.615</span>  INFO <span class="number">52704</span> --- [           命令线程] cn.didadu.chatclient.sender.LoginSender  : 构造登录消息</div><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">53</span>:<span class="number">00.712</span>  INFO <span class="number">52704</span> --- [           命令线程] cn.didadu.chatclient.sender.LoginSender  : 发送登录消息</div><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">53</span>:<span class="number">00.770</span>  INFO <span class="number">52704</span> --- [ntLoopGroup-<span class="number">3</span>-<span class="number">1</span>] cn.didadu.chatclient.sender.BaseSender   : 发送成功</div><div class="line">请输入某个操作指令：</div><div class="line">[menu] <span class="number">0</span>-&gt;show 所有命令 | <span class="number">1</span>-&gt;登录 | </div><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">53</span>:<span class="number">00.830</span>  INFO <span class="number">52704</span> --- [ntLoopGroup-<span class="number">3</span>-<span class="number">1</span>] c.d.chatclient.client.ClientSession      : 登录成功</div><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">54</span>:<span class="number">40.841</span>  INFO <span class="number">52704</span> --- [ntLoopGroup-<span class="number">3</span>-<span class="number">1</span>] c.d.c.handler.HeartBeatClientHandler     :  发送 HEART_BEAT  消息 to server</div><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">54</span>:<span class="number">40.846</span>  INFO <span class="number">52704</span> --- [ntLoopGroup-<span class="number">3</span>-<span class="number">1</span>] c.d.c.handler.HeartBeatClientHandler     :  收到回写的 HEART_BEAT  消息 from server</div><div class="line">......</div></pre></td></tr></table></figure>
+<p>服务端的输出如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">52</span>:<span class="number">38.501</span>  INFO <span class="number">52702</span> --- [           main] cn.didadu.chatserver.ServerApplication   : Started ServerApplication in <span class="number">1.268</span> seconds (JVM running <span class="keyword">for</span> <span class="number">2.025</span>)</div><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">52</span>:<span class="number">38.681</span>  INFO <span class="number">52702</span> --- [           main] cn.didadu.chatserver.server.ChatServer   : 疯狂创客圈 CrazyIM 服务启动, 端口 /<span class="number">0</span>:<span class="number">0</span>:<span class="number">0</span>:<span class="number">0</span>:<span class="number">0</span>:<span class="number">0</span>:<span class="number">0</span>:<span class="number">0</span>:<span class="number">8080</span></div><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">53</span>:<span class="number">00.804</span>  INFO <span class="number">52702</span> --- [pool-<span class="number">1</span>-thread-<span class="number">1</span>] cn.didadu.chatcommon.bean.User           : 登录中: User(uid=bboyjing, devId=<span class="number">1111</span>, token=<span class="number">123</span>, nickName=<span class="keyword">null</span>, platform=<span class="keyword">null</span>, intPlatFrom=<span class="number">5</span>, sessionId=<span class="keyword">null</span>)</div><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">53</span>:<span class="number">00.806</span>  INFO <span class="number">52702</span> --- [pool-<span class="number">1</span>-thread-<span class="number">1</span>] c.d.chatserver.server.ServerSession      :  ServerSession 绑定会话 /<span class="number">127.0</span>.0.1:<span class="number">55130</span></div><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">53</span>:<span class="number">00.806</span>  INFO <span class="number">52702</span> --- [pool-<span class="number">1</span>-thread-<span class="number">1</span>] cn.didadu.chatserver.server.SessionMap   : 用户登录:id= bboyjing   在线总数: <span class="number">1</span></div><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">53</span>:<span class="number">00.823</span>  INFO <span class="number">52702</span> --- [pool-<span class="number">1</span>-thread-<span class="number">1</span>] c.d.c.handler.LoginRequestHandler        : 登录成功:User(uid=bboyjing, devId=<span class="number">1111</span>, token=<span class="number">123</span>, nickName=<span class="keyword">null</span>, platform=<span class="keyword">null</span>, intPlatFrom=<span class="number">5</span>, sessionId=<span class="number">50</span>eb2bbb34f54b0f96e3147bd88058ed)</div><div class="line"><span class="number">2021</span>-<span class="number">03</span>-<span class="number">22</span> <span class="number">11</span>:<span class="number">54</span>:<span class="number">40.845</span>  INFO <span class="number">52702</span> --- [pool-<span class="number">2</span>-thread-<span class="number">1</span>] c.d.c.handler.HeartBeatServerHandler     : 收到 HEART_BEAT 消息 from client</div><div class="line">......</div></pre></td></tr></table></figure>
+<p>从log可以看出，到目前为止完成了简单的登录功能，下一章节来补充聊天功能。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Netty/" rel="tag"># Netty</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/03/20/CrazyIM学习笔记三【服务端登录流程】/" rel="next" title="CrazyIM学习笔记三【服务端登录流程】">
+                <i class="fa fa-chevron-left"></i> CrazyIM学习笔记三【服务端登录流程】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/03/23/CrazyIM学习笔记五【点对点单聊】/" rel="prev" title="CrazyIM学习笔记五【点对点单聊】">
+                CrazyIM学习笔记五【点对点单聊】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://qiniu.didadu.cn/zhangjing.jpg"
+               alt="bboyjing" />
+          <p class="site-author-name" itemprop="name">bboyjing</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">147</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              友情链接
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://bailaohe.github.io/" title="bailaohe" target="_blank">bailaohe</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#ClientCommand模块"><span class="nav-number">1.</span> <span class="nav-text">ClientCommand模块</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ClientCommandMenu"><span class="nav-number">1.1.</span> <span class="nav-text">ClientCommandMenu</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LoginConsoleCommand"><span class="nav-number">1.2.</span> <span class="nav-text">LoginConsoleCommand</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ProtoBufBuilder模块"><span class="nav-number">2.</span> <span class="nav-text">ProtoBufBuilder模块</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#BaseBuilder"><span class="nav-number">2.1.</span> <span class="nav-text">BaseBuilder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LoginMsgBuilder"><span class="nav-number">2.2.</span> <span class="nav-text">LoginMsgBuilder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HeartBeatMsgBuilder"><span class="nav-number">2.3.</span> <span class="nav-text">HeartBeatMsgBuilder</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sender模块"><span class="nav-number">3.</span> <span class="nav-text">Sender模块</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#BaseSender"><span class="nav-number">3.1.</span> <span class="nav-text">BaseSender</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LoginSender"><span class="nav-number">3.2.</span> <span class="nav-text">LoginSender</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Handler模块"><span class="nav-number">4.</span> <span class="nav-text">Handler模块</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#HeartBeatClientHandler"><span class="nav-number">4.1.</span> <span class="nav-text">HeartBeatClientHandler</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LoginResponceHandler"><span class="nav-number">4.2.</span> <span class="nav-text">LoginResponceHandler</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ExceptionHandler"><span class="nav-number">4.3.</span> <span class="nav-text">ExceptionHandler</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Concurrent模块"><span class="nav-number">5.</span> <span class="nav-text">Concurrent模块</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ExecuteTask"><span class="nav-number">5.1.</span> <span class="nav-text">ExecuteTask</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#FutureTaskScheduler"><span class="nav-number">5.2.</span> <span class="nav-text">FutureTaskScheduler</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#组装各个模块"><span class="nav-number">6.</span> <span class="nav-text">组装各个模块</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#NettyClient"><span class="nav-number">6.1.</span> <span class="nav-text">NettyClient</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CommandController"><span class="nav-number">6.2.</span> <span class="nav-text">CommandController</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ClientApplication"><span class="nav-number">6.3.</span> <span class="nav-text">ClientApplication</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调试"><span class="nav-number">7.</span> <span class="nav-text">调试</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bboyjing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

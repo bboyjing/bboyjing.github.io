@@ -266,7 +266,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/11/自己动手写JVM八【解析class文件（六）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/23/自己动手写JVM十二【运行时数据区（二）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -291,8 +291,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/11/自己动手写JVM八【解析class文件（六）】/" itemprop="url">
-                  自己动手写JVM八【解析class文件（六）】
+                <a class="post-title-link" href="/2017/01/23/自己动手写JVM十二【运行时数据区（二）】/" itemprop="url">
+                  自己动手写JVM十二【运行时数据区（二）】
                 </a>
               
             
@@ -306,8 +306,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-11T16:34:31+08:00">
-                2017-01-11
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-23T11:47:29+08:00">
+                2017-01-23
               </time>
             
 
@@ -361,12 +361,11 @@
 
       
         
-          <p>本章节继续学习常量池相关信息</p>
-<h3 id="常量池"><a href="#常量池" class="headerlink" title="常量池"></a>常量池</h3><p>接上一章节</p>
-<h4 id="CONSTANT-Fieldref-info"><a href="#CONSTANT-Fieldref-info" class="headerlink" title="CONSTANT_Fieldref_info"></a>CONSTANT_Fieldref_info</h4><p>CONSTANT_Fieldref_info表示字段符号引用，其结构体如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">CONSTANT_Fieldref_info &#123;</div><div class="line">    u1 tag;</div><div class="line">    u2 class_index;</div><div class="line">    u2 name_and_type_index;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+          <p>本章我们来重点分析下局部变量表和操作数栈，并测试本章代码。</p>
+<h3 id="局部变量表和操作数栈实例详解"><a href="#局部变量表和操作数栈实例详解" class="headerlink" title="局部变量表和操作数栈实例详解"></a>局部变量表和操作数栈实例详解</h3><p>下面以圆形的周长为例进行分析，首先简单的Java代码如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Math</span> </span>&#123;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">        System.out.println(circumference(<span class="number">1.6f</span>));</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">float</span> <span class="title">circumference</span><span class="params">(<span class="keyword">float</span> r)</span> </span>&#123;</div><div class="line">        <span class="keyword">float</span> pi = <span class="number">3.14f</span>;</div><div class="line">        <span class="keyword">float</span> c = <span class="number">2</span> * pi * r;</div><div class="line">        <span class="keyword">return</span> c;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/11/自己动手写JVM八【解析class文件（六）】/#more" rel="contents">
+            <a class="btn" href="/2017/01/23/自己动手写JVM十二【运行时数据区（二）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -407,7 +406,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/10/自己动手写JVM七【解析class文件（五）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/22/自己动手写JVM十一【运行时数据区（一）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -432,8 +431,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/10/自己动手写JVM七【解析class文件（五）】/" itemprop="url">
-                  自己动手写JVM七【解析class文件（五）】
+                <a class="post-title-link" href="/2017/01/22/自己动手写JVM十一【运行时数据区（一）】/" itemprop="url">
+                  自己动手写JVM十一【运行时数据区（一）】
                 </a>
               
             
@@ -447,8 +446,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-10T17:48:37+08:00">
-                2017-01-10
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-22T15:45:36+08:00">
+                2017-01-22
               </time>
             
 
@@ -502,12 +501,11 @@
 
       
         
-          <p>本章节继续学习常量池相关信息</p>
-<h3 id="常量池"><a href="#常量池" class="headerlink" title="常量池"></a>常量池</h3><p>接上一章节</p>
-<h4 id="CONSTANT-String-info"><a href="#CONSTANT-String-info" class="headerlink" title="CONSTANT_String_info"></a>CONSTANT_String_info</h4><p>CONSTANT_String_info常量表示java.lang.String字面量，结构如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">CONSTANT_String_info &#123;</div><div class="line">    u1 tag;</div><div class="line">    u2 string_index;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+          <p>到目前为止，已经实现了搜索、解析class文件，本章节就来讨论下如何初步实现运行时数据区。</p>
+<h3 id="运行时数据区概述"><a href="#运行时数据区概述" class="headerlink" title="运行时数据区概述"></a>运行时数据区概述</h3><p>在运行Java程序时，Java虚拟机需要使用内存在存放各式各样的数据。Java虚拟机规范把这些内存区域叫作运行时数据区。运行时数据区可以分成两类：一类是多线程共享的，另一类则是线程私有的。多线程共享的运行时数据去需要在Java虚拟机启动时创建浩，在Java虚拟机退出时销毁。线程私有的运行时数据区则是在线程创建时才创建，线程退出时销毁。<br>线程私有的运行时数据区用于辅助执行Java字节码。每个线程有自己的pc寄存器和Java虚拟机栈。Java虚拟机栈又由栈帧构成，栈帧中保存方法执行的状态，包括局部变量表和操作数栈等。本章节将开始学习如何初步实现线程私有的运行时数据区。<br>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/10/自己动手写JVM七【解析class文件（五）】/#more" rel="contents">
+            <a class="btn" href="/2017/01/22/自己动手写JVM十一【运行时数据区（一）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -548,7 +546,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/09/自己动手写JVM六【解析class文件（四）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/16/Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -573,8 +571,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/09/自己动手写JVM六【解析class文件（四）】/" itemprop="url">
-                  自己动手写JVM六【解析class文件（四）】
+                <a class="post-title-link" href="/2017/01/16/Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】/" itemprop="url">
+                  Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】
                 </a>
               
             
@@ -588,8 +586,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-09T23:24:00+08:00">
-                2017-01-09
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-16T17:07:25+08:00">
+                2017-01-16
               </time>
             
 
@@ -607,8 +605,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
 
@@ -643,12 +641,10 @@
 
       
         
-          <p>本章节继续学习ClassFile中各项所代表的含义。</p>
-<h3 id="常量池"><a href="#常量池" class="headerlink" title="常量池"></a>常量池</h3><p>常量池占据了class文件很大一部分数据，里面存储着各式各样的常量信息，包括数字和字符串常量、类和接口名，字段和方法等等，下面我们就来详细了解常量池和各种常量。</p>
-<h4 id="ConstantPool结构体"><a href="#ConstantPool结构体" class="headerlink" title="ConstantPool结构体"></a>ConstantPool结构体</h4><p>constant_pool.go文件中定义了ConstantPool类型，常量池实际上也是一个表，所以ConstantPool被定义成ConstantInfo的数组。所以，要理解常量池，得先去看ConstantInfo是什么，然后再回过来，此处未完待续，接着往下看。</p>
+          <p>Redis还特别适用于解决基于搜索的问题，这类问题通常需要使用集合以及有序集合的交集、并集、和差集操作查找符合指定要求的元素。本章就来学习下，如何使用Redis进行搜索。假设一个对文档搜索的场景，如何使用Redis更快地进行搜索。基于搜索的应用程序相关代码位于<a href="https://github.com/bboyjing/redis-sample" target="_blank" rel="external">项目</a>的search模块中。</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/09/自己动手写JVM六【解析class文件（四）】/#more" rel="contents">
+            <a class="btn" href="/2017/01/16/Redis学习笔记十七【基于搜索的应用程序-使用Redis进行搜索】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -689,7 +685,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/08/自己动手写JVM五【解析class文件（三）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/16/自己动手写JVM十【解析class文件（八）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -714,8 +710,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/08/自己动手写JVM五【解析class文件（三）】/" itemprop="url">
-                  自己动手写JVM五【解析class文件（三）】
+                <a class="post-title-link" href="/2017/01/16/自己动手写JVM十【解析class文件（八）】/" itemprop="url">
+                  自己动手写JVM十【解析class文件（八）】
                 </a>
               
             
@@ -729,8 +725,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-08T15:36:29+08:00">
-                2017-01-08
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-16T10:12:06+08:00">
+                2017-01-16
               </time>
             
 
@@ -784,11 +780,11 @@
 
       
         
-          <p>本章节继续学习ClassFile中各项所代表的含义。</p>
-<h3 id="接口索引表"><a href="#接口索引表" class="headerlink" title="接口索引表"></a>接口索引表</h3><p>类和超类索引后面时接口索引表，表中存放的也是常量池索引。ClassFile.class没有实现接口，所以接口表是空的：<br><img src="http://qiniu.didadu.cn/jvmgo_10.png" alt="jvmgo_10"><br>在class_file.go文件中添加读取接口索引表的方法：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">func</span> <span class="params">(self *ClassFile)</span> <span class="title">readInterface</span><span class="params">(reader *ClassReader)</span></span> &#123;</div><div class="line">	<span class="comment">//接口是u2类型的表结构，所以用的readUint16s方法读取</span></div><div class="line">	self.interfaces = reader.readUint16s()</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+          <p>本章节继续学习属性相关信息</p>
+<h3 id="解析属性表"><a href="#解析属性表" class="headerlink" title="解析属性表"></a>解析属性表</h3><h4 id="Code属性"><a href="#Code属性" class="headerlink" title="Code属性"></a>Code属性</h4><p>Code时变长属性，只存在于method_info结构中。Code属性中存放字节码等方法相关信息，其结构定义如下：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/08/自己动手写JVM五【解析class文件（三）】/#more" rel="contents">
+            <a class="btn" href="/2017/01/16/自己动手写JVM十【解析class文件（八）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -829,7 +825,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/05/自己动手写JVM四【解析class文件（二）】/">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/12/自己动手写JVM九【解析class文件（七）】/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="bboyjing">
@@ -854,8 +850,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/01/05/自己动手写JVM四【解析class文件（二）】/" itemprop="url">
-                  自己动手写JVM四【解析class文件（二）】
+                <a class="post-title-link" href="/2017/01/12/自己动手写JVM九【解析class文件（七）】/" itemprop="url">
+                  自己动手写JVM九【解析class文件（七）】
                 </a>
               
             
@@ -869,8 +865,8 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-05T14:44:52+08:00">
-                2017-01-05
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-12T14:01:29+08:00">
+                2017-01-12
               </time>
             
 
@@ -924,11 +920,11 @@
 
       
         
-          <p>本章节开始重点学习ClassFile中各项所代表的含义，这部分可能会比较枯燥，坚持学下去，会有收获的。</p>
-<h3 id="魔数-magic"><a href="#魔数-magic" class="headerlink" title="魔数(magic)"></a>魔数(magic)</h3><p>很多文件格式都会规定满足该格式的文件必须以某几个固定字节开头，这几个字节主要起标识作用，叫作魔数。class文件的魔数是”0xCAFEBABE”，可以参照classpy打开的ClassFile.class文件看下：<br><img src="http://qiniu.didadu.cn/jvmgo_4.png" alt="jvmgo_4"><br>所以，class文件以固定的4个字节(CAFEBABE)开头。在class_file.go文件中添加读取魔数的方法：</p>
+          <p>本章节开始学习属性表相关信息，上一节找到的main()方法的字节码就出现在属性表中，属性表可谓是个大杂烩，里面存储了各式各样的信息。下面我们就来详细讨论讨论。</p>
+<h3 id="解析属性表"><a href="#解析属性表" class="headerlink" title="解析属性表"></a>解析属性表</h3><h4 id="AttributeInfo接口"><a href="#AttributeInfo接口" class="headerlink" title="AttributeInfo接口"></a>AttributeInfo接口</h4><p>和常量池类似，各种属性表达的信息也各不相同，因此无法用同一的结构来定义。不同之处在于，常量是由Java虚拟机规范严格定义的，共有14种。但是属性是可以扩展的，不同的虚拟机实现可以定义自己的属性类型，所以Java虚拟机规范没有使用tag，而是使用属性名来区别不同的属性。属性的结构定义如下：</p>
           <!--noindex-->
           <div class="post-more-link text-center">
-            <a class="btn" href="/2017/01/05/自己动手写JVM四【解析class文件（二）】/#more" rel="contents">
+            <a class="btn" href="/2017/01/12/自己动手写JVM九【解析class文件（七）】/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -964,7 +960,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/18/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><span class="page-number current">19</span><a class="page-number" href="/page/20/">20</a><span class="space">&hellip;</span><a class="page-number" href="/page/29/">29</a><a class="extend next" rel="next" href="/page/20/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/18/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/18/">18</a><span class="page-number current">19</span><a class="page-number" href="/page/20/">20</a><span class="space">&hellip;</span><a class="page-number" href="/page/30/">30</a><a class="extend next" rel="next" href="/page/20/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1005,7 +1001,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">142</span>
+              <span class="site-state-item-count">147</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1013,7 +1009,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -1022,7 +1018,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1076,7 +1072,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
